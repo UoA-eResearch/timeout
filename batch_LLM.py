@@ -12,7 +12,13 @@ from transformers import Qwen3OmniMoeForConditionalGeneration, Qwen3OmniMoeProce
 from qwen_omni_utils import process_mm_info
 import torch
 
-files = glob("videos/*.json")
+files = []
+for f in glob("videos/*.json"):
+    output_filename = f.replace("videos/", "results/").replace(
+        ".info.json", ".result.json"
+    )
+    if not os.path.isfile(output_filename):
+        files.append(f)
 print(len(files))
 
 MODEL_PATH = "Qwen/Qwen3-Omni-30B-A3B-Instruct"
@@ -34,7 +40,7 @@ def get_prompt(data):
         It has {data.get('like_count', 'an unknown number of')} likes, {data.get('view_count', 'an unknown number of')} views, and {data.get('comment_count', 'an unknown number of')} comments.
         Taking into account this description, and the video, extract the following information, in JSON format:
         description: What is happening in the video? Provide a detailed description of the actions, context, and any notable elements present in the video.
-        transcript: If there is any spoken content in the video, transcribe it accurately. If there is no spoken content, indicate "No spoken content".
+        transcript: If there is any spoken content in the video, transcribe it accurately. If there is no spoken content, indicate "No spoken content". Do not repeat any sentances in the transcript.
         tone: What is the overall tone or mood of the video? Is it humorous, serious, educational, emotional, etc.?
         timeout: Is this video talking about timeout for children (as a parenting punishement strategy)? a boolean true or false
         language: What language is this video in?
@@ -80,7 +86,7 @@ for json_filename in tqdm(files):
                     "video": video_filename,
                     "max_pixels": 360 * 420,
                 },
-                {"type": "text", "text": get_prompt()},
+                {"type": "text", "text": get_prompt(data)},
             ],
         }
     ]
