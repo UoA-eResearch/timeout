@@ -5,7 +5,7 @@ import os
 pd.set_option("display.max_columns", None)
 pd.set_option("display.max_colwidth", 100)
 from pprint import pprint
-import json5 as json  # This is a more forgiving JSON parser that can handle comments, single quotes, and trailing commas
+import json as json  # This is a more forgiving JSON parser that can handle comments, single quotes, and trailing commas
 from glob import glob
 from tqdm import tqdm
 from transformers import Qwen3OmniMoeForConditionalGeneration, Qwen3OmniMoeProcessor
@@ -97,9 +97,12 @@ for json_filename in tqdm(files):
     text = processor.apply_chat_template(
         messages, add_generation_prompt=True, tokenize=False
     )
-    audios, images, videos = process_mm_info(
-        messages, use_audio_in_video=USE_AUDIO_IN_VIDEO
-    )
+    try:
+        audios, images, videos = process_mm_info(
+            messages, use_audio_in_video=USE_AUDIO_IN_VIDEO
+        )
+    except Exception as e:
+        continue
     inputs = processor(
         text=text,
         audio=audios,
