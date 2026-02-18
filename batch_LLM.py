@@ -14,6 +14,7 @@ import torch
 
 files = []
 folder = "supplements_videos"
+os.makedirs(folder.replace("videos", "results"), exist_ok=True)
 for f in glob(f"{folder}/*.json"):
     output_filename = f.replace("videos/", "results/").replace(
         ".info.json", ".result.json"
