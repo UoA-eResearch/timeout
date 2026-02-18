@@ -5,7 +5,7 @@ import os
 pd.set_option("display.max_columns", None)
 pd.set_option("display.max_colwidth", 100)
 from pprint import pprint
-import json as json  # This is a more forgiving JSON parser that can handle comments, single quotes, and trailing commas
+import json
 from glob import glob
 from tqdm import tqdm
 from transformers import Qwen3OmniMoeForConditionalGeneration, Qwen3OmniMoeProcessor
@@ -13,7 +13,8 @@ from qwen_omni_utils import process_mm_info
 import torch
 
 files = []
-for f in glob("videos/*.json"):
+folder = "supplements_videos"
+for f in glob(f"{folder}/*.json"):
     output_filename = f.replace("videos/", "results/").replace(
         ".info.json", ".result.json"
     )
@@ -42,25 +43,20 @@ def get_prompt(data):
         description: What is happening in the video? Provide a detailed description of the actions, context, and any notable elements present in the video.
         transcript: If there is any spoken content in the video, transcribe it accurately. If there is no spoken content, indicate "No spoken content". Do not repeat any sentences in the transcript. If the spoken language isn't English, translate it to English.
         tone: What is the overall tone or mood of the video? Is it humorous, serious, educational, emotional, etc.?
-        timeout: Is this video talking about timeout for children (as a parenting punishement strategy)? a boolean true or false
+        supplements: Does the video mention any supplements, vitamins, or medications? If so, list them. If not, indicate "No supplements mentioned".
+        active_ingredients: If any supplements are mentioned, list the active ingredients in those supplements. If no supplements are mentioned, indicate "No active ingredients mentioned".
+        symptoms: Does the video mention any specific symptoms, conditions, or health issues? If so, list them. If not, indicate "No symptoms mentioned".
+        menopause: Is the video specifically targeting the supplement towards menopause-related symptoms or conditions? Answer True or False.
         language: What language is this video in?
         marketing: Is this video promoting or advertising any product, service, brand, or organization? If so, what is it? Otherwise, indicate "No marketing content".
-        ASD: Is this video specifically targeted towards individuals with Autism Spectrum Disorder (ASD) or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
-        ADHD: Is this video specifically targeted towards individuals with Attention Deficit Hyperactivity Disorder (ADHD) or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
-        anxiety: Is this video specifically targeted towards individuals dealing with anxiety or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
         job: For the main speaker, what is their job or profession? If it is not mentioned in the video, indicate "No job information". A comma separated string, one or more of the following: therapist, psychologist, pediatrician, doctor, nurse, teacher, professor, social worker, counselor, coach, influencer, content creator?
-        sentiment: Does this video recommend timeout, discourage it, or is it neutral? One of negative, neutral or positive
-        criticism: If the video is critical of timeout, what are the main criticisms mentioned? A comma separated string, one or more of the following:
-            Concerns about physical safety – child
-            Concerns about emotional or social development or wellbeing - child
-            Concerns about relational quality – parent-child
-            Concerns about practicality or usability
-            Concerns about litigation
-        alternative_strategies: Does the video mention any alternative strategies to timeout? If so, what are they? A comma separated string. If no alternatives are mentioned, indicate "No alternative strategies mentioned".
+        sentiment: Does this video recommend a particular supplement, discourage it, or is it neutral? One of negative, neutral or positive
+        criticism: If the video is critical of a particular supplement, what are the main criticisms mentioned? 
+        alternative_strategies: Does the video mention any alternative strategies to supplements? If so, what are they? A comma separated string. If no alternatives are mentioned, indicate "No alternative strategies mentioned".
         usefulness: Rate the overall usefulness of the video on a scale from 1 to 10, where 1 is not useful at all and 10 is extremely useful.
         misleading: Rate the extent to which the video contains misleading or inaccurate information on a scale from 1 to 10, where 1 is not misleading at all and 10 is extremely misleading.
         quality: Rate the overall quality of the video on a scale from 1 to 10, where 1 is very poor quality and 10 is excellent quality.
-        personal_experience: Does the speaker mention any personal experience with timeout? If so, briefly summarize it.
+        personal_experience: Does the speaker mention any personal experience with supplements? If so, briefly summarize it.
 
         Do not include comments in your JSON response. Only respond with the JSON object. Make sure the JSON is valid
     """
