@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/UoA-eResearch/timeout)
+
 ### Installation
 
 `uv pip install -r requirements.txt`  
