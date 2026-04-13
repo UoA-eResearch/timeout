@@ -30,7 +30,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y tor ca-certificates curl gnupg
+          sudo apt-get install -y tor ca-certificates curl gnupg xvfb
           # Remove existing Chrome to avoid version conflicts
           sudo apt-get remove -y google-chrome-stable || true
           # Install Google Chrome via Google's signed apt repository
@@ -62,14 +62,14 @@ jobs:
         id: scrape_normal
         continue-on-error: true
         run: |
-          python3 run_googlesearch.py
+          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python3 run_googlesearch.py
 
       - name: Run Google search scraper with Tor (if first attempt failed)
         id: scrape_tor
         if: steps.scrape_normal.outcome == 'failure'
         run: |
           echo "First attempt failed, trying with Tor proxy..."
-          python3 run_googlesearch.py --use-tor
+          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python3 run_googlesearch.py --use-tor
 
       - name: Check for changes
         id: check_changes
@@ -99,4 +99,5 @@ jobs:
           path: |
             supplements.csv
             supplements_links.txt
+            error-screenshot-*.png
           retention-days: 30
