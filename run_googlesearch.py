@@ -13,8 +13,20 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 import pandas as pd
+from datetime import datetime
 
 pd.set_option("display.max_colwidth", None)
+
+
+def save_error_screenshot(driver, error_name):
+    """Save a screenshot when an error occurs"""
+    try:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"error-screenshot-{error_name}-{timestamp}.png"
+        driver.save_screenshot(filename)
+        print(f"Screenshot saved: {filename}")
+    except Exception as e:
+        print(f"Failed to save screenshot: {e}")
 
 
 def search_and_scrape(driver, query, max_scrolls=10):
@@ -39,6 +51,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
         time.sleep(2)
     except Exception as e:
         print(f"Could not click 'Short videos': {e}")
+        save_error_screenshot(driver, "short_videos_not_found")
         return pd.DataFrame()
 
     # Scroll to load more results
@@ -108,6 +121,8 @@ def main():
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
     options.add_argument('--window-size=1920,1080')
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    options.add_argument('--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
     # Add Tor proxy configuration if requested
     if args.use_tor:
@@ -129,6 +144,7 @@ def main():
         if df1.empty:
             print("\nNo results found. Might be IP blocked or rate limited.")
             print("Try running with: torsocks python3 run_googlesearch.py")
+            save_error_screenshot(driver, "no_results_first_search")
             driver.quit()
             sys.exit(1)
 
@@ -175,6 +191,7 @@ def main():
         print(f"\nError during execution: {e}")
         import traceback
         traceback.print_exc()
+        save_error_screenshot(driver, "general_error")
         sys.exit(1)
 
     finally:
