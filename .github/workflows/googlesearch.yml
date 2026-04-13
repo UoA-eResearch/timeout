@@ -27,10 +27,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y tor torsocks
+          # Remove existing Chrome to avoid version conflicts
+          sudo apt-get remove -y google-chrome-stable || true
           # Install Google Chrome (not snap-based chromium-browser which fails in GHA)
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
           rm google-chrome-stable_current_amd64.deb
+          # Verify Chrome version
+          google-chrome --version
 
       - name: Install Python dependencies
         run: |
