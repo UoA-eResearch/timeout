@@ -7,6 +7,7 @@ This script replicates the googlesearch.ipynb notebook logic.
 from tqdm.auto import tqdm
 import os
 import sys
+import argparse
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -92,8 +93,15 @@ def search_and_scrape(driver, query, max_scrolls=10):
 
 def main():
     """Main execution function"""
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Google Search Scraper for Menopause Supplements/Vitamins')
+    parser.add_argument('--use-tor', action='store_true', help='Use Tor SOCKS proxy for scraping')
+    args = parser.parse_args()
+
     print("=" * 80)
     print("Google Search Scraper for Menopause Supplements/Vitamins")
+    if args.use_tor:
+        print("Using Tor SOCKS proxy (localhost:9050)")
     print("=" * 80)
 
     # Configure Chrome options for headless mode
@@ -103,6 +111,10 @@ def main():
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
     options.add_argument('--window-size=1920,1080')
+
+    # Add Tor proxy configuration if requested
+    if args.use_tor:
+        options.add_argument('--proxy-server=socks5://localhost:9050')
 
     print("\nStarting Chrome driver...")
     try:

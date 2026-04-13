@@ -59,8 +59,8 @@ jobs:
         id: scrape_tor
         if: steps.scrape_normal.outcome == 'failure'
         run: |
-          echo "First attempt failed, trying with torsocks..."
-          torsocks python3 run_googlesearch.py
+          echo "First attempt failed, trying with Tor proxy..."
+          python3 run_googlesearch.py --use-tor
 
       - name: Check for changes
         id: check_changes
