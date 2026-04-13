@@ -1,0 +1,93 @@
+name: Google Search Scraper
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Allow pushing changes back to repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            tor \
+            torsocks \
+            chromium-browser \
+            chromium-chromedriver
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pandas tqdm selenium undetected-chromedriver matplotlib-venn
+
+      - name: Configure Tor
+        run: |
+          # Start Tor service
+          sudo systemctl start tor
+          sudo systemctl status tor --no-pager
+
+          # Wait for Tor to be ready
+          sleep 10
+
+          # Verify Tor is working
+          curl --socks5-hostname localhost:9050 https://check.torproject.org/ | grep -q "Congratulations" || echo "Tor may not be working properly"
+
+      - name: Run Google search scraper (first attempt without Tor)
+        id: scrape_normal
+        continue-on-error: true
+        run: |
+          python3 run_googlesearch.py
+
+      - name: Run Google search scraper with Tor (if first attempt failed)
+        id: scrape_tor
+        if: steps.scrape_normal.outcome == 'failure'
+        run: |
+          echo "First attempt failed, trying with torsocks..."
+          torsocks python3 run_googlesearch.py
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet supplements.csv supplements_links.txt 2>/dev/null; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+          fi
+
+      - name: Commit and push results
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add supplements.csv supplements_links.txt
+          git commit -m "Update Google search results [skip ci]"
+          git push
+
+      - name: Upload results as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: search-results
+          path: |
+            supplements.csv
+            supplements_links.txt
+          retention-days: 30
