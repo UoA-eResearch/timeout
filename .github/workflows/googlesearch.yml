@@ -6,6 +6,10 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:  # Allow manual trigger
 
+concurrency:
+  group: google-search-scraper-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
@@ -39,7 +43,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install pandas tqdm selenium undetected-chromedriver matplotlib-venn
+          pip install -r requirements-googlesearch.txt
 
       - name: Configure Tor
         run: |
