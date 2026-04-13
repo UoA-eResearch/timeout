@@ -30,13 +30,14 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y tor torsocks
+          sudo apt-get install -y tor ca-certificates curl gnupg
           # Remove existing Chrome to avoid version conflicts
           sudo apt-get remove -y google-chrome-stable || true
-          # Install Google Chrome (not snap-based chromium-browser which fails in GHA)
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
-          rm google-chrome-stable_current_amd64.deb
+          # Install Google Chrome via Google's signed apt repository
+          curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
           # Verify Chrome version
           google-chrome --version
 
