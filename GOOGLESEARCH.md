@@ -55,12 +55,11 @@ torsocks python3 run_googlesearch.py
 
 ## Requirements
 
-Python packages (see `requirements.txt`):
+Python packages (see `requirements-googlesearch.txt`):
 - pandas
 - tqdm
 - selenium
 - undetected-chromedriver
-- matplotlib-venn
 
 System packages (for Tor support):
 - tor

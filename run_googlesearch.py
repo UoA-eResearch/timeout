@@ -10,12 +10,9 @@ import sys
 import argparse
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 import pandas as pd
-from matplotlib_venn import venn2
-import matplotlib.pyplot as plt
 
 pd.set_option("display.max_colwidth", None)
 
@@ -118,7 +115,7 @@ def main():
 
     print("\nStarting Chrome driver...")
     try:
-        driver = uc.Chrome(options=options, headless=True)
+        driver = uc.Chrome(options=options, headless=True, use_subprocess=False)
         driver.implicitly_wait(10)
         driver.set_page_load_timeout(15)
     except Exception as e:
@@ -151,9 +148,9 @@ def main():
         print(f"Combined unique results: {len(df)} rows")
 
         # Load old data if exists
-        if os.path.exists("googlesearch.csv"):
+        if os.path.exists("supplements.csv"):
             print("\nLoading previous results...")
-            old_df = pd.read_csv("googlesearch.csv")
+            old_df = pd.read_csv("supplements.csv")
             print(f"Previous results: {len(old_df)} rows")
 
             # Show new results
