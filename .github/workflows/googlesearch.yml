@@ -26,11 +26,11 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            tor \
-            torsocks \
-            chromium-browser \
-            chromium-chromedriver
+          sudo apt-get install -y tor torsocks
+          # Install Google Chrome (not snap-based chromium-browser which fails in GHA)
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
+          rm google-chrome-stable_current_amd64.deb
 
       - name: Install Python dependencies
         run: |

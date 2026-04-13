@@ -118,7 +118,7 @@ def main():
 
     print("\nStarting Chrome driver...")
     try:
-        driver = uc.Chrome(options=options, headless=True, use_subprocess=False)
+        driver = uc.Chrome(options=options, headless=True)
         driver.implicitly_wait(10)
         driver.set_page_load_timeout(15)
     except Exception as e:
