@@ -31,14 +31,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ca-certificates curl gnupg xvfb
-          # Remove existing Chrome to avoid version conflicts
-          sudo apt-get remove -y google-chrome-stable || true
-          # Install Google Chrome via Google's signed apt repository
-          curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          # Verify Chrome version
           google-chrome --version
 
       - name: Install Python dependencies
@@ -90,6 +82,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          git pull
           git add supplements.csv supplements_links.txt
           git commit -m "Update Google search results [skip ci]"
           git push
