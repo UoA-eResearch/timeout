@@ -14,6 +14,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 import pandas as pd
 from datetime import datetime
+import shutil
+import subprocess
+import re
 
 pd.set_option("display.max_colwidth", None)
 
@@ -129,8 +132,32 @@ def main():
         options.add_argument('--proxy-server=socks5://localhost:9050')
 
     print("\nStarting Chrome driver...")
+
+    # Detect Chrome version
+    chrome_version = None
+    chrome_path = shutil.which("google-chrome") or shutil.which("chrome")
+    if chrome_path:
+        try:
+            version_output = subprocess.check_output(
+                [chrome_path, "--version"],
+                stderr=subprocess.DEVNULL,
+                text=True,
+            ).strip()
+            # Parse version like "Google Chrome 146.0.7680.0" -> 146
+            match = re.search(r"(\d+)\.", version_output)
+            if match:
+                chrome_version = int(match.group(1))
+                print(f"Detected Chrome version: {chrome_version}")
+        except Exception as e:
+            print(f"Could not detect Chrome version: {e}")
+
     try:
-        driver = uc.Chrome()
+        # Pass version_main to ensure ChromeDriver matches installed Chrome
+        if chrome_version:
+            driver = uc.Chrome(options=options, version_main=chrome_version, use_subprocess=False)
+        else:
+            # Fallback to auto-detection if version detection failed
+            driver = uc.Chrome(options=options, use_subprocess=False)
         driver.implicitly_wait(10)
         driver.set_page_load_timeout(15)
     except Exception as e:
