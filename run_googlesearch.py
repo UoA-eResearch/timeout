@@ -69,7 +69,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
             print(f"Results: {results_count}")
             time.sleep(1.5)
         except Exception as e:
-            print(f"No more results: {e}")
+            print(f"No more results")
             break
 
     # Get all results
@@ -84,7 +84,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
             bits = result.text.split("\n")
             duration = bits[0]
             title = bits[1]
-            bits = bits[2].split()
+            bits = bits[2].split(" · ")
             source = bits[0]
             author = bits[-1]
             parsed_results.append({
@@ -116,7 +116,7 @@ def main():
 
     # Configure Chrome options for headless mode
     options = uc.ChromeOptions()
-    options.add_argument('--headless=new')
+    #options.add_argument('--headless=new')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
@@ -130,7 +130,7 @@ def main():
 
     print("\nStarting Chrome driver...")
     try:
-        driver = uc.Chrome(options=options, headless=True, use_subprocess=False)
+        driver = uc.Chrome()
         driver.implicitly_wait(10)
         driver.set_page_load_timeout(15)
     except Exception as e:
@@ -160,7 +160,7 @@ def main():
 
         # Combine results
         print("\nCombining results...")
-        df = pd.concat([df1, df2]).drop_duplicates()
+        df = pd.concat([df1, df2]).drop_duplicates(subset="link", keep="last")
         print(f"Combined unique results: {len(df)} rows")
 
         # Load old data if exists
@@ -174,13 +174,14 @@ def main():
             print(f"New results: {len(new_results)} rows")
 
             # Combine with old data
-            df = pd.concat([df, old_df]).drop_duplicates()
+            df = pd.concat([df, old_df]).drop_duplicates(subset="link", keep="last")
             print(f"Total unique results: {len(df)} rows")
 
         # Save results
         print("\nSaving results...")
+        df.sort_values(by="link", inplace=True)
         df.to_csv("supplements.csv", index=False)
-        df.link.to_csv("supplements_links.txt", index=False, header=False)
+        df.link.drop_duplicates().to_csv("supplements_links.txt", index=False, header=False)
         print("Saved to: supplements.csv and supplements_links.txt")
 
         print("\n" + "=" * 80)
