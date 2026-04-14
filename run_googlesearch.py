@@ -180,6 +180,7 @@ def main():
         # Save results
         print("\nSaving results...")
         df.sort_values(by="link", inplace=True)
+        df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
         df.to_csv("supplements.csv", index=False)
         df.link.drop_duplicates().to_csv("supplements_links.txt", index=False, header=False)
         print("Saved to: supplements.csv and supplements_links.txt")
