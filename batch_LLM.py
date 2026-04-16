@@ -12,6 +12,8 @@ from transformers import Qwen3OmniMoeForConditionalGeneration, Qwen3OmniMoeProce
 from qwen_omni_utils import process_mm_info
 import torch
 
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 files = []
 folder = "supplements_videos"
 os.makedirs(folder.replace("videos", "results"), exist_ok=True)
