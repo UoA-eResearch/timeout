@@ -69,7 +69,7 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet supplements.csv supplements_links.txt 2>/dev/null; then
+          if git diff --quiet supplements.csv supplements_links.txt timeout.csv timeout_links.txt 2>/dev/null; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected"
           else
@@ -83,7 +83,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git pull
-          git add supplements.csv supplements_links.txt
+          git add supplements.csv supplements_links.txt timeout.csv timeout_links.txt
           git commit -m "Update Google search results [skip ci]"
           git push
 
@@ -95,5 +95,7 @@ jobs:
           path: |
             supplements.csv
             supplements_links.txt
+            timeout.csv
+            timeout_links.txt
             error-screenshot-*.png
           retention-days: 30

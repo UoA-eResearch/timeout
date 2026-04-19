@@ -107,12 +107,12 @@ def search_and_scrape(driver, query, max_scrolls=10):
 def main():
     """Main execution function"""
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Google Search Scraper for Menopause Supplements/Vitamins')
+    parser = argparse.ArgumentParser(description='Google Search Scraper for Menopause Supplements/Vitamins and Parenting Timeout')
     parser.add_argument('--use-tor', action='store_true', help='Use Tor SOCKS proxy for scraping')
     args = parser.parse_args()
 
     print("=" * 80)
-    print("Google Search Scraper for Menopause Supplements/Vitamins")
+    print("Google Search Scraper for Menopause Supplements/Vitamins and Parenting Timeout")
     if args.use_tor:
         print("Using Tor SOCKS proxy (localhost:9050)")
     print("=" * 80)
@@ -211,6 +211,58 @@ def main():
         df.to_csv("supplements.csv", index=False)
         df.link.drop_duplicates().to_csv("supplements_links.txt", index=False, header=False)
         print("Saved to: supplements.csv and supplements_links.txt")
+
+        # Now collect timeout data
+        print("\n" + "=" * 80)
+        print("Starting timeout collection...")
+        print("=" * 80)
+
+        # Search for #parenting #timeout
+        df_timeout1 = search_and_scrape(driver, "#parenting #timeout")
+
+        if df_timeout1.empty:
+            print("\nNo results found for #parenting #timeout. Might be IP blocked or rate limited.")
+            save_error_screenshot(driver, "no_results_timeout_first_search")
+        else:
+            print(f"\nResults from '#parenting #timeout': {len(df_timeout1)} rows")
+            print(df_timeout1.source.value_counts())
+
+        # Search for #gentleparenting #timeout
+        df_timeout2 = search_and_scrape(driver, "#gentleparenting #timeout")
+
+        if df_timeout2.empty:
+            print("\nNo results found for #gentleparenting #timeout.")
+        else:
+            print(f"\nResults from '#gentleparenting #timeout': {len(df_timeout2)} rows")
+            print(df_timeout2.source.value_counts())
+
+        # Combine timeout results
+        if not df_timeout1.empty or not df_timeout2.empty:
+            print("\nCombining timeout results...")
+            df_timeout = pd.concat([df_timeout1, df_timeout2]).drop_duplicates(subset="link", keep="last")
+            print(f"Combined unique timeout results: {len(df_timeout)} rows")
+
+            # Load old timeout data if exists
+            if os.path.exists("timeout.csv"):
+                print("\nLoading previous timeout results...")
+                old_df_timeout = pd.read_csv("timeout.csv")
+                print(f"Previous timeout results: {len(old_df_timeout)} rows")
+
+                # Show new timeout results
+                new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
+                print(f"New timeout results: {len(new_timeout_results)} rows")
+
+                # Combine with old data
+                df_timeout = pd.concat([df_timeout, old_df_timeout]).drop_duplicates(subset="link", keep="last")
+                print(f"Total unique timeout results: {len(df_timeout)} rows")
+
+            # Save timeout results
+            print("\nSaving timeout results...")
+            df_timeout.sort_values(by="link", inplace=True)
+            df_timeout = df_timeout[df_timeout.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
+            df_timeout.to_csv("timeout.csv", index=False)
+            df_timeout.link.drop_duplicates().to_csv("timeout_links.txt", index=False, header=False)
+            print("Saved to: timeout.csv and timeout_links.txt")
 
         print("\n" + "=" * 80)
         print("SUCCESS!")
