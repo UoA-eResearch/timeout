@@ -11,11 +11,18 @@ from tqdm import tqdm
 from transformers import Qwen3OmniMoeForConditionalGeneration, Qwen3OmniMoeProcessor
 from qwen_omni_utils import process_mm_info
 import torch
+import argparse
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='Process videos with LLM')
+parser.add_argument('--dataset', type=str, choices=['timeout', 'supplements'],
+                    required=True, help='Dataset to process (timeout or supplements)')
+args = parser.parse_args()
+
 files = []
-folder = "supplements_videos"
+folder = f"{args.dataset}_videos"
 os.makedirs(folder.replace("videos", "results"), exist_ok=True)
 for f in glob(f"{folder}/*.json"):
     output_filename = f.replace("videos/", "results/").replace(
@@ -37,7 +44,7 @@ model.disable_talker()
 processor = Qwen3OmniMoeProcessor.from_pretrained(MODEL_PATH)
 
 
-def get_prompt(data):
+def get_prompt_supplements(data):
     return f"""This is a video downloaded from {data['extractor']}. Here's the description of the video: {data['description']}.
 
         The creator of the video is {data.get('channel', 'an unknown channel')} ({data.get('uploader', 'an unknown uploader')})
@@ -54,7 +61,7 @@ def get_prompt(data):
         marketing: Is this video promoting or advertising any product, service, brand, or organization? If so, what is it? Otherwise, indicate "No marketing content".
         job: For the main speaker, what is their job or profession? If it is not mentioned in the video, indicate "No job information". A comma separated string, one or more of the following: therapist, psychologist, pediatrician, doctor, nurse, teacher, professor, social worker, counselor, coach, influencer, content creator?
         sentiment: Does this video recommend a particular supplement, discourage it, or is it neutral? One of negative, neutral or positive
-        criticism: If the video is critical of a particular supplement, what are the main criticisms mentioned? 
+        criticism: If the video is critical of a particular supplement, what are the main criticisms mentioned?
         alternative_strategies: Does the video mention any alternative strategies to supplements? If so, what are they? A comma separated string. If no alternatives are mentioned, indicate "No alternative strategies mentioned".
         usefulness: Rate the overall usefulness of the video on a scale from 1 to 10, where 1 is not useful at all and 10 is extremely useful.
         misleading: Rate the extent to which the video contains misleading or inaccurate information on a scale from 1 to 10, where 1 is not misleading at all and 10 is extremely misleading.
@@ -63,6 +70,48 @@ def get_prompt(data):
 
         Do not include comments in your JSON response. Only respond with the JSON object. Make sure the JSON is valid
     """
+
+
+def get_prompt_timeout(data):
+    return f"""This is a video downloaded from {data['extractor']}. Here's the description of the video: {data['description']}.
+
+        The creator of the video is {data.get('channel', 'an unknown channel')} ({data.get('uploader', 'an unknown uploader')})
+        It has {data.get('like_count', 'an unknown number of')} likes, {data.get('view_count', 'an unknown number of')} views, and {data.get('comment_count', 'an unknown number of')} comments.
+        Taking into account this description, and the video, extract the following information, in JSON format:
+        description: What is happening in the video? Provide a detailed description of the actions, context, and any notable elements present in the video.
+        transcript: If there is any spoken content in the video, transcribe it accurately. If there is no spoken content, indicate "No spoken content". Do not repeat any sentences in the transcript. If the spoken language isn't English, translate it to English.
+        tone: What is the overall tone or mood of the video? Is it humorous, serious, educational, emotional, etc.?
+        timeout: Is this video talking about timeout for children (as a parenting punishement strategy)? a boolean true or false
+        parenting_approach: What is the overall parenting approach shown in the video? (e.g., authoritative, permissive, gentle parenting, etc.)
+        child_age: What age range of children is this video targeting or discussing?
+        language: What language is this video in?
+        marketing: Is this video promoting or advertising any product, service, brand, or organization? If so, what is it? Otherwise, indicate "No marketing content".
+        ASD: Is this video specifically targeted towards individuals with Autism Spectrum Disorder (ASD) or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
+        ADHD: Is this video specifically targeted towards individuals with Attention Deficit Hyperactivity Disorder (ADHD) or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
+        anxiety: Is this video specifically targeted towards individuals dealing with anxiety or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
+        job: For the main speaker, what is their job or profession? If it is not mentioned in the video, indicate "No job information". A comma separated string, one or more of the following: therapist, psychologist, pediatrician, doctor, nurse, teacher, professor, social worker, counselor, coach, influencer, content creator?
+        sentiment: Does this video recommend timeout, discourage it, or is it neutral? One of negative, neutral or positive
+        criticism: If the video is critical of timeout, what are the main criticisms mentioned? A comma separated string, one or more of the following:
+            Concerns about physical safety – child
+            Concerns about emotional or social development or wellbeing - child
+            Concerns about relational quality – parent-child
+            Concerns about practicality or usability
+            Concerns about litigation
+        alternative_strategies: Does the video mention any alternative strategies to timeout? If so, what are they? A comma separated string. If no alternatives are mentioned, indicate "No alternative strategies mentioned".
+        usefulness: Rate the overall usefulness of the video on a scale from 1 to 10, where 1 is not useful at all and 10 is extremely useful.
+        misleading: Rate the extent to which the video contains misleading or inaccurate information on a scale from 1 to 10, where 1 is not misleading at all and 10 is extremely misleading.
+        quality: Rate the overall quality of the video on a scale from 1 to 10, where 1 is very poor quality and 10 is excellent quality.
+        personal_experience: Does the speaker mention any personal experience with timeout? If so, briefly summarize it.
+
+        Do not include comments in your JSON response. Only respond with the JSON object. Make sure the JSON is valid
+    """
+
+
+def get_prompt(data, dataset):
+    if dataset == 'timeout':
+        return get_prompt_timeout(data)
+    else:
+        return get_prompt_supplements(data)
 
 
 for json_filename in tqdm(files):
@@ -89,7 +138,7 @@ for json_filename in tqdm(files):
                     "video": video_filename,
                     "max_pixels": 360 * 420,
                 },
-                {"type": "text", "text": get_prompt(data)},
+                {"type": "text", "text": get_prompt(data, args.dataset)},
             ],
         }
     ]
