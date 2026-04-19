@@ -29,17 +29,19 @@ def update_readme_stats(supplements_df, timeout_df):
             content = f.read()
 
         # Prepare statistics
-        supplements_breakdown = supplements_df.source.value_counts().to_string().replace("source","").replace('\n', '\n  - ')
+        supplements_breakdown = supplements_df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n  - ')
         supplements_stats = f"""**Supplements dataset:**
 - Total videos: {len(supplements_df)}
 - Breakdown by source:
   - {supplements_breakdown}"""
+        print(supplements_stats)
 
-        timeout_breakdown = timeout_df.source.value_counts().to_string().replace("source","").replace('\n', '\n  - ')
+        timeout_breakdown = timeout_df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n  - ')
         timeout_stats = f"""**Timeout dataset:**
 - Total videos: {len(timeout_df)}
 - Breakdown by source:
   - {timeout_breakdown}"""
+        print(timeout_stats)
 
         stats_section = f"""## Dataset Statistics
 

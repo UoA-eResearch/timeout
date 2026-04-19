@@ -195,7 +195,6 @@ This downloads:
 **Supplements dataset:**
 - Total videos: 2269
 - Breakdown by source:
-  - 
   - Instagram    664
   - TikTok       622
   - Facebook     573
@@ -204,13 +203,12 @@ This downloads:
 **Timeout dataset:**
 - Total videos: 916
 - Breakdown by source:
-  - 
   - Instagram    373
   - TikTok       341
   - YouTube      102
   - Facebook     100
 
-*Last updated: 2026-04-19 22:45:37 UTC*
+*Last updated: 2026-04-19 23:05:44 UTC*
 
 
 ## Repository Structure
