@@ -21,6 +21,62 @@ import re
 pd.set_option("display.max_colwidth", None)
 
 
+def update_readme_stats(supplements_df, timeout_df):
+    """Update README.md with dataset statistics"""
+    try:
+        readme_path = "README.md"
+        with open(readme_path, 'r') as f:
+            content = f.read()
+
+        # Prepare statistics
+        supplements_stats = f"""**Supplements dataset:**
+- Total videos: {len(supplements_df)}
+- Breakdown by source:
+{supplements_df.source.value_counts().to_string().replace('\n', '\n  - ')}"""
+
+        timeout_stats = f"""**Timeout dataset:**
+- Total videos: {len(timeout_df)}
+- Breakdown by source:
+{timeout_df.source.value_counts().to_string().replace('\n', '\n  - ')}"""
+
+        stats_section = f"""## Dataset Statistics
+
+{supplements_stats}
+
+{timeout_stats}
+
+*Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}*
+
+"""
+
+        # Find where to insert or replace stats
+        # Look for existing Dataset Statistics section
+        import re
+        pattern = r'## Dataset Statistics\n.*?(?=\n## |\Z)'
+
+        if re.search(pattern, content, re.DOTALL):
+            # Replace existing section
+            content = re.sub(pattern, stats_section.rstrip() + '\n\n', content, flags=re.DOTALL)
+        else:
+            # Insert before Repository Structure section or at the end
+            if '## Repository Structure' in content:
+                content = content.replace('## Repository Structure', stats_section + '## Repository Structure')
+            else:
+                # Insert before License section
+                if '## License' in content:
+                    content = content.replace('## License', stats_section + '## License')
+                else:
+                    content += '\n' + stats_section
+
+        with open(readme_path, 'w') as f:
+            f.write(content)
+
+        print(f"\nUpdated README.md with dataset statistics")
+
+    except Exception as e:
+        print(f"Warning: Could not update README.md: {e}")
+
+
 def save_error_screenshot(driver, error_name):
     """Save a screenshot when an error occurs"""
     try:
@@ -265,6 +321,12 @@ def main():
             df_timeout.to_csv("data/timeout.csv", index=False)
             df_timeout.link.drop_duplicates().to_csv("data/timeout_links.txt", index=False, header=False)
             print("Saved to: data/timeout.csv and data/timeout_links.txt")
+
+        # Update README with dataset statistics
+        if os.path.exists("data/supplements.csv") and os.path.exists("data/timeout.csv"):
+            supplements_final = pd.read_csv("data/supplements.csv")
+            timeout_final = pd.read_csv("data/timeout.csv")
+            update_readme_stats(supplements_final, timeout_final)
 
         print("\n" + "=" * 80)
         print("SUCCESS!")
