@@ -9,8 +9,8 @@ This repository collects and analyzes short-form videos about parenting timeout 
 
 The project consists of two main components:
 
-1. **Google Search Scraper** (`run_googlesearch.py`) - Automatically scrapes Google search results for short videos
-2. **Video Analysis** (`batch_LLM.py`) - Processes videos using a large language model to extract structured information
+1. **Google Search Scraper** (`src/run_googlesearch.py`) - Automatically scrapes Google search results for short videos
+2. **Video Analysis** (`src/batch_LLM.py`) - Processes videos using a large language model to extract structured information
 
 ## Installation
 
@@ -39,7 +39,7 @@ System packages (for Tor support):
 
 ## Usage
 
-### 1. Google Search Scraper (`run_googlesearch.py`)
+### 1. Google Search Scraper (`src/run_googlesearch.py`)
 
 This script scrapes Google search results for short videos related to:
 - **Timeout dataset**: `#parenting #timeout` and `#gentleparenting #timeout`
@@ -49,13 +49,13 @@ This script scrapes Google search results for short videos related to:
 
 ```bash
 # Normal execution (scrapes both datasets)
-python3 run_googlesearch.py
+python3 src/run_googlesearch.py
 
 # With Tor (if IP blocked)
-torsocks python3 run_googlesearch.py
+torsocks python3 src/run_googlesearch.py
 
 # Or use the --use-tor flag
-python3 run_googlesearch.py --use-tor
+python3 src/run_googlesearch.py --use-tor
 ```
 
 #### How it works:
@@ -71,12 +71,12 @@ python3 run_googlesearch.py --use-tor
 #### Output files:
 
 **Timeout dataset:**
-- `timeout.csv` - Full results with columns: link, duration, title, source, author
-- `timeout_links.txt` - Just the links, one per line
+- `data/timeout.csv` - Full results with columns: link, duration, title, source, author
+- `data/timeout_links.txt` - Just the links, one per line
 
 **Supplements dataset:**
-- `supplements.csv` - Full results with columns: link, duration, title, source, author
-- `supplements_links.txt` - Just the links, one per line
+- `data/supplements.csv` - Full results with columns: link, duration, title, source, author
+- `data/supplements_links.txt` - Just the links, one per line
 
 #### IP Blocking Protection:
 
@@ -108,7 +108,7 @@ Common cron schedules:
 - `0 0 * * 0` - Weekly on Sunday at midnight
 - `0 0 1 * *` - Monthly on the 1st at midnight
 
-### 2. Video Analysis (`batch_LLM.py`)
+### 2. Video Analysis (`src/batch_LLM.py`)
 
 This script processes downloaded videos using the Qwen3-Omni-30B-A3B-Instruct multimodal model to extract structured information.
 
@@ -122,10 +122,10 @@ This script processes downloaded videos using the Qwen3-Omni-30B-A3B-Instruct mu
 
 ```bash
 # Process timeout dataset
-python3 batch_LLM.py --dataset timeout
+python3 src/batch_LLM.py --dataset timeout
 
 # Process supplements dataset
-python3 batch_LLM.py --dataset supplements
+python3 src/batch_LLM.py --dataset supplements
 ```
 
 #### How it works:
@@ -180,33 +180,39 @@ To download videos from the collected links, use `yt-dlp`:
 
 ```bash
 # Download timeout videos
-yt-dlp --write-info-json --batch-file timeout_links.txt --paths timeout_videos
+yt-dlp --write-info-json --batch-file data/timeout_links.txt --paths timeout_videos
 
 # Download supplements videos
-yt-dlp --write-info-json --batch-file supplements_links.txt --paths supplements_videos
+yt-dlp --write-info-json --batch-file data/supplements_links.txt --paths supplements_videos
 ```
 
 This downloads:
 - Video files to `{dataset}_videos/`
 - Metadata JSON files (`.info.json`) with video information
 
-## Files in this Repository
+## Repository Structure
 
-- **`run_googlesearch.py`** - Python script for Google search scraping (headless mode)
-- **`batch_LLM.py`** - Video analysis script using Qwen3-Omni model
-- **`googlesearch.ipynb`** - Original Jupyter notebook with scraping logic
-- **`test_LLM.ipynb`** - Jupyter notebook for testing LLM analysis
-- **`join_results.ipynb`** - Jupyter notebook for combining and analyzing results
-- **`.github/workflows/googlesearch.yml`** - GitHub Actions workflow for automated scraping
-- **`requirements.txt`** - Python dependencies for video analysis
-- **`requirements-googlesearch.txt`** - Python dependencies for scraping
-
-## Data Files
-
-- **`timeout.csv`** / **`timeout_links.txt`** - Collected timeout video links and metadata
-- **`supplements.csv`** / **`supplements_links.txt`** - Collected supplements video links and metadata
-- **`timeout_LLM_results.xlsx`** - Analyzed results for timeout videos
-- **`supplements_LLM_results.xlsx`** - Analyzed results for supplements videos
+```
+.
+├── src/                        # Python scripts
+│   ├── run_googlesearch.py     # Google search scraping script
+│   └── batch_LLM.py            # Video analysis script using Qwen3-Omni model
+├── notebooks/                  # Jupyter notebooks
+│   ├── googlesearch.ipynb      # Original scraping notebook
+│   ├── test_LLM.ipynb          # Testing LLM analysis
+│   └── join_results.ipynb      # Combining and analyzing results
+├── data/                       # Data files
+│   ├── timeout.csv             # Timeout video links and metadata
+│   ├── timeout_links.txt       # Timeout video links only
+│   ├── supplements.csv         # Supplements video links and metadata
+│   ├── supplements_links.txt   # Supplements video links only
+│   ├── timeout_LLM_results.xlsx      # Analyzed timeout results
+│   └── supplements_LLM_results.xlsx  # Analyzed supplements results
+├── .github/workflows/
+│   └── googlesearch.yml        # GitHub Actions workflow for automated scraping
+├── requirements.txt            # Python dependencies for video analysis
+└── requirements-googlesearch.txt  # Python dependencies for scraping
+```
 
 ## License
 
