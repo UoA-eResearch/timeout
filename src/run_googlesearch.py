@@ -143,9 +143,21 @@ def search_and_scrape(driver, query, max_scrolls=10):
         try:
             link = result.find_elements(By.TAG_NAME, "a")[0].get_attribute("href")
             bits = result.text.split("\n")
+
+            # Ensure we have at least 3 elements in bits
+            if len(bits) < 3:
+                print(f"Skipping result with insufficient data: {bits}")
+                continue
+
             duration = bits[0]
             title = bits[1]
             bits = bits[2].split(" · ")
+
+            # Ensure we have source information
+            if len(bits) == 0:
+                print(f"Skipping result with no source info")
+                continue
+
             source = bits[0]
             author = bits[-1]
             parsed_results.append({
@@ -174,6 +186,12 @@ def main():
     if args.use_tor:
         print("Using Tor SOCKS proxy (localhost:9050)")
     print("=" * 80)
+
+    # Variables to track new results for commit message
+    supplements_new = 0
+    supplements_total = 0
+    timeout_new = 0
+    timeout_total = 0
 
     # Configure Chrome options for headless mode
     options = uc.ChromeOptions()
@@ -257,15 +275,20 @@ def main():
             # Show new results
             new_results = df[~df.link.isin(old_df.link)]
             print(f"New results: {len(new_results)} rows")
+            supplements_new = len(new_results)
 
             # Combine with old data
             df = pd.concat([df, old_df]).drop_duplicates(subset="link", keep="first")
             print(f"Total unique results: {len(df)} rows")
+        else:
+            # If no old data exists, all results are new
+            supplements_new = len(df)
 
         # Save results
         print("\nSaving results...")
         df.sort_values(by="link", inplace=True)
         df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
+        supplements_total = len(df)
         os.makedirs("data", exist_ok=True)
         df.to_csv("data/supplements.csv", index=False)
         df.link.drop_duplicates().to_csv("data/supplements_links.txt", index=False, header=False)
@@ -310,15 +333,20 @@ def main():
                 # Show new timeout results
                 new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
                 print(f"New timeout results: {len(new_timeout_results)} rows")
+                timeout_new = len(new_timeout_results)
 
                 # Combine with old data
                 df_timeout = pd.concat([df_timeout, old_df_timeout]).drop_duplicates(subset="link", keep="first")
                 print(f"Total unique timeout results: {len(df_timeout)} rows")
+            else:
+                # If no old data exists, all results are new
+                timeout_new = len(df_timeout)
 
             # Save timeout results
             print("\nSaving timeout results...")
             df_timeout.sort_values(by="link", inplace=True)
             df_timeout = df_timeout[df_timeout.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
+            timeout_total = len(df_timeout)
             os.makedirs("data", exist_ok=True)
             df_timeout.to_csv("data/timeout.csv", index=False)
             df_timeout.link.drop_duplicates().to_csv("data/timeout_links.txt", index=False, header=False)
@@ -332,6 +360,13 @@ def main():
 
         print("\n" + "=" * 80)
         print("SUCCESS!")
+        print("=" * 80)
+
+        # Output summary for GitHub Actions to use in commit message
+        print("\n" + "=" * 80)
+        print("SUMMARY FOR COMMIT MESSAGE:")
+        print(f"Supplements: +{supplements_new} new, {supplements_total} total")
+        print(f"Timeout: +{timeout_new} new, {timeout_total} total")
         print("=" * 80)
 
     except Exception as e:
