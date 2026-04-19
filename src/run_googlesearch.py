@@ -245,7 +245,7 @@ def main():
 
         # Combine results
         print("\nCombining results...")
-        df = pd.concat([df1, df2]).drop_duplicates(subset="link", keep="last")
+        df = pd.concat([df1, df2]).drop_duplicates(subset="link", keep="first")
         print(f"Combined unique results: {len(df)} rows")
 
         # Load old data if exists
@@ -259,7 +259,7 @@ def main():
             print(f"New results: {len(new_results)} rows")
 
             # Combine with old data
-            df = pd.concat([df, old_df]).drop_duplicates(subset="link", keep="last")
+            df = pd.concat([df, old_df]).drop_duplicates(subset="link", keep="first")
             print(f"Total unique results: {len(df)} rows")
 
         # Save results
@@ -298,7 +298,7 @@ def main():
         # Combine timeout results
         if not df_timeout1.empty or not df_timeout2.empty:
             print("\nCombining timeout results...")
-            df_timeout = pd.concat([df_timeout1, df_timeout2]).drop_duplicates(subset="link", keep="last")
+            df_timeout = pd.concat([df_timeout1, df_timeout2]).drop_duplicates(subset="link", keep="first")
             print(f"Combined unique timeout results: {len(df_timeout)} rows")
 
             # Load old timeout data if exists
@@ -312,7 +312,7 @@ def main():
                 print(f"New timeout results: {len(new_timeout_results)} rows")
 
                 # Combine with old data
-                df_timeout = pd.concat([df_timeout, old_df_timeout]).drop_duplicates(subset="link", keep="last")
+                df_timeout = pd.concat([df_timeout, old_df_timeout]).drop_duplicates(subset="link", keep="first")
                 print(f"Total unique timeout results: {len(df_timeout)} rows")
 
             # Save timeout results
