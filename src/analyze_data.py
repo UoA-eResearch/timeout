@@ -409,12 +409,12 @@ The timeout dataset was filtered to include only videos where `timeout=True` (n=
     # Find where to insert the analysis section
     # Look for existing "## Data Analysis" section or insert before "## License"
     if "## Data Analysis" in readme_content:
-        # Replace existing analysis section
-        pattern = r'## Data Analysis.*?(?=## |\Z)'
-        readme_content = re.sub(pattern, analysis_section, readme_content, flags=re.DOTALL)
+        # Replace existing analysis section (everything from "## Data Analysis" to the next "## " or end of file)
+        pattern = r'\n## Data Analysis.*?(?=\n## |\Z)'
+        readme_content = re.sub(pattern, '\n' + analysis_section.strip(), readme_content, flags=re.DOTALL)
     elif "## License" in readme_content:
         # Insert before License section
-        readme_content = readme_content.replace("## License", analysis_section + "## License")
+        readme_content = readme_content.replace("\n## License", "\n" + analysis_section + "\n## License")
     else:
         # Append at the end
         readme_content += "\n" + analysis_section

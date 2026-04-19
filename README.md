@@ -190,6 +190,43 @@ This downloads:
 - Video files to `{dataset}_videos/`
 - Metadata JSON files (`.info.json`) with video information
 
+### 4. Data Analysis (`src/analyze_data.py`)
+
+This script analyzes the LLM-processed data from the Excel files and generates comprehensive reports with visualizations.
+
+#### Run the analysis locally:
+
+```bash
+python3 src/analyze_data.py
+```
+
+#### What it does:
+
+1. Loads and filters datasets (menopause=True for supplements, timeout=True for timeout)
+2. Generates descriptive statistics and sentiment analysis
+3. Creates visualizations for trends over time
+4. Analyzes:
+   - **Supplements dataset**: Top supplements mentioned, symptoms targeted, sentiment trends, popularity over time
+   - **Timeout dataset**: Sentiment trends, video counts over time, platform distribution
+5. Updates the README with findings and plots
+
+#### Output:
+
+- Plots saved to `plots/` directory
+- README updated with analysis results and visualizations
+
+#### Automated Execution:
+
+The repository includes a GitHub Actions workflow (`.github/workflows/analyze_data.yml`) that:
+- Runs automatically when Excel files (`data/*_LLM_results.xlsx`) are modified
+- Can be triggered manually via GitHub Actions UI (workflow_dispatch)
+- Automatically commits updated plots and README back to the repository
+
+To trigger manually:
+1. Go to the "Actions" tab in GitHub
+2. Select "Data Analysis" workflow
+3. Click "Run workflow"
+
 ## Dataset Statistics
 
 **Supplements dataset:**
@@ -217,7 +254,8 @@ This downloads:
 .
 ├── src/                        # Python scripts
 │   ├── run_googlesearch.py     # Google search scraping script
-│   └── batch_LLM.py            # Video analysis script using Qwen3-Omni model
+│   ├── batch_LLM.py            # Video analysis script using Qwen3-Omni model
+│   └── analyze_data.py         # Data analysis script for generating reports
 ├── notebooks/                  # Jupyter notebooks
 │   ├── googlesearch.ipynb      # Original scraping notebook
 │   ├── test_LLM.ipynb          # Testing LLM analysis
@@ -229,16 +267,19 @@ This downloads:
 │   ├── supplements_links.txt   # Supplements video links only
 │   ├── timeout_LLM_results.xlsx      # Analyzed timeout results
 │   └── supplements_LLM_results.xlsx  # Analyzed supplements results
+├── plots/                      # Analysis plots (auto-generated)
 ├── .github/workflows/
-│   └── googlesearch.yml        # GitHub Actions workflow for automated scraping
+│   ├── googlesearch.yml        # GitHub Actions workflow for automated scraping
+│   └── analyze_data.yml        # GitHub Actions workflow for data analysis
 ├── requirements.txt            # Python dependencies for video analysis
 └── requirements-googlesearch.txt  # Python dependencies for scraping
 ```
 
 
+
 ## Data Analysis
 
-*Last updated: 2026-04-19 23:46:46 UTC*
+*Last updated: 2026-04-19 23:48:37 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -345,7 +386,6 @@ The timeout dataset was filtered to include only videos where `timeout=True` (n=
 **Number of videos over time**
 
 ![Number of videos over time](plots/timeout_videos_over_time.png)
-
 ## License
 
 See `LICENSE` file for details.
