@@ -81,7 +81,7 @@ def get_prompt_timeout(data):
         description: What is happening in the video? Provide a detailed description of the actions, context, and any notable elements present in the video.
         transcript: If there is any spoken content in the video, transcribe it accurately. If there is no spoken content, indicate "No spoken content". Do not repeat any sentences in the transcript. If the spoken language isn't English, translate it to English.
         tone: What is the overall tone or mood of the video? Is it humorous, serious, educational, emotional, etc.?
-        timeout: Is this video talking about timeout for children (as a parenting punishement strategy)? a boolean true or false
+        timeout: Is this video talking about timeout for children (as a parenting punishment strategy)? a boolean true or false
         parenting_approach: What is the overall parenting approach shown in the video? (e.g., authoritative, permissive, gentle parenting, etc.)
         child_age: What age range of children is this video targeting or discussing?
         language: What language is this video in?
