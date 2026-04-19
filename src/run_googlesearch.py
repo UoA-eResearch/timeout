@@ -191,9 +191,9 @@ def main():
         print(f"Combined unique results: {len(df)} rows")
 
         # Load old data if exists
-        if os.path.exists("supplements.csv"):
+        if os.path.exists("data/supplements.csv"):
             print("\nLoading previous results...")
-            old_df = pd.read_csv("supplements.csv")
+            old_df = pd.read_csv("data/supplements.csv")
             print(f"Previous results: {len(old_df)} rows")
 
             # Show new results
@@ -208,9 +208,10 @@ def main():
         print("\nSaving results...")
         df.sort_values(by="link", inplace=True)
         df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
-        df.to_csv("supplements.csv", index=False)
-        df.link.drop_duplicates().to_csv("supplements_links.txt", index=False, header=False)
-        print("Saved to: supplements.csv and supplements_links.txt")
+        os.makedirs("data", exist_ok=True)
+        df.to_csv("data/supplements.csv", index=False)
+        df.link.drop_duplicates().to_csv("data/supplements_links.txt", index=False, header=False)
+        print("Saved to: data/supplements.csv and data/supplements_links.txt")
 
         # Now collect timeout data
         print("\n" + "=" * 80)
@@ -243,9 +244,9 @@ def main():
             print(f"Combined unique timeout results: {len(df_timeout)} rows")
 
             # Load old timeout data if exists
-            if os.path.exists("timeout.csv"):
+            if os.path.exists("data/timeout.csv"):
                 print("\nLoading previous timeout results...")
-                old_df_timeout = pd.read_csv("timeout.csv")
+                old_df_timeout = pd.read_csv("data/timeout.csv")
                 print(f"Previous timeout results: {len(old_df_timeout)} rows")
 
                 # Show new timeout results
@@ -260,9 +261,10 @@ def main():
             print("\nSaving timeout results...")
             df_timeout.sort_values(by="link", inplace=True)
             df_timeout = df_timeout[df_timeout.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
-            df_timeout.to_csv("timeout.csv", index=False)
-            df_timeout.link.drop_duplicates().to_csv("timeout_links.txt", index=False, header=False)
-            print("Saved to: timeout.csv and timeout_links.txt")
+            os.makedirs("data", exist_ok=True)
+            df_timeout.to_csv("data/timeout.csv", index=False)
+            df_timeout.link.drop_duplicates().to_csv("data/timeout_links.txt", index=False, header=False)
+            print("Saved to: data/timeout.csv and data/timeout_links.txt")
 
         print("\n" + "=" * 80)
         print("SUCCESS!")
