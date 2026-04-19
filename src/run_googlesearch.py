@@ -49,7 +49,7 @@ def update_readme_stats(supplements_df, timeout_df):
 
 {timeout_stats}
 
-*Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}*
+*Last updated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}*
 
 """
 
