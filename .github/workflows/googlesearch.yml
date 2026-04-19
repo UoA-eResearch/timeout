@@ -42,7 +42,7 @@ jobs:
         id: scrape_normal
         continue-on-error: true
         run: |
-          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python3 src/run_googlesearch.py
+          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python3 src/run_googlesearch.py | tee scraper_output.log
 
       - name: Install and configure Tor (if first attempt failed)
         id: install_tor
@@ -64,7 +64,7 @@ jobs:
         if: steps.scrape_normal.outcome == 'failure'
         run: |
           echo "Retrying with Tor proxy..."
-          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python3 src/run_googlesearch.py --use-tor
+          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python3 src/run_googlesearch.py --use-tor | tee scraper_output.log
 
       - name: Check for changes
         id: check_changes
@@ -77,13 +77,31 @@ jobs:
             echo "Changes detected"
           fi
 
+      - name: Extract summary for commit message
+        id: extract_summary
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          # Extract the summary lines from the scraper output
+          if [ -f scraper_output.log ]; then
+            SUPPLEMENTS_LINE=$(grep "Supplements:" scraper_output.log | tail -1 || echo "Supplements: stats unavailable")
+            TIMEOUT_LINE=$(grep "Timeout:" scraper_output.log | tail -1 || echo "Timeout: stats unavailable")
+            echo "supplements_summary=$SUPPLEMENTS_LINE" >> $GITHUB_OUTPUT
+            echo "timeout_summary=$TIMEOUT_LINE" >> $GITHUB_OUTPUT
+          else
+            echo "supplements_summary=Supplements: stats unavailable" >> $GITHUB_OUTPUT
+            echo "timeout_summary=Timeout: stats unavailable" >> $GITHUB_OUTPUT
+          fi
+
       - name: Commit and push results
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git pull
-          git commit -am "Update Google search results [skip ci]"
+          git commit -am "Update Google search results [skip ci]
+
+          ${{ steps.extract_summary.outputs.supplements_summary }}
+          ${{ steps.extract_summary.outputs.timeout_summary }}"
           git push
 
       - name: Upload results as artifact
