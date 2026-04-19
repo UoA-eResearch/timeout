@@ -1,0 +1,66 @@
+name: Data Analysis
+
+on:
+  push:
+    paths:
+      - 'data/timeout_LLM_results.xlsx'
+      - 'data/supplements_LLM_results.xlsx'
+  workflow_dispatch:  # Allow manual trigger
+
+concurrency:
+  group: data-analysis-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Allow pushing changes back to repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pandas openpyxl matplotlib seaborn tabulate
+
+      - name: Run data analysis
+        run: |
+          python3 src/analyze_data.py
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet README.md plots/ 2>/dev/null; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+          fi
+
+      - name: Commit and push results
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md plots/
+          git commit -m "Update data analysis results [skip ci]"
+          git push
+
+      - name: Upload plots as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: analysis-plots
+          path: plots/
+          retention-days: 30

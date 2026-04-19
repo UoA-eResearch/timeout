@@ -235,6 +235,117 @@ This downloads:
 └── requirements-googlesearch.txt  # Python dependencies for scraping
 ```
 
+
+## Data Analysis
+
+*Last updated: 2026-04-19 23:46:46 UTC*
+
+This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
+
+### Supplements Dataset Analysis (Menopause-Related Content)
+
+The supplements dataset was filtered to include only videos where `menopause=True` (n=557 videos).
+
+#### Key Findings
+
+**Video Distribution by Platform:**
+| extractor   |   count |       like_count |   view_count |   comment_count |
+|:------------|--------:|-----------------:|-------------:|----------------:|
+| youtube     |     244 | 567552           |  1.95543e+07 |           17658 |
+| TikTok      |     215 |      1.05836e+06 |  3.44081e+07 |           30682 |
+| facebook    |      85 |      0           |  1.28066e+07 |               0 |
+| html5       |       5 |      0           |  0           |               0 |
+| Instagram   |       3 |     82           |  0           |             118 |
+| twitter     |       3 |    113           |  0           |              10 |
+| generic     |       2 |     13           |  0           |               4 |
+
+
+**Top 10 Supplements Promoted:**
+| Supplement               |   Video Count |
+|:-------------------------|--------------:|
+| No supplements mentioned |            96 |
+| Vitamin D                |            92 |
+| Magnesium                |            69 |
+| Calcium                  |            32 |
+| Omega-3                  |            30 |
+| Creatine                 |            23 |
+| Vitamin E                |            17 |
+| Yes                      |            16 |
+| Vitamin B12              |            16 |
+| Collagen                 |            14 |
+
+
+**Top 10 Symptoms Targeted:**
+| Symptom       |   Mention Count |
+|:--------------|----------------:|
+| Menopause     |             125 |
+| Hot flashes   |              75 |
+| Perimenopause |              62 |
+| menopause     |              58 |
+| mood swings   |              54 |
+| night sweats  |              49 |
+| hot flashes   |              48 |
+| anxiety       |              45 |
+| perimenopause |              33 |
+| depression    |              28 |
+
+#### Visualizations
+
+**Sentiment trends over time**
+
+![Sentiment trends over time](plots/supplements_sentiment_over_time.png)
+
+**Popularity metrics over time**
+
+![Popularity metrics over time](plots/supplements_popularity_over_time.png)
+
+**Top 10 supplements promoted**
+
+![Top 10 supplements promoted](plots/supplements_top_products.png)
+
+**Top 3 supplements trends over time**
+
+![Top 3 supplements trends over time](plots/supplements_top3_over_time.png)
+
+**Top 10 symptoms targeted**
+
+![Top 10 symptoms targeted](plots/supplements_top_symptoms.png)
+
+
+### Timeout Dataset Analysis
+
+The timeout dataset was filtered to include only videos where `timeout=True` (n=198 videos).
+
+#### Key Findings
+
+**Video Distribution by Platform:**
+| extractor   |   count |       like_count |       view_count |   comment_count |
+|:------------|--------:|-----------------:|-----------------:|----------------:|
+| TikTok      |     111 |      6.93815e+06 |      6.96975e+07 |           75515 |
+| youtube     |      43 | 933798           |      2.23285e+07 |            7239 |
+| Instagram   |      36 |      2.30622e+06 |      0           |           34919 |
+| facebook    |       4 |      0           | 281104           |               0 |
+| Pinterest   |       3 |      0           |      0           |               0 |
+| generic     |       1 |      0           |      0           |               0 |
+
+
+**Sentiment Distribution:**
+| sentiment   |   count |
+|:------------|--------:|
+| negative    |     122 |
+| neutral     |      52 |
+| positive    |      24 |
+
+#### Visualizations
+
+**Sentiment trends over time**
+
+![Sentiment trends over time](plots/timeout_sentiment_over_time.png)
+
+**Number of videos over time**
+
+![Number of videos over time](plots/timeout_videos_over_time.png)
+
 ## License
 
 See `LICENSE` file for details.
