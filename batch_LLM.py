@@ -81,19 +81,27 @@ def get_prompt_timeout(data):
         description: What is happening in the video? Provide a detailed description of the actions, context, and any notable elements present in the video.
         transcript: If there is any spoken content in the video, transcribe it accurately. If there is no spoken content, indicate "No spoken content". Do not repeat any sentences in the transcript. If the spoken language isn't English, translate it to English.
         tone: What is the overall tone or mood of the video? Is it humorous, serious, educational, emotional, etc.?
-        timeout_strategy: Does the video mention or demonstrate any timeout or disciplinary strategies for children? If so, describe them. If not, indicate "No timeout strategy mentioned".
+        timeout: Is this video talking about timeout for children (as a parenting punishement strategy)? a boolean true or false
         parenting_approach: What is the overall parenting approach shown in the video? (e.g., authoritative, permissive, gentle parenting, etc.)
         child_age: What age range of children is this video targeting or discussing?
         language: What language is this video in?
         marketing: Is this video promoting or advertising any product, service, brand, or organization? If so, what is it? Otherwise, indicate "No marketing content".
+        ASD: Is this video specifically targeted towards individuals with Autism Spectrum Disorder (ASD) or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
+        ADHD: Is this video specifically targeted towards individuals with Attention Deficit Hyperactivity Disorder (ADHD) or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
+        anxiety: Is this video specifically targeted towards individuals dealing with anxiety or does it contain content that is particularly relevant or beneficial for this audience? a boolean true or false
         job: For the main speaker, what is their job or profession? If it is not mentioned in the video, indicate "No job information". A comma separated string, one or more of the following: therapist, psychologist, pediatrician, doctor, nurse, teacher, professor, social worker, counselor, coach, influencer, content creator?
-        sentiment: Does this video recommend timeout as a disciplinary strategy, discourage it, or is it neutral? One of negative, neutral or positive
-        criticism: If the video is critical of timeout strategies, what are the main criticisms mentioned?
+        sentiment: Does this video recommend timeout, discourage it, or is it neutral? One of negative, neutral or positive
+        criticism: If the video is critical of timeout, what are the main criticisms mentioned? A comma separated string, one or more of the following:
+            Concerns about physical safety – child
+            Concerns about emotional or social development or wellbeing - child
+            Concerns about relational quality – parent-child
+            Concerns about practicality or usability
+            Concerns about litigation
         alternative_strategies: Does the video mention any alternative strategies to timeout? If so, what are they? A comma separated string. If no alternatives are mentioned, indicate "No alternative strategies mentioned".
         usefulness: Rate the overall usefulness of the video on a scale from 1 to 10, where 1 is not useful at all and 10 is extremely useful.
         misleading: Rate the extent to which the video contains misleading or inaccurate information on a scale from 1 to 10, where 1 is not misleading at all and 10 is extremely misleading.
         quality: Rate the overall quality of the video on a scale from 1 to 10, where 1 is very poor quality and 10 is excellent quality.
-        personal_experience: Does the speaker mention any personal experience with timeout or parenting strategies? If so, briefly summarize it.
+        personal_experience: Does the speaker mention any personal experience with timeout? If so, briefly summarize it.
 
         Do not include comments in your JSON response. Only respond with the JSON object. Make sure the JSON is valid
     """
