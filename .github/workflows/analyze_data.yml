@@ -40,12 +40,12 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet README.md plots/ 2>/dev/null; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
-          else
+          if git status --porcelain README.md plots/ | grep -q .; then
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "Changes detected"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
           fi
 
       - name: Commit and push results
@@ -53,6 +53,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
           git add README.md plots/
           git commit -m "Update data analysis results [skip ci]"
           git push
