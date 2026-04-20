@@ -279,9 +279,14 @@ To trigger manually:
 
 ## Data Analysis
 
-*Last updated: 2026-04-20 00:03:31 UTC*
+*Last updated: 2026-04-20 00:43:01 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
+
+> **Note on Dataset Sizes:** The numbers in this Data Analysis section are smaller than those reported in the Dataset Statistics section above. This is expected and occurs for several reasons:
+> - **Download failures**: Not all videos can be successfully downloaded with yt-dlp (some may be deleted, geo-restricted, or platform-restricted)
+> - **LLM processing**: Not all downloaded videos are successfully processed by the LLM
+> - **Content filtering**: Not all scraped videos are actually about the topic of interest—sometimes search terms return unrelated videos, which are identified and filtered out by the LLM (e.g., videos where `menopause=False` or `timeout=False`)
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
@@ -293,24 +298,24 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 | extractor   |   count |       like_count |   view_count |   comment_count |
 |:------------|--------:|-----------------:|-------------:|----------------:|
 | youtube     |     244 | 567552           |  1.95543e+07 |           17658 |
-| TikTok      |     215 |      1.05836e+06 |  3.44081e+07 |           30682 |
+| tiktok      |     215 |      1.05836e+06 |  3.44081e+07 |           30682 |
 | facebook    |      85 |      0           |  1.28066e+07 |               0 |
-| Instagram   |       3 |     82           |  0           |             118 |
+| instagram   |       3 |     82           |  0           |             118 |
 
 
 **Top 10 Supplements Promoted:**
-| Supplement               |   Video Count |
-|:-------------------------|--------------:|
-| No supplements mentioned |            93 |
-| Vitamin D                |            90 |
-| Magnesium                |            69 |
-| Calcium                  |            32 |
-| Omega-3                  |            30 |
-| Creatine                 |            23 |
-| Vitamin E                |            17 |
-| Yes                      |            16 |
-| Vitamin B12              |            16 |
-| Collagen                 |            14 |
+| Supplement          |   Video Count |
+|:--------------------|--------------:|
+| Vitamin D           |            90 |
+| Magnesium           |            69 |
+| Calcium             |            32 |
+| Omega-3             |            30 |
+| Creatine            |            23 |
+| Vitamin E           |            17 |
+| Vitamin B12         |            16 |
+| Collagen            |            14 |
+| Magnesium Glycinate |            14 |
+| Vitamin D3          |            14 |
 
 
 **Top 10 Symptoms Targeted:**
@@ -359,9 +364,9 @@ The timeout dataset was filtered to include only videos where `timeout=True` fro
 **Video Distribution by Platform:**
 | extractor   |   count |       like_count |       view_count |   comment_count |
 |:------------|--------:|-----------------:|-----------------:|----------------:|
-| TikTok      |     111 |      6.93815e+06 |      6.96975e+07 |           75515 |
+| tiktok      |     111 |      6.93815e+06 |      6.96975e+07 |           75515 |
 | youtube     |      43 | 933798           |      2.23285e+07 |            7239 |
-| Instagram   |      36 |      2.30622e+06 |      0           |           34919 |
+| instagram   |      36 |      2.30622e+06 |      0           |           34919 |
 | facebook    |       4 |      0           | 281104           |               0 |
 
 
