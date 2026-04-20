@@ -5,6 +5,7 @@ on:
     paths:
       - 'data/timeout_LLM_results.xlsx'
       - 'data/supplements_LLM_results.xlsx'
+      - 'src/analyze_data.py'
   workflow_dispatch:  # Allow manual trigger
 
 concurrency:
