@@ -41,7 +41,20 @@ def load_and_filter_data():
     timeout_df = pd.read_excel(DATA_DIR / "timeout_LLM_results.xlsx")
     print(f"Loaded timeout dataset: {len(timeout_df)} rows")
 
-    # Filter datasets
+    # Filter to specific platforms (YouTube, TikTok, Facebook, Instagram)
+    allowed_platforms = ['youtube', 'tiktok', 'facebook', 'instagram']
+
+    supplements_df = supplements_df[
+        supplements_df['extractor'].str.lower().isin(allowed_platforms)
+    ].copy()
+    print(f"Filtered supplements to allowed platforms: {len(supplements_df)} rows")
+
+    timeout_df = timeout_df[
+        timeout_df['extractor'].str.lower().isin(allowed_platforms)
+    ].copy()
+    print(f"Filtered timeout to allowed platforms: {len(timeout_df)} rows")
+
+    # Filter datasets by menopause/timeout columns
     supplements_filtered = supplements_df[supplements_df['menopause'] == True].copy()
     print(f"Filtered supplements (menopause=True): {len(supplements_filtered)} rows")
 
@@ -246,7 +259,8 @@ def analyze_supplements(df):
     for symptoms in df['symptoms'].dropna():
         if isinstance(symptoms, str) and symptoms.lower() != 'none':
             items = [s.strip().strip("'\"") for s in symptoms.strip('[]').split(',')]
-            all_symptoms.extend([s for s in items if s and s.lower() not in ['none', 'n/a']])
+            # Lowercase symptoms for consistent counting
+            all_symptoms.extend([s.lower() for s in items if s and s.lower() not in ['none', 'n/a']])
 
     symptom_counts = Counter(all_symptoms)
     top_symptoms = symptom_counts.most_common(10)
@@ -350,7 +364,7 @@ def analyze_timeout(df):
     return analysis_results
 
 
-def update_readme(supplements_results, timeout_results):
+def update_readme(supplements_results, timeout_results, supplements_count, timeout_count):
     """Update README.md with analysis findings."""
     print("\nUpdating README...")
 
@@ -370,7 +384,7 @@ This section contains automated analysis of the LLM-processed video data. The an
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` (n={len(pd.read_excel(DATA_DIR / 'supplements_LLM_results.xlsx')[pd.read_excel(DATA_DIR / 'supplements_LLM_results.xlsx')['menopause'] == True])} videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n={supplements_count} videos).
 
 #### Key Findings
 
@@ -390,7 +404,7 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
     analysis_section += f"""
 ### Timeout Dataset Analysis
 
-The timeout dataset was filtered to include only videos where `timeout=True` (n={len(pd.read_excel(DATA_DIR / 'timeout_LLM_results.xlsx')[pd.read_excel(DATA_DIR / 'timeout_LLM_results.xlsx')['timeout'] == True])} videos).
+The timeout dataset was filtered to include only videos where `timeout=True` from YouTube, TikTok, Facebook, and Instagram (n={timeout_count} videos).
 
 #### Key Findings
 
@@ -440,8 +454,8 @@ def main():
     # Analyze timeout dataset
     timeout_results = analyze_timeout(timeout_df)
 
-    # Update README
-    update_readme(supplements_results, timeout_results)
+    # Update README with counts
+    update_readme(supplements_results, timeout_results, len(supplements_df), len(timeout_df))
 
     print("\n" + "="*80)
     print("Analysis completed successfully!")

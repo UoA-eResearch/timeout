@@ -279,13 +279,13 @@ To trigger manually:
 
 ## Data Analysis
 
-*Last updated: 2026-04-19 23:48:37 UTC*
+*Last updated: 2026-04-20 00:03:31 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` (n=557 videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=547 videos).
 
 #### Key Findings
 
@@ -295,17 +295,14 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 | youtube     |     244 | 567552           |  1.95543e+07 |           17658 |
 | TikTok      |     215 |      1.05836e+06 |  3.44081e+07 |           30682 |
 | facebook    |      85 |      0           |  1.28066e+07 |               0 |
-| html5       |       5 |      0           |  0           |               0 |
 | Instagram   |       3 |     82           |  0           |             118 |
-| twitter     |       3 |    113           |  0           |              10 |
-| generic     |       2 |     13           |  0           |               4 |
 
 
 **Top 10 Supplements Promoted:**
 | Supplement               |   Video Count |
 |:-------------------------|--------------:|
-| No supplements mentioned |            96 |
-| Vitamin D                |            92 |
+| No supplements mentioned |            93 |
+| Vitamin D                |            90 |
 | Magnesium                |            69 |
 | Calcium                  |            32 |
 | Omega-3                  |            30 |
@@ -319,16 +316,16 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 **Top 10 Symptoms Targeted:**
 | Symptom       |   Mention Count |
 |:--------------|----------------:|
-| Menopause     |             125 |
-| Hot flashes   |              75 |
-| Perimenopause |              62 |
-| menopause     |              58 |
-| mood swings   |              54 |
-| night sweats  |              49 |
-| hot flashes   |              48 |
-| anxiety       |              45 |
-| perimenopause |              33 |
-| depression    |              28 |
+| menopause     |             181 |
+| hot flashes   |             131 |
+| perimenopause |              91 |
+| mood swings   |              82 |
+| night sweats  |              74 |
+| anxiety       |              66 |
+| fatigue       |              48 |
+| inflammation  |              43 |
+| depression    |              41 |
+| brain fog     |              39 |
 
 #### Visualizations
 
@@ -355,7 +352,7 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 
 ### Timeout Dataset Analysis
 
-The timeout dataset was filtered to include only videos where `timeout=True` (n=198 videos).
+The timeout dataset was filtered to include only videos where `timeout=True` from YouTube, TikTok, Facebook, and Instagram (n=194 videos).
 
 #### Key Findings
 
@@ -366,15 +363,13 @@ The timeout dataset was filtered to include only videos where `timeout=True` (n=
 | youtube     |      43 | 933798           |      2.23285e+07 |            7239 |
 | Instagram   |      36 |      2.30622e+06 |      0           |           34919 |
 | facebook    |       4 |      0           | 281104           |               0 |
-| Pinterest   |       3 |      0           |      0           |               0 |
-| generic     |       1 |      0           |      0           |               0 |
 
 
 **Sentiment Distribution:**
 | sentiment   |   count |
 |:------------|--------:|
-| negative    |     122 |
-| neutral     |      52 |
+| negative    |     119 |
+| neutral     |      51 |
 | positive    |      24 |
 
 #### Visualizations
