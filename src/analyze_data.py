@@ -44,13 +44,17 @@ def load_and_filter_data():
     # Filter to specific platforms (YouTube, TikTok, Facebook, Instagram)
     allowed_platforms = ['youtube', 'tiktok', 'facebook', 'instagram']
 
+    # Normalize extractor to lowercase before filtering
+    supplements_df['extractor'] = supplements_df['extractor'].str.lower()
     supplements_df = supplements_df[
-        supplements_df['extractor'].str.lower().isin(allowed_platforms)
+        supplements_df['extractor'].isin(allowed_platforms)
     ].copy()
     print(f"Filtered supplements to allowed platforms: {len(supplements_df)} rows")
 
+    # Normalize extractor to lowercase before filtering
+    timeout_df['extractor'] = timeout_df['extractor'].str.lower()
     timeout_df = timeout_df[
-        timeout_df['extractor'].str.lower().isin(allowed_platforms)
+        timeout_df['extractor'].isin(allowed_platforms)
     ].copy()
     print(f"Filtered timeout to allowed platforms: {len(timeout_df)} rows")
 
@@ -103,17 +107,38 @@ def analyze_supplements(df):
 
     # 2. Sentiment trends over time
     print("\n2. Sentiment Trends Over Time")
-    sentiment_over_time = df.groupby(['year_month', 'sentiment']).size().unstack(fill_value=0)
+    sentiment_order = ['negative', 'neutral', 'positive']
+    sentiment_labels = {
+        'negative': 'Negative',
+        'neutral': 'Neutral',
+        'positive': 'Positive'
+    }
+    sentiment_colors = {
+        'negative': '#d62728',
+        'neutral': '#7f7f7f',
+        'positive': '#2ca02c'
+    }
+    sentiment_over_time = (
+        df.groupby(['year_month', 'sentiment'])
+        .size()
+        .unstack(fill_value=0)
+        .rename(columns=lambda col: str(col).strip().lower())
+        .reindex(columns=sentiment_order, fill_value=0)
+    )
     print(sentiment_over_time)
 
     # Plot sentiment over time
     fig, ax = plt.subplots(figsize=(14, 6))
-    sentiment_over_time.plot(kind='bar', stacked=True, ax=ax,
-                              color=['#d62728', '#7f7f7f', '#2ca02c'])
+    sentiment_over_time.plot(
+        kind='bar',
+        stacked=True,
+        ax=ax,
+        color=[sentiment_colors[col] for col in sentiment_over_time.columns]
+    )
     ax.set_title('Sentiment Trends Over Time - Supplements Dataset', fontsize=16, fontweight='bold')
     ax.set_xlabel('Month', fontsize=12)
     ax.set_ylabel('Number of Videos', fontsize=12)
-    ax.legend(title='Sentiment', labels=['Negative', 'Neutral', 'Positive'])
+    ax.legend(title='Sentiment', labels=[sentiment_labels[col] for col in sentiment_over_time.columns])
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     plot_path = PLOTS_DIR / 'supplements_sentiment_over_time.png'
@@ -167,11 +192,13 @@ def analyze_supplements(df):
     # 4. What supplements are promoted (top products)
     print("\n4. Supplements Promoted")
     all_supplements = []
+    sentinel_values = {'none', 'no supplements mentioned', 'yes', 'n/a', 'na', ''}
     for supp_list in df['supplements'].dropna():
         if isinstance(supp_list, str):
             # Parse the list-like string
             items = [s.strip().strip("'\"") for s in supp_list.strip('[]').split(',')]
-            all_supplements.extend([s for s in items if s and s.lower() != 'none'])
+            # Filter out sentinel values and empty strings
+            all_supplements.extend([s for s in items if s and s.lower() not in sentinel_values])
 
     supplement_counts = Counter(all_supplements)
     top_supplements = supplement_counts.most_common(10)
@@ -214,7 +241,8 @@ def analyze_supplements(df):
             for supp_list in period_df['supplements'].dropna():
                 if isinstance(supp_list, str):
                     items = [s.strip().strip("'\"") for s in supp_list.strip('[]').split(',')]
-                    period_supplements.extend([s for s in items if s and s.lower() != 'none'])
+                    # Filter out sentinel values
+                    period_supplements.extend([s for s in items if s and s.lower() not in sentinel_values])
 
             period_counts = Counter(period_supplements)
             for name in top_3_names:
@@ -319,15 +347,36 @@ def analyze_timeout(df):
 
     # Sentiment over time
     print("\n2. Sentiment Trends Over Time")
-    sentiment_over_time = df.groupby(['year_month', 'sentiment']).size().unstack(fill_value=0)
+    sentiment_order = ['negative', 'neutral', 'positive']
+    sentiment_labels = {
+        'negative': 'Negative',
+        'neutral': 'Neutral',
+        'positive': 'Positive'
+    }
+    sentiment_colors = {
+        'negative': '#d62728',
+        'neutral': '#7f7f7f',
+        'positive': '#2ca02c'
+    }
+    sentiment_over_time = (
+        df.groupby(['year_month', 'sentiment'])
+        .size()
+        .unstack(fill_value=0)
+        .rename(columns=lambda col: str(col).strip().lower())
+        .reindex(columns=sentiment_order, fill_value=0)
+    )
 
     fig, ax = plt.subplots(figsize=(14, 6))
-    sentiment_over_time.plot(kind='bar', stacked=True, ax=ax,
-                              color=['#d62728', '#7f7f7f', '#2ca02c'])
+    sentiment_over_time.plot(
+        kind='bar',
+        stacked=True,
+        ax=ax,
+        color=[sentiment_colors[col] for col in sentiment_over_time.columns]
+    )
     ax.set_title('Sentiment Trends Over Time - Timeout Dataset', fontsize=16, fontweight='bold')
     ax.set_xlabel('Month', fontsize=12)
     ax.set_ylabel('Number of Videos', fontsize=12)
-    ax.legend(title='Sentiment', labels=['Negative', 'Neutral', 'Positive'])
+    ax.legend(title='Sentiment', labels=[sentiment_labels[col] for col in sentiment_over_time.columns])
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     plot_path = PLOTS_DIR / 'timeout_sentiment_over_time.png'
@@ -373,7 +422,7 @@ def update_readme(supplements_results, timeout_results, supplements_count, timeo
         readme_content = f.read()
 
     # Create analysis section
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
+    timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
 
     analysis_section = f"""
 ## Data Analysis
