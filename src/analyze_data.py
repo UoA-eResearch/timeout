@@ -382,6 +382,11 @@ def update_readme(supplements_results, timeout_results, supplements_count, timeo
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
+> **Note on Dataset Sizes:** The numbers in this Data Analysis section are smaller than those reported in the Dataset Statistics section above. This is expected and occurs for several reasons:
+> - **Download failures**: Not all videos can be successfully downloaded with yt-dlp (some may be deleted, geo-restricted, or platform-restricted)
+> - **LLM processing**: Not all downloaded videos are successfully processed by the LLM
+> - **Content filtering**: Not all scraped videos are actually about the topic of interest—sometimes search terms return unrelated videos, which are identified and filtered out by the LLM (e.g., videos where `menopause=False` or `timeout=False`)
+
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
 The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n={supplements_count} videos).
