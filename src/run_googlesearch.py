@@ -29,18 +29,18 @@ def update_readme_stats(supplements_df, timeout_df):
             content = f.read()
 
         # Prepare statistics
-        supplements_breakdown = supplements_df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n  - ')
+        supplements_breakdown = supplements_df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n- ')
         supplements_stats = f"""**Supplements dataset:**
 - Total videos: {len(supplements_df)}
 - Breakdown by source:
-  - {supplements_breakdown}"""
+- {supplements_breakdown}"""
         print(supplements_stats)
 
-        timeout_breakdown = timeout_df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n  - ')
+        timeout_breakdown = timeout_df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n- ')
         timeout_stats = f"""**Timeout dataset:**
 - Total videos: {len(timeout_df)}
 - Breakdown by source:
-  - {timeout_breakdown}"""
+- {timeout_breakdown}"""
         print(timeout_stats)
 
         stats_section = f"""## Dataset Statistics
@@ -153,11 +153,16 @@ def search_and_scrape(driver, query, max_scrolls=10):
 
             duration = bits[0]
             title = bits[1]
-            bits = bits[2].split(" · ")
+            source_info = bits[2].strip()
 
             # Ensure we have source information
-            if len(bits) == 0:
+            if not source_info:
                 print(f"Skipping result with no source info")
+                continue
+
+            bits = source_info.split(" · ")
+            if not bits[0].strip():
+                print(f"Skipping result with empty source info")
                 continue
 
             source = bits[0]
@@ -274,23 +279,26 @@ def main():
             old_df = pd.read_csv("data/supplements.csv")
             print(f"Previous results: {len(old_df)} rows")
 
-            # Show new results
-            new_results = df[~df.link.isin(old_df.link)]
-            print(f"New results: {len(new_results)} rows")
-            supplements_new = len(new_results)
-
             # Combine with old data
             df = pd.concat([df, old_df]).drop_duplicates(subset="link", keep="first")
             print(f"Total unique results: {len(df)} rows")
-        else:
-            # If no old data exists, all results are new
-            supplements_new = len(df)
 
         # Save results
         print("\nSaving results...")
         df.sort_values(by="link", inplace=True)
         df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
         supplements_total = len(df)
+
+        # Calculate new results after filtering
+        if os.path.exists("data/supplements.csv"):
+            old_df = pd.read_csv("data/supplements.csv")
+            new_results = df[~df.link.isin(old_df.link)]
+            supplements_new = len(new_results)
+            print(f"New results (after filtering): {supplements_new} rows")
+        else:
+            # If no old data exists, all results are new
+            supplements_new = len(df)
+
         os.makedirs("data", exist_ok=True)
         df.to_csv("data/supplements.csv", index=False)
         df.link.drop_duplicates().to_csv("data/supplements_links.txt", index=False, header=False)
@@ -332,27 +340,37 @@ def main():
                 old_df_timeout = pd.read_csv("data/timeout.csv")
                 print(f"Previous timeout results: {len(old_df_timeout)} rows")
 
-                # Show new timeout results
-                new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
-                print(f"New timeout results: {len(new_timeout_results)} rows")
-                timeout_new = len(new_timeout_results)
-
                 # Combine with old data
                 df_timeout = pd.concat([df_timeout, old_df_timeout]).drop_duplicates(subset="link", keep="first")
                 print(f"Total unique timeout results: {len(df_timeout)} rows")
-            else:
-                # If no old data exists, all results are new
-                timeout_new = len(df_timeout)
 
             # Save timeout results
             print("\nSaving timeout results...")
             df_timeout.sort_values(by="link", inplace=True)
             df_timeout = df_timeout[df_timeout.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
             timeout_total = len(df_timeout)
+
+            # Calculate new timeout results after filtering
+            if os.path.exists("data/timeout.csv"):
+                old_df_timeout = pd.read_csv("data/timeout.csv")
+                new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
+                timeout_new = len(new_timeout_results)
+                print(f"New timeout results (after filtering): {timeout_new} rows")
+            else:
+                # If no old data exists, all results are new
+                timeout_new = len(df_timeout)
+
             os.makedirs("data", exist_ok=True)
             df_timeout.to_csv("data/timeout.csv", index=False)
             df_timeout.link.drop_duplicates().to_csv("data/timeout_links.txt", index=False, header=False)
             print("Saved to: data/timeout.csv and data/timeout_links.txt")
+        else:
+            # No new timeout data collected, but may have existing data
+            if os.path.exists("data/timeout.csv"):
+                old_df_timeout = pd.read_csv("data/timeout.csv")
+                timeout_total = len(old_df_timeout)
+                timeout_new = 0
+                print(f"No new timeout data collected. Existing: {timeout_total} rows")
 
         # Update README with dataset statistics
         if os.path.exists("data/supplements.csv") and os.path.exists("data/timeout.csv"):
