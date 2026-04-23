@@ -109,13 +109,29 @@ Common cron schedules:
 - `0 0 * * 0` - Weekly on Sunday at midnight
 - `0 0 1 * *` - Monthly on the 1st at midnight
 
-### 2. Video Analysis (`src/batch_LLM.py`)
+### 2. Downloading Videos
+
+To download videos from the collected links, use `yt-dlp`:
+
+```bash
+# Download timeout videos
+yt-dlp --write-info-json --batch-file data/timeout_links.txt --paths timeout_videos
+
+# Download supplements videos
+yt-dlp --write-info-json --batch-file data/supplements_links.txt --paths supplements_videos
+```
+
+This downloads:
+- Video files to `{dataset}_videos/`
+- Metadata JSON files (`.info.json`) with video information
+
+### 3. Video Analysis (`src/batch_LLM.py`)
 
 This script processes downloaded videos using the Qwen3-Omni-30B-A3B-Instruct multimodal model to extract structured information.
 
 #### Prerequisites:
 
-- Downloaded videos (see "Downloading Videos" section below)
+- Downloaded videos (see "Downloading Videos" section above)
 - GPU with sufficient VRAM (approximately 78GB required)
 - `transformers` library and Qwen dependencies
 
@@ -174,22 +190,6 @@ python3 src/batch_LLM.py --dataset supplements
 Results are saved as JSON files in:
 - `timeout_results/` - Analysis results for timeout videos
 - `supplements_results/` - Analysis results for supplements videos
-
-### 3. Downloading Videos
-
-To download videos from the collected links, use `yt-dlp`:
-
-```bash
-# Download timeout videos
-yt-dlp --write-info-json --batch-file data/timeout_links.txt --paths timeout_videos
-
-# Download supplements videos
-yt-dlp --write-info-json --batch-file data/supplements_links.txt --paths supplements_videos
-```
-
-This downloads:
-- Video files to `{dataset}_videos/`
-- Metadata JSON files (`.info.json`) with video information
 
 ### 4. Data Analysis (`src/analyze_data.py`)
 
