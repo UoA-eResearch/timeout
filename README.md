@@ -191,7 +191,72 @@ Results are saved as JSON files in:
 - `timeout_results/` - Analysis results for timeout videos
 - `supplements_results/` - Analysis results for supplements videos
 
-### 4. Data Analysis (`src/analyze_data.py`)
+### 4. Joining Results (`src/join_results.py`)
+
+After running `batch_LLM.py`, this script merges the per-video AI result JSON files with their yt-dlp metadata and writes the combined data to the Excel files consumed by `analyze_data.py`.
+
+#### Run join_results locally:
+
+```bash
+# Join results for both datasets
+python3 src/join_results.py
+
+# Join results for a single dataset
+python3 src/join_results.py --dataset timeout
+python3 src/join_results.py --dataset supplements
+```
+
+#### Output files:
+
+- `data/timeout_LLM_results.xlsx` - Combined timeout results
+- `data/supplements_LLM_results.xlsx` - Combined supplements results
+
+---
+
+### 5. Full Pipeline (`run_pipeline.sh`)
+
+`run_pipeline.sh` runs the entire pipeline end-to-end:
+
+1. Downloads new videos with **yt-dlp**
+2. Runs **batch_LLM.py** to analyze each video
+3. Runs **join_results.py** to merge results into Excel files
+4. Commits and pushes any updated data files back to the repository
+
+#### Prerequisites
+
+- `yt-dlp` installed and on `$PATH`
+- Python environment with `requirements.txt` installed (see [Installation](#installation))
+- GPU with ~78 GB VRAM for the LLM step (can be skipped if results already exist)
+- Git credentials configured (or set `GIT_USER_NAME` / `GIT_USER_EMAIL` environment variables)
+
+#### Run the pipeline
+
+```bash
+# Process both datasets
+./run_pipeline.sh
+
+# Process a single dataset
+./run_pipeline.sh timeout
+./run_pipeline.sh supplements
+```
+
+#### Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `GIT_USER_NAME` | `pipeline-bot` | Name used for the automated git commit |
+| `GIT_USER_EMAIL` | `pipeline-bot@users.noreply.github.com` | Email used for the automated git commit |
+
+#### What happens
+
+1. **yt-dlp** downloads every URL in `data/{dataset}_links.txt` into `{dataset}_videos/`, writing a `.info.json` metadata file alongside each video. Videos that have already been downloaded are skipped automatically.
+2. **batch_LLM.py** processes each video and writes a `.result.json` file to `{dataset}_results/`. Already-processed videos are skipped.
+3. **join_results.py** reads all result JSONs, joins them with the yt-dlp metadata, and saves `data/{dataset}_LLM_results.xlsx`.
+4. A `git pull --rebase` is performed, changed data files are staged, and a timestamped commit is pushed.
+
+---
+
+### 6. Data Analysis (`src/analyze_data.py`)
 
 This script analyzes the LLM-processed data from the Excel files and generates comprehensive reports with visualizations.
 
@@ -253,14 +318,16 @@ To trigger manually:
 
 ```
 .
+├── run_pipeline.sh             # End-to-end pipeline script (yt-dlp → LLM → join → push)
 ├── src/                        # Python scripts
 │   ├── run_googlesearch.py     # Google search scraping script
 │   ├── batch_LLM.py            # Video analysis script using Qwen3-Omni model
+│   ├── join_results.py         # Join LLM result JSONs with metadata into Excel files
 │   └── analyze_data.py         # Data analysis script for generating reports
 ├── notebooks/                  # Jupyter notebooks
 │   ├── googlesearch.ipynb      # Original scraping notebook
 │   ├── test_LLM.ipynb          # Testing LLM analysis
-│   └── join_results.ipynb      # Combining and analyzing results
+│   └── join_results.ipynb      # Combining and analyzing results (source for join_results.py)
 ├── data/                       # Data files
 │   ├── timeout.csv             # Timeout video links and metadata
 │   ├── timeout_links.txt       # Timeout video links only
