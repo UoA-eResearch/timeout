@@ -218,7 +218,7 @@ python3 src/join_results.py --dataset supplements
 `run_pipeline.sh` runs the entire pipeline end-to-end:
 
 1. Downloads new videos with **yt-dlp**
-2. Runs **batch_LLM.py** to analyse each video
+2. Runs **batch_LLM.py** to analyze each video
 3. Runs **join_results.py** to merge results into Excel files
 4. Commits and pushes any updated data files back to the repository
 
