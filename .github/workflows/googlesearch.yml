@@ -42,6 +42,7 @@ jobs:
         id: scrape_normal
         continue-on-error: true
         run: |
+          set -o pipefail
           xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python3 src/run_googlesearch.py | tee scraper_output.log
 
       - name: Install and configure Tor (if first attempt failed)
@@ -63,6 +64,7 @@ jobs:
         id: scrape_tor
         if: steps.scrape_normal.outcome == 'failure'
         run: |
+          set -o pipefail
           echo "Retrying with Tor proxy..."
           xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' python3 src/run_googlesearch.py --use-tor | tee scraper_output.log
 
