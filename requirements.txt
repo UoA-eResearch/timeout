@@ -1,15 +1,10 @@
 pandas
 tqdm
 yt-dlp[default,curl-cffi]
-accelerate
-torch
+openai
+requests
 json5
 ipython-autotime
-qwen-omni-utils
-torchvision
-transformers<5
-https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.4/flash_attn-2.8.3+cu130torch2.11-cp310-cp310-linux_x86_64.whl
 openpyxl
 bertopic
 nbformat
-torchcodec
