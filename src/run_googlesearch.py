@@ -257,12 +257,12 @@ def main():
                 print("\nNo results found. Might be IP blocked or rate limited.")
                 print("Try running with: torsocks python3 run_googlesearch.py")
                 save_error_screenshot(driver, "no_results")
-                driver.quit()
-                sys.exit(1)
+                break
 
             print(f"\nResults from {search_term}: {len(df)} rows")
             print(df.source.value_counts())
             dfs.append(df)
+            time.sleep(60)
 
         # Combine results
         print("\nCombining results...")
