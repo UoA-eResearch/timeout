@@ -115,10 +115,10 @@ To download videos from the collected links, use `yt-dlp`:
 
 ```bash
 # Download timeout videos
-yt-dlp --download-archive timeout_archive.log --write-info-json --batch-file data/timeout_links.txt --paths timeout_videos
+yt-dlp --download-archive timeout_archive.log --write-info-json --output "%(title).200B.%(ext)s" --batch-file data/timeout_links.txt --paths timeout_videos
 
 # Download supplements videos
-yt-dlp --download-archive supplements_archive.log --write-info-json --batch-file data/supplements_links.txt --paths supplements_videos
+yt-dlp --download-archive supplements_archive.log --write-info-json --output "%(title).200B.%(ext)s" --batch-file data/supplements_links.txt --paths supplements_videos
 ```
 
 This downloads:
@@ -296,12 +296,12 @@ To trigger manually:
 ## Dataset Statistics
 
 **Supplements dataset:**
-- Total videos: 7267
+- Total videos: 7367
 - Breakdown by source:
-- Instagram    2213
-- TikTok       2191
-- Facebook     1622
-- YouTube      1241
+- Instagram    2245
+- TikTok       2217
+- Facebook     1644
+- YouTube      1261
 
 **Timeout dataset:**
 - Total videos: 2789
@@ -311,7 +311,7 @@ To trigger manually:
 - Facebook      438
 - YouTube       152
 
-*Last updated: 2026-06-08 05:15:54 UTC*
+*Last updated: 2026-06-08 05:37:12 UTC*
 
 
 ## Repository Structure
