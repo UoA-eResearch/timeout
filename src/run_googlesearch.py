@@ -87,6 +87,9 @@ def save_error_screenshot(driver, error_name):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"error-screenshot-{error_name}-{timestamp}.png"
         driver.save_screenshot(filename)
+        with open(filename.replace(".png", ".html"), "w") as f:
+            f.write(driver.page_source)
+
         print(f"Screenshot saved: {filename}")
     except Exception as e:
         print(f"Failed to save screenshot: {e}")
