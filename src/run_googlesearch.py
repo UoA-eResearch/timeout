@@ -248,29 +248,25 @@ def main():
         sys.exit(1)
 
     try:
-        # Search for #menopause #supplements
-        df1 = search_and_scrape(driver, "#menopause #supplements")
+        dfs = []
+        for search_term in pd.read_table("data/supplements_search_terms.txt", header=None)[0]:
+            print(f"\nRunning search for: {search_term}")
+            df = search_and_scrape(driver, search_term)
 
-        if df1.empty:
-            print("\nNo results found. Might be IP blocked or rate limited.")
-            print("Try running with: torsocks python3 run_googlesearch.py")
-            save_error_screenshot(driver, "no_results_first_search")
-            driver.quit()
-            sys.exit(1)
+            if df.empty:
+                print("\nNo results found. Might be IP blocked or rate limited.")
+                print("Try running with: torsocks python3 run_googlesearch.py")
+                save_error_screenshot(driver, "no_results")
+                driver.quit()
+                sys.exit(1)
 
-        print(f"\nResults from '#menopause #supplements': {len(df1)} rows")
-        print(df1.source.value_counts())
-
-        # Search for #menopause #vitamins
-        df2 = search_and_scrape(driver, "#menopause #vitamins")
-
-        print(f"\nResults from '#menopause #vitamins': {len(df2)} rows")
-        if not df2.empty:
-            print(df2.source.value_counts())
+            print(f"\nResults from {search_term}: {len(df)} rows")
+            print(df.source.value_counts())
+            dfs.append(df)
 
         # Combine results
         print("\nCombining results...")
-        df = pd.concat([df1, df2]).drop_duplicates(subset="link", keep="first")
+        df = pd.concat(dfs).drop_duplicates(subset="link", keep="first")
         print(f"Combined unique results: {len(df)} rows")
 
         # Load old data if exists
