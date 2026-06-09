@@ -346,7 +346,7 @@ To trigger manually:
 
 ## Data Analysis
 
-*Last updated: 2026-06-09 22:46:53 UTC*
+*Last updated: 2026-06-09 22:47:44 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -357,47 +357,47 @@ This section contains automated analysis of the LLM-processed video data. The an
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=1186 videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=2997 videos).
 
 #### Key Findings
 
 **Video Distribution by Platform:**
-| extractor   |   count |       like_count |   view_count |   comment_count |
-|:------------|--------:|-----------------:|-------------:|----------------:|
-| tiktok      |     868 |      3.40072e+06 |  1.14165e+08 |          128859 |
-| youtube     |     203 | 200690           |  4.58375e+06 |            8890 |
-| facebook    |     113 |      0           |  2.07937e+07 |               0 |
-| instagram   |       2 |    768           |  0           |              31 |
+| extractor   |   count |    like_count |   view_count |   comment_count |
+|:------------|--------:|--------------:|-------------:|----------------:|
+| tiktok      |    1192 |   5.39532e+06 |  1.47229e+08 |          249837 |
+| youtube     |    1048 |   1.27627e+06 |  3.97316e+07 |           48610 |
+| facebook    |     754 |   0           |  1.24132e+08 |               0 |
+| instagram   |       3 | 770           |  0           |              31 |
 
 
 **Top 10 Supplements Promoted:**
-| Supplement          |   Video Count |
-|:--------------------|--------------:|
-| Vitamin D           |            57 |
-| Magnesium           |            48 |
-| magnesium           |            36 |
-| vitamin D           |            34 |
-| Omega-3             |            32 |
-| Perimeno Health     |            26 |
-| Creatine            |            23 |
-| Vitamin C           |            19 |
-| magnesium glycinate |            19 |
-| Magnesium Glycinate |            17 |
+| Supplement      |   Video Count |
+|:----------------|--------------:|
+| Vitamin D       |           142 |
+| Magnesium       |            97 |
+| vitamin D       |            89 |
+| magnesium       |            86 |
+| Omega-3         |            83 |
+| Creatine        |            65 |
+| Vitamin D3      |            49 |
+| Omega 3         |            39 |
+| Perimeno Health |            38 |
+| Vitamin C       |            36 |
 
 
 **Top 10 Symptoms Targeted:**
 | Symptom               |   Mention Count |
 |:----------------------|----------------:|
-| no symptoms mentioned |             329 |
-| hot flashes           |             308 |
-| night sweats          |             177 |
-| mood swings           |             156 |
-| brain fog             |             116 |
-| anxiety               |             112 |
-| fatigue               |              85 |
-| sleep issues          |              74 |
-| menopause             |              67 |
-| weight gain           |              66 |
+| no symptoms mentioned |             889 |
+| hot flashes           |             695 |
+| night sweats          |             388 |
+| mood swings           |             346 |
+| brain fog             |             298 |
+| anxiety               |             273 |
+| fatigue               |             220 |
+| weight gain           |             180 |
+| menopause             |             156 |
+| sleep issues          |             155 |
 
 #### Visualizations
 
