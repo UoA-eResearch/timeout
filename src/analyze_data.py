@@ -198,7 +198,7 @@ def analyze_supplements(df):
             # Parse the list-like string
             items = [s.strip().strip("'\"") for s in supp_list.strip('[]').split(',')]
             # Filter out sentinel values and empty strings
-            all_supplements.extend([s for s in items if s and s.lower() not in sentinel_values])
+            all_supplements.extend([s.title() for s in items if s and s.lower() not in sentinel_values])
 
     supplement_counts = Counter(all_supplements)
     top_supplements = supplement_counts.most_common(10)
@@ -288,7 +288,7 @@ def analyze_supplements(df):
         if isinstance(symptoms, str) and symptoms.lower() != 'none':
             items = [s.strip().strip("'\"") for s in symptoms.strip('[]').split(',')]
             # Lowercase symptoms for consistent counting
-            all_symptoms.extend([s.lower() for s in items if s and s.lower() not in ['none', 'n/a']])
+            all_symptoms.extend([s.title() for s in items if s and s.lower() not in ['none', 'n/a', 'no symptoms mentioned']])
 
     symptom_counts = Counter(all_symptoms)
     top_symptoms = symptom_counts.most_common(10)

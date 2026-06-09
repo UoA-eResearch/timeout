@@ -346,7 +346,7 @@ To trigger manually:
 
 ## Data Analysis
 
-*Last updated: 2026-06-09 22:47:44 UTC*
+*Last updated: 2026-06-09 23:09:28 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -371,33 +371,33 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 
 
 **Top 10 Supplements Promoted:**
-| Supplement      |   Video Count |
-|:----------------|--------------:|
-| Vitamin D       |           142 |
-| Magnesium       |            97 |
-| vitamin D       |            89 |
-| magnesium       |            86 |
-| Omega-3         |            83 |
-| Creatine        |            65 |
-| Vitamin D3      |            49 |
-| Omega 3         |            39 |
-| Perimeno Health |            38 |
-| Vitamin C       |            36 |
+| Supplement          |   Video Count |
+|:--------------------|--------------:|
+| Vitamin D           |           231 |
+| Magnesium           |           183 |
+| Omega-3             |           114 |
+| Creatine            |            97 |
+| Magnesium Glycinate |            95 |
+| Vitamin D3          |            68 |
+| Calcium             |            67 |
+| Vitamin C           |            58 |
+| Ashwagandha         |            58 |
+| Collagen            |            55 |
 
 
 **Top 10 Symptoms Targeted:**
-| Symptom               |   Mention Count |
-|:----------------------|----------------:|
-| no symptoms mentioned |             889 |
-| hot flashes           |             695 |
-| night sweats          |             388 |
-| mood swings           |             346 |
-| brain fog             |             298 |
-| anxiety               |             273 |
-| fatigue               |             220 |
-| weight gain           |             180 |
-| menopause             |             156 |
-| sleep issues          |             155 |
+| Symptom      |   Mention Count |
+|:-------------|----------------:|
+| Hot Flashes  |             695 |
+| Night Sweats |             388 |
+| Mood Swings  |             346 |
+| Brain Fog    |             298 |
+| Anxiety      |             273 |
+| Fatigue      |             220 |
+| Weight Gain  |             180 |
+| Menopause    |             156 |
+| Sleep Issues |             155 |
+| Mood Changes |             141 |
 
 #### Visualizations
 
