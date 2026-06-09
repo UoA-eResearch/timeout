@@ -11,11 +11,14 @@ from glob import glob
 from tqdm import tqdm
 from openai import OpenAI
 import argparse
+from tqdm.contrib.concurrent import thread_map
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Process videos with LLM')
 parser.add_argument('--dataset', type=str, choices=['timeout', 'supplements'],
                     required=True, help='Dataset to process (timeout or supplements)')
+parser.add_argument('--max_workers', type=int, default=4, help='Maximum number of worker threads')
+parser.add_argument('--think', action='store_true', default=False, help='Enable thinking steps')
 args = parser.parse_args()
 
 files = []
@@ -101,23 +104,23 @@ def get_prompt(data, dataset):
         return get_prompt_supplements(data)
 
 
-for json_filename in tqdm(files):
+def process_file(json_filename):
     output_filename = json_filename.replace("videos/", "results/").replace(
         ".info.json", ".result.json"
     )
     if os.path.isfile(output_filename):
-        continue
+        return
     print(f"{json_filename}")
     with open(json_filename) as f:
         data = json.load(f)
     if data["ext"] in ["mp3", "m4a"]:
-        continue
+        return
     try:
         video_filename = json_filename.replace("info.json", data["ext"])
         assert os.path.isfile(video_filename)
     except Exception as e:
         print(f"{e} for {json_filename}")
-        continue
+        return
     video_filename = json_filename.replace("info.json", data["ext"])
     with open(video_filename, "rb") as video_file:
         base64_video = "data:video/" + data["ext"] + ";base64," + base64.b64encode(video_file.read()).decode("utf-8")
@@ -129,7 +132,7 @@ for json_filename in tqdm(files):
                     "role": "user",
                     "content": [
                         {"type": "video_url", "video_url": {"url": base64_video}},
-                        {"type": "text", "text": get_prompt(data, "supplements")},
+                        {"type": "text", "text": get_prompt(data, args.dataset)},
                     ],
                 }
             ],
@@ -138,7 +141,7 @@ for json_filename in tqdm(files):
             top_p=0.95,
             extra_body={
                 "chat_template_kwargs": {
-                    "enable_thinking": False,
+                    "enable_thinking": args.think,
                 },
                 "mm_processor_kwargs": {"use_audio_in_video": True},
             },
@@ -150,3 +153,5 @@ for json_filename in tqdm(files):
         print(f"Wrote results to {output_filename}")
     except Exception as e:
         print(f"{e} for {video_filename}")
+
+thread_map(process_file, files, max_workers=args.max_workers)
