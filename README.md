@@ -44,7 +44,7 @@ System packages (for Tor support):
 
 This script scrapes Google search results for short videos related to:
 - **Timeout dataset**: `#parenting #timeout` and `#gentleparenting #timeout`
-- **Supplements dataset**: `#menopause #supplements` and `#menopause #vitamins`
+- **Supplements dataset**: see `data/supplements_search_terms.txt`
 
 #### Run the scraper locally:
 
@@ -127,13 +127,12 @@ This downloads:
 
 ### 3. Video Analysis (`src/batch_LLM.py`)
 
-This script processes downloaded videos using the Qwen3-Omni-30B-A3B-Instruct multimodal model to extract structured information.
+This script processes downloaded videos using the Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16 omnimodal LLM to extract structured information.
 
 #### Prerequisites:
 
 - Downloaded videos (see "Downloading Videos" section above)
 - GPU with sufficient VRAM (approximately 78GB required)
-- `transformers` library and Qwen dependencies
 
 #### Run the video analysis:
 
@@ -321,7 +320,7 @@ To trigger manually:
 ├── run_pipeline.sh             # End-to-end pipeline script (yt-dlp → LLM → join → push)
 ├── src/                        # Python scripts
 │   ├── run_googlesearch.py     # Google search scraping script
-│   ├── batch_LLM.py            # Video analysis script using Qwen3-Omni model
+│   ├── batch_LLM.py            # Video analysis script using an omnimodal LLM
 │   ├── join_results.py         # Join LLM result JSONs with metadata into Excel files
 │   └── analyze_data.py         # Data analysis script for generating reports
 ├── notebooks/                  # Jupyter notebooks
