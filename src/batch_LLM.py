@@ -110,6 +110,8 @@ for json_filename in tqdm(files):
     print(f"{json_filename}")
     with open(json_filename) as f:
         data = json.load(f)
+    if data["ext"] in ["mp3", "m4a"]:
+        continue
     try:
         video_filename = json_filename.replace("info.json", data["ext"])
         assert os.path.isfile(video_filename)
