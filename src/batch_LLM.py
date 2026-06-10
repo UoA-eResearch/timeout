@@ -17,17 +17,20 @@ from tqdm.contrib.concurrent import thread_map
 parser = argparse.ArgumentParser(description='Process videos with LLM')
 parser.add_argument('--dataset', type=str, choices=['timeout', 'supplements'],
                     required=True, help='Dataset to process (timeout or supplements)')
-parser.add_argument('--max_workers', type=int, default=4, help='Maximum number of worker threads')
+parser.add_argument('--max_workers', type=int, default=16, help='Maximum number of worker threads')
 parser.add_argument('--think', action='store_true', default=False, help='Enable thinking steps')
 args = parser.parse_args()
 
 files = []
 folder = f"{args.dataset}_videos"
-os.makedirs(folder.replace("videos", "results"), exist_ok=True)
+result_folder = f"{args.dataset}_results"
+if args.think:
+    result_folder += "_think"
+os.makedirs(result_folder, exist_ok=True)
 for f in glob(f"{folder}/*.json"):
-    output_filename = f.replace("videos/", "results/").replace(
+    output_filename = os.path.join(result_folder, os.path.basename(f.replace(
         ".info.json", ".result.json"
-    )
+    )))
     if not os.path.isfile(output_filename):
         files.append(f)
 print(len(files))
@@ -105,12 +108,11 @@ def get_prompt(data, dataset):
 
 
 def process_file(json_filename):
-    output_filename = json_filename.replace("videos/", "results/").replace(
+    output_filename = os.path.join(result_folder, os.path.basename(json_filename.replace(
         ".info.json", ".result.json"
-    )
+    )))
     if os.path.isfile(output_filename):
         return
-    print(f"{json_filename}")
     with open(json_filename) as f:
         data = json.load(f)
     if data["ext"] in ["mp3", "m4a"]:
