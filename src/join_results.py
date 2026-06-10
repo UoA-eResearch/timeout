@@ -37,7 +37,9 @@ METADATA_KEYS = [
 
 def join_dataset(dataset: str) -> pd.DataFrame:
     results_dir = f"{dataset}_results"
-    videos_dir = f"{dataset}_videos"
+    if os.path.isdir(results_dir + "_think"):
+        results_dir = results_dir + "_think"
+        print(f"Using thinking results from {results_dir}")
 
     result_files = glob(f"{results_dir}/*.json")
     if not result_files:
@@ -58,7 +60,7 @@ def join_dataset(dataset: str) -> pd.DataFrame:
             ai_data["AI_description"] = ai_data.pop("description")
 
         metadata_file = (
-            result_file.replace(f"{dataset}_results/", f"{dataset}_videos/")
+            result_file.replace(results_dir, f"{dataset}_videos/")
             .replace(".result.json", ".info.json")
         )
         if not os.path.isfile(metadata_file):
