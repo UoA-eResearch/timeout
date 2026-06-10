@@ -128,6 +128,8 @@ def process_file(json_filename):
         base64_video = "data:video/" + data["ext"] + ";base64," + base64.b64encode(video_file.read()).decode("utf-8")
     for retry in range(3):
         try:
+            reasoning_budget = 16384
+            grace_period = 1024
             response = client.chat.completions.create(
                 model="nemotron_3_nano_omni",
                 messages=[
@@ -143,8 +145,10 @@ def process_file(json_filename):
                 temperature=0.6,
                 top_p=0.95,
                 extra_body={
+                    "thinking_token_budget": reasoning_budget + grace_period,
                     "chat_template_kwargs": {
                         "enable_thinking": args.think,
+                        "reasoning_budget": reasoning_budget,
                     },
                     "mm_processor_kwargs": {"use_audio_in_video": True},
                 },
@@ -154,7 +158,6 @@ def process_file(json_filename):
             json.loads(text)
             with open(output_filename, "w") as f:
                 f.write(text)
-            print(f"Wrote results to {output_filename}")
             return
         except Exception as e:
             print(f"{e} for {video_filename}")
