@@ -265,6 +265,7 @@ def main():
             print(f"\nResults from {search_term}: {len(df)} rows")
             print(df.source.value_counts())
             dfs.append(df)
+            time.sleep(60)
 
         # Combine results
         print("\nCombining results...")
