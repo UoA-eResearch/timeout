@@ -124,34 +124,38 @@ def process_file(json_filename):
     video_filename = json_filename.replace("info.json", data["ext"])
     with open(video_filename, "rb") as video_file:
         base64_video = "data:video/" + data["ext"] + ";base64," + base64.b64encode(video_file.read()).decode("utf-8")
-    try:
-        response = client.chat.completions.create(
-            model="nemotron_3_nano_omni",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "video_url", "video_url": {"url": base64_video}},
-                        {"type": "text", "text": get_prompt(data, args.dataset)},
-                    ],
-                }
-            ],
-            max_tokens=20480,
-            temperature=0.6,
-            top_p=0.95,
-            extra_body={
-                "chat_template_kwargs": {
-                    "enable_thinking": args.think,
+    for retry in range(3):
+        try:
+            response = client.chat.completions.create(
+                model="nemotron_3_nano_omni",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "video_url", "video_url": {"url": base64_video}},
+                            {"type": "text", "text": get_prompt(data, args.dataset)},
+                        ],
+                    }
+                ],
+                max_tokens=20480,
+                temperature=0.6,
+                top_p=0.95,
+                extra_body={
+                    "chat_template_kwargs": {
+                        "enable_thinking": args.think,
+                    },
+                    "mm_processor_kwargs": {"use_audio_in_video": True},
                 },
-                "mm_processor_kwargs": {"use_audio_in_video": True},
-            },
-        )
-        text = response.choices[0].message.content
-        text = text.replace("```json", "").replace("```", "").strip()
-        with open(output_filename, "w") as f:
-            f.write(text)
-        print(f"Wrote results to {output_filename}")
-    except Exception as e:
-        print(f"{e} for {video_filename}")
+            )
+            text = response.choices[0].message.content
+            text = text.replace("```json", "").replace("```", "").strip()
+            json.loads(text)
+            with open(output_filename, "w") as f:
+                f.write(text)
+            print(f"Wrote results to {output_filename}")
+            return
+        except Exception as e:
+            print(f"{e} for {video_filename}")
+    print(f"All 3 retries failed for {video_filename}")
 
 thread_map(process_file, files, max_workers=args.max_workers)
