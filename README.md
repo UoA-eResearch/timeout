@@ -346,7 +346,7 @@ To trigger manually:
 
 ## Data Analysis
 
-*Last updated: 2026-06-09 23:12:53 UTC*
+*Last updated: 2026-06-10 22:27:59 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -357,47 +357,47 @@ This section contains automated analysis of the LLM-processed video data. The an
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=3179 videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=2660 videos).
 
 #### Key Findings
 
 **Video Distribution by Platform:**
 | extractor   |   count |    like_count |   view_count |   comment_count |
 |:------------|--------:|--------------:|-------------:|----------------:|
-| tiktok      |    1193 |   5.39896e+06 |  1.47322e+08 |          250066 |
-| youtube     |    1048 |   1.27627e+06 |  3.97316e+07 |           48610 |
-| facebook    |     935 |   0           |  1.48443e+08 |               0 |
+| tiktok      |    1058 |   4.06698e+06 |  1.23261e+08 |          172713 |
+| youtube     |     817 |   1.02007e+06 |  3.32322e+07 |           44401 |
+| facebook    |     782 |   0           |  1.21677e+08 |               0 |
 | instagram   |       3 | 770           |  0           |              31 |
 
 
 **Top 10 Supplements Promoted:**
 | Supplement          |   Video Count |
 |:--------------------|--------------:|
-| Vitamin D           |           248 |
-| Magnesium           |           189 |
-| Omega-3             |           125 |
-| Creatine            |           110 |
-| Magnesium Glycinate |           105 |
-| Calcium             |            72 |
-| Vitamin D3          |            72 |
-| Vitamin C           |            60 |
-| Ashwagandha         |            60 |
-| Collagen            |            56 |
+| Vitamin D           |           325 |
+| Magnesium           |           228 |
+| Omega-3             |           172 |
+| Calcium             |           122 |
+| Creatine            |           118 |
+| Magnesium Glycinate |           107 |
+| Vitamin C           |           103 |
+| Vitamin D3          |            89 |
+| Collagen            |            89 |
+| Ashwagandha         |            81 |
 
 
 **Top 10 Symptoms Targeted:**
-| Symptom      |   Mention Count |
-|:-------------|----------------:|
-| Hot Flashes  |             718 |
-| Night Sweats |             403 |
-| Mood Swings  |             362 |
-| Brain Fog    |             322 |
-| Anxiety      |             292 |
-| Fatigue      |             236 |
-| Weight Gain  |             190 |
-| Menopause    |             160 |
-| Sleep Issues |             158 |
-| Insomnia     |             153 |
+| Symptom       |   Mention Count |
+|:--------------|----------------:|
+| Menopause     |             714 |
+| Hot Flashes   |             713 |
+| Perimenopause |             455 |
+| Night Sweats  |             389 |
+| Mood Swings   |             343 |
+| Brain Fog     |             312 |
+| Anxiety       |             289 |
+| Fatigue       |             255 |
+| Weight Gain   |             208 |
+| Mood Changes  |             187 |
 
 #### Visualizations
 
