@@ -98,6 +98,11 @@ def save_error_screenshot(driver, error_name):
 def check_and_solve_captcha(driver):
     driver.implicitly_wait(0)
     try:
+        driver.find_element(By.CSS_SELECTOR, "form#captcha-form")
+        raise ValueError("Unsolvable CAPTCHA found")
+    except:
+        pass
+    try:
         captcha_iframe = [
             iframe for iframe in driver.find_elements(By.TAG_NAME, "iframe")
             if "captcha" in (iframe.get_attribute("title") or "").lower()
