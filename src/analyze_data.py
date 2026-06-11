@@ -288,7 +288,7 @@ def analyze_supplements(df):
         if isinstance(symptoms, str) and symptoms.lower() != 'none':
             items = [s.strip().strip("'\"") for s in symptoms.strip('[]').split(',')]
             # Lowercase symptoms for consistent counting
-            all_symptoms.extend([s.title() for s in items if s and s.lower() not in ['none', 'n/a', 'no symptoms mentioned']])
+            all_symptoms.extend([s.title() for s in items if s and s.lower() not in ['none', 'n/a', 'no symptoms mentioned', 'menopause', 'perimenopause']])
 
     symptom_counts = Counter(all_symptoms)
     top_symptoms = symptom_counts.most_common(10)

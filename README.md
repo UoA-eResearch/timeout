@@ -346,7 +346,7 @@ To trigger manually:
 
 ## Data Analysis
 
-*Last updated: 2026-06-10 22:33:29 UTC*
+*Last updated: 2026-06-11 01:19:40 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -386,18 +386,18 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 
 
 **Top 10 Symptoms Targeted:**
-| Symptom       |   Mention Count |
-|:--------------|----------------:|
-| Menopause     |             714 |
-| Hot Flashes   |             713 |
-| Perimenopause |             455 |
-| Night Sweats  |             389 |
-| Mood Swings   |             343 |
-| Brain Fog     |             312 |
-| Anxiety       |             289 |
-| Fatigue       |             255 |
-| Weight Gain   |             208 |
-| Mood Changes  |             187 |
+| Symptom      |   Mention Count |
+|:-------------|----------------:|
+| Hot Flashes  |             713 |
+| Night Sweats |             389 |
+| Mood Swings  |             343 |
+| Brain Fog    |             312 |
+| Anxiety      |             289 |
+| Fatigue      |             255 |
+| Weight Gain  |             208 |
+| Mood Changes |             187 |
+| Stress       |             171 |
+| Insomnia     |             169 |
 
 #### Visualizations
 
