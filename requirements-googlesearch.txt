@@ -2,3 +2,4 @@ pandas
 tqdm
 selenium
 undetected-chromedriver
+selenium-recaptcha-solver

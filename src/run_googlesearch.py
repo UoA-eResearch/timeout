@@ -17,6 +17,7 @@ from datetime import datetime
 import shutil
 import subprocess
 import re
+from selenium_recaptcha_solver import RecaptchaSolver
 
 pd.set_option("display.max_colwidth", None)
 
@@ -94,14 +95,30 @@ def save_error_screenshot(driver, error_name):
     except Exception as e:
         print(f"Failed to save screenshot: {e}")
 
+def check_and_solve_captcha(driver):
+    driver.implicitly_wait(0)
+    try:
+        captcha_iframe = [
+            iframe for iframe in driver.find_elements(By.TAG_NAME, "iframe")
+            if "captcha" in (iframe.get_attribute("title") or "").lower()
+        ][0]
+        print("Solving recaptcha")
+        solver = RecaptchaSolver(driver=driver)
+        solver.click_recaptcha_v2(iframe=captcha_iframe)
+    except Exception as e:
+        pass
+    driver.implicitly_wait(10)
+    return
 
 def search_and_scrape(driver, query, max_scrolls=10):
     """Search Google and scrape short video results"""
     print(f"\nSearching for: {query}")
+    solver = RecaptchaSolver(driver=driver)
 
     # Navigate to Google
     driver.get("https://www.google.com/")
     time.sleep(2)
+    check_and_solve_captcha(driver)
 
     # Search
     search_field = driver.find_element(By.TAG_NAME, "textarea")
@@ -109,12 +126,14 @@ def search_and_scrape(driver, query, max_scrolls=10):
     search_field.send_keys(query)
     search_field.submit()
     time.sleep(3)
+    check_and_solve_captcha(driver)
 
     # Click on Short videos if available
     try:
         driver.find_element(By.LINK_TEXT, "Short videos").click()
         print("Clicked on 'Short videos'")
         time.sleep(2)
+        check_and_solve_captcha(driver)
     except Exception as e:
         print(f"Could not click 'Short videos': {e}")
         save_error_screenshot(driver, "short_videos_not_found")
@@ -125,6 +144,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
     for i in range(max_scrolls):
         ActionChains(driver).scroll_by_amount(0, 10000).perform()
         time.sleep(1)
+        check_and_solve_captcha(driver)
 
     # Click "More results" until no more available
     print("Loading more results...")
@@ -134,6 +154,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
             results_count = len(driver.find_elements(By.CSS_SELECTOR, "div.MjjYud"))
             print(f"Results: {results_count}")
             time.sleep(1.5)
+            check_and_solve_captcha(driver)
         except Exception as e:
             print(f"No more results")
             break
@@ -141,6 +162,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
     # Get all results
     results = driver.find_elements(By.CSS_SELECTOR, "div.MjjYud")
     print(f"\nTotal results found: {len(results)}")
+    check_and_solve_captcha(driver)
 
     # Parse results
     parsed_results = []
@@ -152,6 +174,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
             # Ensure we have at least 3 elements in bits
             if len(bits) < 3:
                 print(f"Skipping result with insufficient data: {bits}")
+                #save_error_screenshot(driver, "insufficient_data")
                 continue
 
             duration = bits[0]
