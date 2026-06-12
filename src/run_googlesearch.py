@@ -81,9 +81,12 @@ def update_readme_stats(supplements_df, timeout_df):
     except Exception as e:
         print(f"Warning: Could not update README.md: {e}")
 
+errors = 0
 
 def save_error_screenshot(driver, error_name):
     """Save a screenshot when an error occurs"""
+    global errors
+    errors += 1
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"error-screenshot-{error_name}-{timestamp}.png"
@@ -110,6 +113,7 @@ def check_and_solve_captcha(driver):
         print("Solving recaptcha")
         solver = RecaptchaSolver(driver=driver)
         solver.click_recaptcha_v2(iframe=captcha_iframe)
+        time.sleep(1)
     except Exception as e:
         pass
     driver.implicitly_wait(10)
@@ -414,6 +418,10 @@ def main():
         print(f"Supplements: +{supplements_new} new, {supplements_total} total")
         print(f"Timeout: +{timeout_new} new, {timeout_total} total")
         print("=" * 80)
+
+        print(f"Total errors encountered: {errors}")
+        if errors > 0:
+            sys.exit(1)
 
     except Exception as e:
         print(f"\nError during execution: {e}")

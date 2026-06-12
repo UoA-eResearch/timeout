@@ -13,6 +13,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     permissions:
       contents: write  # Allow pushing changes back to repo
