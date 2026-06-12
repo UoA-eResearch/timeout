@@ -4,6 +4,7 @@ Script to run the googlesearch notebook and save results.
 This script replicates the googlesearch.ipynb notebook logic.
 """
 
+import random
 from tqdm.auto import tqdm
 import os
 import sys
@@ -284,7 +285,9 @@ def main():
 
     try:
         dfs = []
-        for search_term in pd.read_table("data/supplements_search_terms.txt", header=None)[0]:
+        search_terms = pd.read_table("data/supplements_search_terms.txt", header=None)[0]
+        random.shuffle(search_terms)
+        for search_term in search_terms:
             print(f"\nRunning search for: {search_term}")
             df = search_and_scrape(driver, search_term)
 
