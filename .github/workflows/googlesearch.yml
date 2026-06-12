@@ -20,10 +20,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -31,7 +31,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg xvfb
+          sudo apt-get install -y ca-certificates curl gnupg xvfb ffmpeg
           google-chrome --version
 
       - name: Install Python dependencies
@@ -108,7 +108,7 @@ jobs:
           git push
 
       - name: Upload results as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: search-results
