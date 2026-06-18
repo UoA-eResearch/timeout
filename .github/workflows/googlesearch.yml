@@ -64,6 +64,7 @@ jobs:
       - name: Run Google search scraper with Tor (if first attempt failed)
         id: scrape_tor
         if: steps.scrape_normal.outcome == 'failure'
+        continue-on-error: true
         run: |
           set -o pipefail
           echo "Retrying with Tor proxy..."
