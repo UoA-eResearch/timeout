@@ -71,6 +71,7 @@ jobs:
 
       - name: Check for changes
         id: check_changes
+        if: always()
         run: |
           if git diff --quiet data/supplements.csv data/supplements_links.txt data/timeout.csv data/timeout_links.txt 2>/dev/null; then
             echo "changed=false" >> $GITHUB_OUTPUT
