@@ -102,7 +102,7 @@ def save_error_screenshot(driver, error_name):
 def check_and_solve_captcha(driver):
     driver.implicitly_wait(0)
     try:
-        driver.find_element(By.CSS_SELECTOR, "form#captcha-form")
+        driver.find_element(By.CSS_SELECTOR, "form[id*=captcha]")
         raise ValueError("Unsolvable CAPTCHA found")
     except:
         pass
@@ -126,28 +126,11 @@ def search_and_scrape(driver, query, max_scrolls=10):
     solver = RecaptchaSolver(driver=driver)
 
     # Navigate to Google
-    driver.get("https://www.google.com/")
+    url = f"https://www.google.com/search?udm=39&q={query}"
+    print(url)
+    driver.get(url)
     time.sleep(2)
     check_and_solve_captcha(driver)
-
-    # Search
-    search_field = driver.find_element(By.TAG_NAME, "textarea")
-    search_field.clear()
-    search_field.send_keys(query)
-    search_field.submit()
-    time.sleep(3)
-    check_and_solve_captcha(driver)
-
-    # Click on Short videos if available
-    try:
-        driver.find_element(By.LINK_TEXT, "Short videos").click()
-        print("Clicked on 'Short videos'")
-        time.sleep(2)
-        check_and_solve_captcha(driver)
-    except Exception as e:
-        print(f"Could not click 'Short videos': {e}")
-        save_error_screenshot(driver, "short_videos_not_found")
-        return pd.DataFrame()
 
     # Scroll to load more results
     print(f"Scrolling to load more results...")
