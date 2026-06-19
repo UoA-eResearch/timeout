@@ -325,23 +325,23 @@ def main():
         print("Starting timeout collection...")
         print("=" * 80)
 
-        # Search for #parenting #timeout
-        df_timeout1 = search_and_scrape(driver, "#parenting #timeout")
+        # Search for parenting timeout
+        df_timeout1 = search_and_scrape(driver, "parenting timeout")
 
         if df_timeout1.empty:
-            print("\nNo results found for #parenting #timeout. Might be IP blocked or rate limited.")
+            print("\nNo results found for parenting timeout. Might be IP blocked or rate limited.")
             save_error_screenshot(driver, "no_results_timeout_first_search")
         else:
-            print(f"\nResults from '#parenting #timeout': {len(df_timeout1)} rows")
+            print(f"\nResults from 'parenting timeout': {len(df_timeout1)} rows")
             print(df_timeout1.source.value_counts())
 
-        # Search for #gentleparenting #timeout
-        df_timeout2 = search_and_scrape(driver, "#gentleparenting #timeout")
+        # Search for gentleparenting timeout
+        df_timeout2 = search_and_scrape(driver, "gentleparenting timeout")
 
         if df_timeout2.empty:
-            print("\nNo results found for #gentleparenting #timeout.")
+            print("\nNo results found for gentleparenting timeout.")
         else:
-            print(f"\nResults from '#gentleparenting #timeout': {len(df_timeout2)} rows")
+            print(f"\nResults from 'gentleparenting timeout': {len(df_timeout2)} rows")
             print(df_timeout2.source.value_counts())
 
         # Combine timeout results
