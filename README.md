@@ -114,10 +114,10 @@ To download videos from the collected links, use `yt-dlp`:
 
 ```bash
 # Download timeout videos
-yt-dlp --download-archive timeout_archive.log --write-info-json --output "%(title).200B [%(id)s].%(ext)s" --batch-file data/timeout_links.txt --paths timeout_videos
+yt-dlp --download-archive timeout_archive.log --write-info-json --output "%(title).100B [%(id)s].%(ext)s" --batch-file data/timeout_links.txt --paths timeout_videos
 
 # Download supplements videos
-yt-dlp --download-archive supplements_archive.log --write-info-json --output "%(title).200B [%(id)s].%(ext)s" --batch-file data/supplements_links.txt --paths supplements_videos
+yt-dlp --download-archive supplements_archive.log --write-info-json --output "%(title).100B [%(id)s].%(ext)s" --batch-file data/supplements_links.txt --paths supplements_videos
 ```
 
 This downloads:
