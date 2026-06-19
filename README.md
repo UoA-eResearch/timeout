@@ -61,13 +61,12 @@ python3 src/run_googlesearch.py --use-tor
 
 #### How it works:
 
-1. Searches Google for the specified hashtag combinations
-2. Clicks on "Short videos" filter
-3. Scrolls to load more results and clicks "More results" button
-4. Scrapes video metadata: link, duration, title, source, author
-5. Combines results with previous data
-6. Filters to include only Instagram, TikTok, YouTube, and Facebook videos
-7. Saves results to CSV and text files
+1. Searches the Google "Short videos" section for the specified search terms
+2. Scrolls to load more results and clicks "More results" button
+3. Scrapes video metadata: link, duration, title, source, author
+4. Combines results with previous data
+5. Filters to include only Instagram, TikTok, YouTube, and Facebook videos
+6. Saves results to CSV and text files
 
 #### Output files:
 
