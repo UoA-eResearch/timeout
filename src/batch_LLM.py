@@ -12,6 +12,7 @@ from tqdm import tqdm
 from openai import OpenAI
 import argparse
 from tqdm.contrib.concurrent import thread_map
+import ffmpeg
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Process videos with LLM')
@@ -36,6 +37,16 @@ for f in glob(f"{folder}/*.json"):
 print(len(files))
 
 client = OpenAI(base_url="https://ai.cer-sandbox.cloud.edu.au/v1", api_key="not needed")
+
+def has_audio(video_path):
+    try:
+        # Probe the video file specifically selecting audio streams
+        probe = ffmpeg.probe(video_path, select_streams='a')
+        # If the 'streams' list is not empty, an audio track exists
+        return len(probe['streams']) > 0
+    except ffmpeg.Error as e:
+        print(f"Error checking file: {e}")
+        return False
 
 def get_prompt_supplements(data):
     return f"""This is a video downloaded from {data['extractor']}. Here's the description of the video: {data['description']}.
@@ -119,7 +130,7 @@ def process_file(json_filename):
         return
     try:
         video_filename = json_filename.replace("info.json", data["ext"])
-        assert os.path.isfile(video_filename)
+        assert os.path.isfile(video_filename), f"Video file {video_filename} does not exist"
     except Exception as e:
         print(f"{e} for {json_filename}")
         return
@@ -150,7 +161,7 @@ def process_file(json_filename):
                         "enable_thinking": args.think,
                         "reasoning_budget": reasoning_budget,
                     },
-                    "mm_processor_kwargs": {"use_audio_in_video": True},
+                    "mm_processor_kwargs": {"use_audio_in_video": has_audio(video_filename)},
                 },
             )
             text = response.choices[0].message.content
