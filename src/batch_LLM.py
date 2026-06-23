@@ -49,7 +49,7 @@ def has_audio(video_path):
         return False
 
 def get_prompt_supplements(data):
-    return f"""This is a video downloaded from {data['extractor']}. Here's the description of the video: {data['description']}.
+    return f"""This is a video downloaded from {data['extractor']}. Here's the description of the video: {data.get('description', 'No description available')}.
 
         The creator of the video is {data.get('channel', 'an unknown channel')} ({data.get('uploader', 'an unknown uploader')})
         It has {data.get('like_count', 'an unknown number of')} likes, {data.get('view_count', 'an unknown number of')} views, and {data.get('comment_count', 'an unknown number of')} comments.
@@ -126,8 +126,13 @@ def process_file(json_filename):
         return
     with open(json_filename) as f:
         data = json.load(f)
-    if data["ext"] in ["mp3", "m4a"]:
+    try:
+        if data["ext"] in ["mp3", "m4a"]:
+            return
+    except Exception as e:
+        print(f"Error occurred while checking video extension for {json_filename}: {e}")
         return
+
     try:
         video_filename = json_filename.replace("info.json", data["ext"])
         assert os.path.isfile(video_filename), f"Video file {video_filename} does not exist"
