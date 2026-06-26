@@ -147,6 +147,27 @@ def analyze_supplements(df):
     analysis_results['plots'].append(('supplements_sentiment_over_time.png', 'Sentiment trends over time'))
     print(f"Saved plot: {plot_path}")
 
+    # 2.5. Normalized sentiment over time
+    fig, ax = plt.subplots(figsize=(14, 6))
+    sentiment_over_time_normalized = sentiment_over_time.div(sentiment_over_time.sum(axis=1), axis=0)
+    sentiment_over_time_normalized.plot(
+        kind='bar',
+        stacked=True,
+        ax=ax,
+        color=[sentiment_colors[col] for col in sentiment_over_time_normalized.columns]
+    )
+    ax.set_title('Sentiment Trends Over Time - Supplements Dataset', fontsize=16, fontweight='bold')
+    ax.set_xlabel('Month', fontsize=12)
+    ax.set_ylabel('Proportion of Videos', fontsize=12)
+    ax.legend(title='Sentiment', labels=[sentiment_labels[col] for col in sentiment_over_time_normalized.columns])
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plot_path = PLOTS_DIR / 'supplements_relative_sentiment_over_time.png'
+    plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    analysis_results['plots'].append(('supplements_relative_sentiment_over_time.png', 'Relative sentiment trends over time'))
+    print(f"Saved plot: {plot_path}")
+
     # 3. Popularity of topic over time (number of posts and likes)
     print("\n3. Popularity Over Time")
     popularity = df.groupby('year_month').agg({
@@ -198,7 +219,15 @@ def analyze_supplements(df):
             # Parse the list-like string
             items = [s.strip().strip("'\"") for s in supp_list.strip('[]').split(',')]
             # Filter out sentinel values and empty strings
-            all_supplements.extend([s.title() for s in items if s and s.lower() not in sentinel_values])
+            for supplement in items:
+                supplement = supplement.lower()
+                if supplement.lower() in sentinel_values:
+                    continue
+                if supplement in ["vitamin d", "vitamin d3"]:
+                    supplement = "Vitamin D"
+                if supplement in ["magnesium", "magnesium glycinate"]:
+                    supplement = "Magnesium"
+                all_supplements.append(supplement.title())
 
     supplement_counts = Counter(all_supplements)
     top_supplements = supplement_counts.most_common(10)
@@ -288,7 +317,13 @@ def analyze_supplements(df):
         if isinstance(symptoms, str) and symptoms.lower() != 'none':
             items = [s.strip().strip("'\"") for s in symptoms.strip('[]').split(',')]
             # Lowercase symptoms for consistent counting
-            all_symptoms.extend([s.title() for s in items if s and s.lower() not in ['none', 'n/a', 'no symptoms mentioned', 'menopause', 'perimenopause']])
+            for symptom in items:
+                symptom = symptom.lower()
+                if symptom in ['none', 'n/a', 'no symptoms mentioned', 'menopause', 'perimenopause']:
+                    continue
+                if symptom in ["mood swings", "mood changes", "anxiety", "stress", "depression", "irritability"]:
+                    symptom = "mood changes"
+                all_symptoms.append(symptom.title())
 
     symptom_counts = Counter(all_symptoms)
     top_symptoms = symptom_counts.most_common(10)

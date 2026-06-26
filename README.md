@@ -345,7 +345,7 @@ To trigger manually:
 
 ## Data Analysis
 
-*Last updated: 2026-06-23 22:55:39 UTC*
+*Last updated: 2026-06-26 00:52:04 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -370,39 +370,43 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 
 
 **Top 10 Supplements Promoted:**
-| Supplement          |   Video Count |
-|:--------------------|--------------:|
-| Vitamin D           |           383 |
-| Magnesium           |           296 |
-| Omega-3             |           202 |
-| Calcium             |           146 |
-| Creatine            |           133 |
-| Magnesium Glycinate |           121 |
-| Vitamin C           |           119 |
-| Collagen            |           107 |
-| Ashwagandha         |           104 |
-| Vitamin D3          |           102 |
+| Supplement   |   Video Count |
+|:-------------|--------------:|
+| Vitamin D    |           485 |
+| Magnesium    |           417 |
+| Omega-3      |           202 |
+| Calcium      |           146 |
+| Creatine     |           133 |
+| Vitamin C    |           119 |
+| Collagen     |           107 |
+| Ashwagandha  |           104 |
+| Black Cohosh |            96 |
+| Vitamin K2   |            84 |
 
 
 **Top 10 Symptoms Targeted:**
 | Symptom            |   Mention Count |
 |:-------------------|----------------:|
+| Mood Changes       |            1846 |
 | Hot Flashes        |            1025 |
 | Night Sweats       |             558 |
-| Mood Swings        |             515 |
 | Brain Fog          |             460 |
-| Anxiety            |             429 |
 | Fatigue            |             366 |
 | Weight Gain        |             332 |
-| Mood Changes       |             257 |
 | Sleep Disturbances |             242 |
-| Stress             |             240 |
+| Insomnia           |             239 |
+| Low Energy         |             220 |
+| Joint Pain         |             190 |
 
 #### Visualizations
 
 **Sentiment trends over time**
 
 ![Sentiment trends over time](plots/supplements_sentiment_over_time.png)
+
+**Relative sentiment trends over time**
+
+![Relative sentiment trends over time](plots/supplements_relative_sentiment_over_time.png)
 
 **Popularity metrics over time**
 
