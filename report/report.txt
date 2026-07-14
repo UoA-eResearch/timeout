@@ -1,0 +1,58 @@
+# Menopause Supplements — Findings Report
+
+*Generated: 2026-07-14 03:03:27 UTC*
+
+## PRISMA-SM counts (this snapshot)
+- Identified (scraped): not available locally
+- Loaded rows: 7770
+- After platform filter: 7770
+- **Included (menopause==True): 4127**
+
+## Findings
+
+**Video distribution by platform** (engagement is platform-dependent; do not pool raw):
+
+| extractor   |   count |      like_count |    view_count |   comment_count |
+|:------------|--------:|----------------:|--------------:|----------------:|
+| TikTok      |    1444 |     5.75165e+06 |   1.64563e+08 |          282981 |
+| youtube     |    1358 |     1.28668e+06 |   4.32314e+07 |           55815 |
+| facebook    |    1227 |     0           |   2.00264e+08 |               0 |
+| Instagram   |      98 | 59511           | 770           |            2271 |
+
+**RQ2 — Top 10 supplements promoted** (top 3 in bold elsewhere):
+
+| Supplement          |   Video Count |
+|:--------------------|--------------:|
+| Vitamin D           |           403 |
+| Magnesium           |           307 |
+| Omega-3             |           206 |
+| Calcium             |           154 |
+| ,                   |           152 |
+| Creatine            |           139 |
+| Magnesium Glycinate |           126 |
+| Vitamin C           |           122 |
+| Collagen            |           112 |
+| Ashwagandha         |           109 |
+
+**RQ3 — Tracked top 3:** Vitamin D, Magnesium, Omega-3 (see supplements_top3_over_time.png; interpret with rolling-window/survivorship caveats).
+
+**RQ4 — Advice/content profile for top 3 supplements:**
+
+- **Vitamin D** (n=403): sentiment={'positive': 359, 'neutral': 35, 'negative': 9}; marketing-present=0%; median misleading=2.0
+- **Magnesium** (n=307): sentiment={'positive': 269, 'neutral': 32, 'negative': 6}; marketing-present=0%; median misleading=2.0
+- **Omega-3** (n=206): sentiment={'positive': 192, 'neutral': 11, 'negative': 3}; marketing-present=0%; median misleading=2.0
+
+**RQ5 — Top 10 symptoms targeted:**
+
+| Symptom               |   Mention Count |
+|:----------------------|----------------:|
+| Hot Flashes           |            1069 |
+| Menopause             |            1053 |
+| Perimenopause         |             682 |
+| Night Sweats          |             579 |
+| Mood Swings           |             541 |
+| Brain Fog             |             480 |
+| Anxiety               |             452 |
+| No Symptoms Mentioned |             446 |
+| Fatigue               |             378 |
+| Weight Gain           |             346 |

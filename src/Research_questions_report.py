@@ -1,80 +1,213 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
+import re
+import os
+import argparse
+from pathlib import Path
 
-# 1. GENERATE SYNTHETIC DATASET (Simulating Artifact 2)
-np.random.seed(42)
-n_records = 350
+def generate_report(data_path, output_txt="report.txt", output_plot="supplements_top3_over_time.png"):
+    print(f"Loading data from {data_path}...")
+    
+    # 1. Read File 
+    try:
+        if data_path.endswith('.xlsx'):
+            df_raw = pd.read_excel(data_path)
+        else:
+            df_raw = pd.read_csv(data_path)
+    except FileNotFoundError:
+        print(f"Error: File '{data_path}' not found.")
+        return
 
-platforms = ['TikTok', 'IG_Reels', 'YT_Shorts']
-creators = ['Medical_MD', 'Allied_Health', 'Influencer', 'Brand_Commercial', 'Lay_User']
-supplements = ['Magnesium', 'Ashwagandha', 'Black Cohosh', 'Maca Root', 'Probiotics', 'CBD Oil', 'Vitamin D3']
-symptoms_pool = ['Hot_Flashes', 'Weight_Gain', 'Brain_Fog', 'Insomnia', 'Anxiety', 'Libido']
-framings = ['Scientific_Data_Claim', 'Personal_Testimonial', 'Product_Review', 'Symptom_Fear_Mongering']
+    total_loaded = len(df_raw)
+    
+    # 2. PRISMA-SM Filtering
+    if 'menopause' in df_raw.columns:
+        df = df_raw[df_raw['menopause'].astype(str).str.lower() == 'true'].copy()
+    else:
+        df = df_raw.copy()
+        print("Warning: 'menopause' column not found. Processing all rows.")
+        
+    included_count = len(df)
+    
+    # 3. Safe List Parser (Replaces ast.literal_eval to avoid SyntaxWarnings)
+    def safe_parse_list(val):
+        if pd.isna(val):
+            return []
+        val_str = str(val).strip()
+        if val_str.lower() in ["no supplements mentioned", "none", "no supplements", "n/a", ""]:
+            return []
+        
+        # Extract items safely using regex to find text inside quotes
+        if val_str.startswith('[') and val_str.endswith(']'):
+            items = re.findall(r"['\"](.*?)['\"]", val_str)
+            if items:
+                return [x.strip() for x in items if x.strip()]
+            # Fallback if no quotes exist but it has brackets: [Magnesium, Calcium]
+            content = val_str[1:-1].strip()
+            if content:
+                return [x.strip() for x in content.split(',') if x.strip()]
+            return []
+        
+        # Fallback for plain comma-separated strings
+        return [x.strip() for x in val_str.split(',') if x.strip()]
 
-start_date = datetime(2024, 1, 1)
-date_list = [start_date + timedelta(days=int(np.random.randint(0, 850))) for _ in range(n_records)]
+    # Normalize Title Casing to group identical supplements correctly
+    def clean_and_title(val):
+        val_str = str(val).strip()
+        if val_str.lower() == 'omega-3': return 'Omega-3'
+        if val_str.lower() in ['hrt', 'hormone replacement therapy']: return 'HRT'
+        if val_str.lower() == 'vitamin d': return 'Vitamin D'
+        if val_str.lower() == 'vitamin d3': return 'Vitamin D3'
+        return val_str.title()
 
-data = {
-    'video_id': [f"vid_{np.random.randint(100000, 999999)}" for _ in range(n_records)],
-    'platform': np.random.choice(platforms, n_records, p=[0.5, 0.3, 0.2]),
-    'upload_date': date_list,
-    'creator_type': np.random.choice(creators, n_records, p=[0.15, 0.25, 0.35, 0.15, 0.10]),
-    'view_count': np.random.negative_binomial(1, 0.00002, n_records), # Heavily right-skewed social metrics
-    'likes': np.random.randint(100, 50000, n_records),
-    'comments': np.random.randint(10, 2000, n_records),
-    'shares': np.random.randint(5, 5000, n_records),
-    'primary_intervention': np.random.choice(['Supplement', 'Dietary_Change', 'Lifestyle_Exercise'], n_records, p=[0.7, 0.15, 0.15]),
-    'supplement_name': np.random.choice(supplements, n_records, p=[0.3, 0.2, 0.15, 0.1, 0.1, 0.1, 0.05]),
-    'targeted_symptoms': [",".join(list(np.random.choice(symptoms_pool, np.random.randint(1, 4), replace=False))) for _ in range(n_records)],
-    'advice_framing': np.random.choice(framings, n_records),
-    'scientific_caution': np.random.choice([0, 1], n_records, p=[0.75, 0.25])
-}
+    # Parse and clean Supplements
+    if 'supplements' in df.columns:
+        df['supplements_list'] = df['supplements'].apply(safe_parse_list)
+        df['supplements_list'] = df['supplements_list'].apply(lambda lst: [clean_and_title(x) for x in lst])
+    else:
+        df['supplements_list'] = [[] for _ in range(len(df))]
+        
+    # Parse and clean Symptoms
+    if 'symptoms' in df.columns:
+        df['symptoms_list'] = df['symptoms'].apply(safe_parse_list)
+        df['symptoms_list'] = df['symptoms_list'].apply(lambda lst: [str(x).title() for x in lst])
+    else:
+        df['symptoms_list'] = [[] for _ in range(len(df))]
 
-df_raw = pd.DataFrame(data)
+    # 4. Custom Date Parser (Handles the 20150127.0 float formats)
+    def parse_custom_date(val):
+        if pd.isna(val):
+            return pd.NaT
+        try:
+            val_str = str(int(float(val))).strip()
+            if len(val_str) == 8:
+                return pd.to_datetime(val_str, format='%Y%m%d')
+        except (ValueError, TypeError):
+            pass
+        return pd.to_datetime(val, errors='coerce')
 
-# Inject synthetic duplicates to test the De-duplication Protocol
-df_duplicates = df_raw.sample(n=30, random_state=42)
-df_pipeline = pd.concat([df_raw, df_duplicates], ignore_index=True)
+    if 'upload_date' in df.columns:
+        df['parsed_date'] = df['upload_date'].apply(parse_custom_date)
+    else:
+        df['parsed_date'] = pd.NaT
 
-print(f"--- Pipeline Initialized: {df_pipeline.shape[0]} raw records ingested. ---")
+    # 5. Generate the Report Document
+    with open(output_txt, 'w', encoding='utf-8') as f:
+        current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+        f.write("# Menopause Supplements — Findings Report\n\n")
+        f.write(f"*Generated: {current_time}*\n\n")
+        
+        f.write("## PRISMA-SM counts (this snapshot)\n")
+        f.write("- Identified (scraped): not available locally\n")
+        f.write(f"- Loaded rows: {total_loaded}\n")
+        f.write(f"- After platform filter: {total_loaded}\n")
+        f.write(f"- **Included (menopause==True): {included_count}**\n\n")
 
-# 2. DE-DUPLICATION & PROCESSING
-df_clean = df_pipeline.drop_duplicates(subset=['video_id']).copy()
-print(f"Post De-duplication: {df_clean.shape[0]} unique videos retained.")
+        f.write("## Findings\n\n")
+        f.write("**Video distribution by platform** (engagement is platform-dependent; do not pool raw):\n\n")
+        
+        # Platform Distribution
+        if 'extractor' in df.columns:
+            platform_stats = df.groupby('extractor').agg(count=('extractor', 'count'))
+            for col in ['like_count', 'view_count', 'comment_count']:
+                if col in df.columns:
+                    # Convert to numeric to avoid sum concatenation errors
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+                    platform_stats[col] = df.groupby('extractor')[col].sum()
+                else:
+                    platform_stats[col] = 0
+                    
+            platform_stats = platform_stats.reset_index().sort_values(by='count', ascending=False)
+            f.write(platform_stats.to_markdown(index=False))
+        else:
+            f.write("Platform data ('extractor' column) not found in dataset.\n")
+        f.write("\n\n")
 
-# Calculate Engagement Score using standard metric weights
-df_clean['engagement_score'] = df_clean['likes'] + df_clean['comments'] + df_clean['shares']
-df_clean['year_quarter'] = df_clean['upload_date'].dt.to_period('Q')
+        # RQ2 — Top 10 Supplements
+        f.write("**RQ2 — Top 10 supplements promoted** (top 3 in bold elsewhere):\n\n")
+        
+        supplements_exploded = df.explode('supplements_list')
+        supplements_exploded = supplements_exploded[supplements_exploded['supplements_list'].astype(bool)]
+        top_10_supplements = supplements_exploded['supplements_list'].value_counts().head(10).reset_index()
+        top_10_supplements.columns = ['Supplement', 'Video Count']
+        
+        f.write(top_10_supplements.to_markdown(index=False))
+        f.write("\n\n")
 
-# 3. ANALYSIS: RQ2 (Top 3 Supplements by Frequency and Reach)
-top_supplements = df_clean['supplement_name'].value_counts()
-top_3_names = top_supplements.head(3).index.tolist()
-print("\n[RQ2] Top 3 Most Promoted Supplements:")
-print(top_supplements.head(3))
+        top_3 = top_10_supplements['Supplement'].head(3).tolist()
+        f.write(f"**RQ3 — Tracked top 3:** {', '.join(top_3)} (see {os.path.basename(output_plot)}; interpret with rolling-window/survivorship caveats).\n\n")
 
-# 4. ANALYSIS: RQ3 (Temporal Shifts 2024 - 2026)
-temporal_mix = df_clean[df_clean['supplement_name'].isin(top_3_names)]
-temporal_trend = temporal_mix.groupby(['year_quarter', 'supplement_name']).size().unstack(fill_value=0)
+        # RQ3 — Plot Generation (Now using the safely parsed dates)
+        if not supplements_exploded['parsed_date'].isna().all() and len(top_3) > 0:
+            top3_data = supplements_exploded[supplements_exploded['supplements_list'].isin(top_3)].dropna(subset=['parsed_date'])
+            
+            if not top3_data.empty:
+                # Group by Month End
+                monthly_trends = top3_data.groupby([pd.Grouper(key='parsed_date', freq='ME'), 'supplements_list']).size().unstack(fill_value=0)
+                
+                plt.figure(figsize=(10, 6))
+                monthly_trends.plot(ax=plt.gca(), linewidth=2)
+                plt.title('Top 3 Menopause Supplements Promoted Over Time')
+                plt.ylabel('Video Count')
+                plt.xlabel('Date')
+                plt.grid(True, linestyle='--', alpha=0.7)
+                plt.legend(title='Supplement')
+                plt.tight_layout()
+                plt.savefig(output_plot)
+                plt.close()
+                print(f"Temporal plot successfully saved to {output_plot}")
+            else:
+                print("No valid dates align with the top 3 supplements. Plot not generated.")
+        else:
+            print("Date column missing/unparseable or no supplements found. Plot not generated.")
 
-# 5. ANALYSIS: RQ5 (Symptom Co-occurrence Matrix)
-# Explode the comma-separated symptoms column into a clean binary matrix
-symptom_df = df_clean[['supplement_name', 'targeted_symptoms']].copy()
-symptom_df = symptom_df.assign(targeted_symptoms=symptom_df['targeted_symptoms'].str.split(',')).explode('targeted_symptoms')
-matrix_data = pd.crosstab(symptom_df['supplement_name'], symptom_df['targeted_symptoms'])
+        # RQ4 — Dynamic Advice/Content Profile
+        f.write("**RQ4 — Advice/content profile for top 3 supplements:**\n\n")
+        for supp in top_3:
+            supp_videos = df[df['supplements_list'].apply(lambda x: supp in x)]
+            n = len(supp_videos)
+            
+            if n > 0:
+                sentiment_counts = {}
+                if 'sentiment' in supp_videos.columns:
+                    sentiment_counts = supp_videos['sentiment'].value_counts().to_dict()
+                
+                marketing_pct = 0
+                if 'marketing' in supp_videos.columns:
+                    # Convert to boolean handling text representations
+                    bool_series = supp_videos['marketing'].astype(str).str.lower().map({'true': True, 'false': False, '1': True, '0': False})
+                    bool_series = bool_series.fillna(False).astype(bool)
+                    marketing_pct = int(bool_series.mean() * 100)
+                    
+                median_misleading = 0.0
+                if 'misleading' in supp_videos.columns:
+                    supp_videos.loc[:, 'misleading'] = pd.to_numeric(supp_videos['misleading'], errors='coerce')
+                    median_misleading = supp_videos['misleading'].median()
+                
+                f.write(f"- **{supp}** (n={n}): sentiment={sentiment_counts}; marketing-present={marketing_pct}%; median misleading={median_misleading:.1f}\n")
+        f.write("\n")
 
-print("\n[RQ5] Symptom Targeting Matrix (Top 3 Ingredients):")
-print(matrix_data.loc[top_3_names])
+        # RQ5 — Top 10 Symptoms
+        f.write("**RQ5 — Top 10 symptoms targeted:**\n\n")
+        symptoms_exploded = df.explode('symptoms_list')
+        symptoms_exploded = symptoms_exploded[symptoms_exploded['symptoms_list'].astype(bool)]
+        top_10_symptoms = symptoms_exploded['symptoms_list'].value_counts().head(10).reset_index()
+        top_10_symptoms.columns = ['Symptom', 'Mention Count']
+        
+        f.write(top_10_symptoms.to_markdown(index=False))
+        f.write("\n")
 
-# 6. VISUALIZATION EXPORT
-plt.figure(figsize=(12, 5))
-sns.lineplot(data=temporal_trend, markers=True, linewidth=2.5)
-plt.title('Temporal Prominence Shifts of Top 3 Menopause Supplements (2024-2026)')
-plt.ylabel('Video Count')
-plt.xlabel('Year-Quarter')
-plt.grid(True, linestyle='--', alpha=0.6)
-plt.tight_layout()
-plt.savefig('menopause_supplement_trends.png')
-print("\n--- Pipeline Execution Complete. Trend analysis exported to 'menopause_supplement_trends.png' ---")
+    print(f"Report successfully generated and saved to {output_txt}")
+
+if __name__ == "__main__":
+    SRC_DIR = Path(__file__).resolve().parent
+    ROOT_DIR = SRC_DIR.parent
+    
+    parser = argparse.ArgumentParser(description="Generate Menopause Supplements Report")
+    parser.add_argument("--data", type=str, default= str(ROOT_DIR) + "/data/supplements_LLM_results.xlsx", help="Path to input dataset (.csv or .xlsx)")
+    parser.add_argument("--out_txt", type=str, default= str(ROOT_DIR) + "/report/report.txt", help="Path to output report text file")
+    parser.add_argument("--out_plot", type=str, default= str(ROOT_DIR) + "/report/supplements_top3_over_time.png", help="Path to output temporal plot")
+
+    args = parser.parse_args()
+    generate_report(data_path=args.data, output_txt=args.out_txt, output_plot=args.out_plot)
