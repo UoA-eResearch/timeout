@@ -294,22 +294,22 @@ To trigger manually:
 ## Dataset Statistics
 
 **Supplements dataset:**
-- Total videos: 17647
+- Total videos: 18183
 - Breakdown by source:
-- Instagram    5438
-- TikTok       4979
-- YouTube      3648
-- Facebook     3582
+- Instagram    5591
+- TikTok       5079
+- YouTube      3811
+- Facebook     3702
 
 **Timeout dataset:**
-- Total videos: 2894
+- Total videos: 2924
 - Breakdown by source:
-- Instagram    1338
-- TikTok        943
-- Facebook      455
-- YouTube       158
+- Instagram    1352
+- TikTok        946
+- Facebook      464
+- YouTube       162
 
-*Last updated: 2026-07-14 03:04:10 UTC*
+*Last updated: 2026-07-24 01:18:53 UTC*
 
 
 ## Repository Structure
