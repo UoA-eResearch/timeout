@@ -345,7 +345,7 @@ To trigger manually:
 
 ## Data Analysis
 
-*Last updated: 2026-06-26 00:55:04 UTC*
+*Last updated: 2026-07-29 02:01:43 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -356,47 +356,47 @@ This section contains automated analysis of the LLM-processed video data. The an
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=3899 videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=5542 videos).
 
 #### Key Findings
 
 **Video Distribution by Platform:**
 | extractor   |   count |      like_count |    view_count |   comment_count |
 |:------------|--------:|----------------:|--------------:|----------------:|
-| tiktok      |    1370 |     5.47429e+06 |   1.5514e+08  |          250616 |
-| youtube     |    1278 |     1.22835e+06 |   4.0946e+07  |           53626 |
-| facebook    |    1158 |     0           |   1.87598e+08 |               0 |
-| instagram   |      93 | 59399           | 630           |            2268 |
+| youtube     |    1983 |     1.65892e+06 |   5.83508e+07 |           68059 |
+| tiktok      |    1954 |     6.94468e+06 |   1.91005e+08 |          293980 |
+| facebook    |    1510 |     0           |   3.11268e+08 |               0 |
+| instagram   |      95 | 59437           | 630           |            2268 |
 
 
 **Top 10 Supplements Promoted:**
 | Supplement   |   Video Count |
 |:-------------|--------------:|
-| Vitamin D    |           485 |
-| Magnesium    |           417 |
-| Omega-3      |           202 |
-| Calcium      |           146 |
-| Creatine     |           133 |
-| Vitamin C    |           119 |
-| Collagen     |           107 |
-| Ashwagandha  |           104 |
-| Black Cohosh |            96 |
-| Vitamin K2   |            84 |
+| Vitamin D    |           573 |
+| Magnesium    |           479 |
+| Omega-3      |           224 |
+| Calcium      |           182 |
+| Creatine     |           160 |
+| Vitamin C    |           130 |
+| Black Cohosh |           122 |
+| Collagen     |           121 |
+| Ashwagandha  |           120 |
+| Vitamin K2   |            94 |
 
 
 **Top 10 Symptoms Targeted:**
 | Symptom            |   Mention Count |
 |:-------------------|----------------:|
-| Mood Changes       |            1846 |
-| Hot Flashes        |            1025 |
-| Night Sweats       |             558 |
-| Brain Fog          |             460 |
-| Fatigue            |             366 |
-| Weight Gain        |             332 |
-| Sleep Disturbances |             242 |
-| Insomnia           |             239 |
-| Low Energy         |             220 |
-| Joint Pain         |             190 |
+| Mood Changes       |            2578 |
+| Hot Flashes        |            1474 |
+| Night Sweats       |             783 |
+| Brain Fog          |             650 |
+| Fatigue            |             521 |
+| Weight Gain        |             493 |
+| Sleep Disturbances |             327 |
+| Insomnia           |             316 |
+| Low Energy         |             296 |
+| Joint Pain         |             277 |
 
 #### Visualizations
 
