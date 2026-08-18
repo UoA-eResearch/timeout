@@ -68,9 +68,22 @@ def get_prompt_supplements(data):
         criticism: If the video is critical of a particular supplement, what are the main criticisms mentioned? 
         alternative_strategies: Does the video mention any alternative strategies to supplements? If so, what are they? A comma separated string. If no alternatives are mentioned, indicate "No alternative strategies mentioned".
         usefulness: Rate the overall usefulness of the video on a scale from 1 to 10, where 1 is not useful at all and 10 is extremely useful.
+        usefulness_reason: In one or two sentences, explain what specifically in the video led you to give that usefulness rating.
         misleading: Rate the extent to which the video contains misleading or inaccurate information on a scale from 1 to 10, where 1 is not misleading at all and 10 is extremely misleading.
+        misleading_reason: In one or two sentences, explain what specifically in the video led you to give that misleading rating, naming any claims you considered inaccurate.
         quality: Rate the overall quality of the video on a scale from 1 to 10, where 1 is very poor quality and 10 is excellent quality.
+        quality_reason: In one or two sentences, explain what specifically in the video led you to give that quality rating.
         personal_experience: Does the speaker mention any personal experience with supplements? If so, briefly summarize it.
+        content_type: What is this video predominantly? Exactly one of: predominantly informative, predominantly marketing, predominantly personal commentary. Use "predominantly personal commentary" for videos that are mainly an influencer sharing opinions, lifestyle content or general chat without substantive information and without promoting a specific product.
+        primary_focus: Is the video predominantly about menopause symptoms and the experience of menopause, or predominantly about supplements and remedies? Exactly one of: symptoms and experience, supplements and remedies, both equally, neither.
+        health_framework: What health or medical framework does the knowledge in the video draw on? Exactly one of: western biomedical, traditional chinese medicine, ayurvedic, naturopathic or holistic, other traditional or indigenous, mixed, unclear.
+        cultural_background: What cultural background does the main speaker appear to come from, based only on what is visible or audible in the video and its metadata (language, setting, self-description)? If there is not enough information, indicate "Unclear".
+        menopause_framing: How is menopause itself framed? Exactly one of: symptom burden or suffering, medical problem to be treated, neutral or matter of fact, natural life stage, positive or empowering, unclear.
+        emotional_tone: What is the dominant emotional tone of the main speaker? A comma separated string, one or more of the following: hopeful, relieved, excited, enthusiastic, reassuring, empathetic, neutral, concerned, anxious, disappointed, frustrated, angry, dismissive, humorous.
+        emotional_intensity: Rate how emotionally intense or enthusiastic the main speaker is when talking about menopause or supplements, on a scale from 1 to 10, where 1 is flat and detached and 10 is highly emotional or highly enthusiastic.
+        supplement_sentiment: Considering only the parts of the video that talk about supplements, is the speaker positive, negative or neutral about them? One of negative, neutral, positive, or "No supplements discussed".
+        credentials: What credentials does the main speaker claim or display? Exactly one of: qualified health professional, researcher or academic, company or brand account, influencer or content creator with no stated qualifications, person speaking from personal experience only, unclear. Base this only on the video and its metadata; do not guess beyond what is stated or shown.
+        credentials_evidence: What in the video or its metadata supports the credentials answer (e.g. a title in the channel name, a stated qualification, a clinic setting)? If there is nothing, indicate "No evidence".
 
         Do not include comments in your JSON response. Only respond with the JSON object. Make sure the JSON is valid
     """
