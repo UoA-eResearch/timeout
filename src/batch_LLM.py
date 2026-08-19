@@ -59,6 +59,14 @@ def get_prompt_supplements(data):
         tone: What is the overall tone or mood of the video? Is it humorous, serious, educational, emotional, etc.?
         supplements: Does the video mention any supplements, vitamins, or medications? If so, list them. If not, indicate "No supplements mentioned".
         active_ingredients: If any supplements are mentioned, list the active ingredients in those supplements. If no supplements are mentioned, indicate "No active ingredients mentioned".
+        supplement_categories: Classify each supplement listed in the supplements field into exactly one of the categories below. Return a comma separated string with one category per supplement, in the same order as the supplements field. If no supplements are mentioned, indicate "No supplements mentioned". The categories are:
+            Medicine or hormone therapy - a prescription or pharmaceutical product, including hormone replacement therapy, oestrogen, progesterone, testosterone, antidepressants and other medicines.
+            Menopause formulation - a branded multi-ingredient product explicitly marketed for menopause, perimenopause or menopausal symptoms.
+            Functional product - a branded multi-ingredient product explicitly marketed for a body system or symptom rather than for a named ingredient, for example gut health, sleep, skin, hair, bone, mood or energy products.
+            Single ingredient - a product identified by one substance rather than by a brand or a symptom, for example magnesium, vitamin D, collagen, black cohosh, creatine.
+            General or unclear - a supplement that is mentioned too vaguely to classify, for example "my supplements", "a multivitamin" or an unnamed product.
+        ingredient_types: For each supplement you classified as "Single ingredient", give its substance type. Return a comma separated string with one entry per supplement, in the same order as the supplements field, using "Not applicable" for supplements in any other category. Each substance type must be exactly one of: vitamin, mineral, herbal or botanical, amino acid or derivative, protein or peptide, fatty acid, probiotic, hormone precursor, other. If no supplements are mentioned, indicate "No supplements mentioned".
+        primary_supplement_category: Of the supplements mentioned, which single category does the video mainly focus on? Exactly one of: Medicine or hormone therapy, Menopause formulation, Functional product, Single ingredient, General or unclear, No supplements mentioned.
         symptoms: Does the video mention any specific symptoms, conditions, or health issues? If so, list them. If not, indicate "No symptoms mentioned".
         menopause: Is the video specifically targeting the supplement towards menopause-related symptoms or conditions? Answer True or False.
         language: What language is this video in?
