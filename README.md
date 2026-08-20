@@ -291,6 +291,16 @@ To trigger manually:
 2. Select "Data Analysis" workflow
 3. Click "Run workflow"
 
+### 7. Pipeline Sankey Diagram (`src/generate_sankey.py`)
+
+Generates an interactive Sankey diagram of the supplements data pipeline — how Google search links flow through download, LLM processing, the menopause screen, deduplication and the supplement screen into primary supplement categories, with real counts at every stage.
+
+```bash
+python3 src/generate_sankey.py
+```
+
+Writes a self-contained page to `docs/index.html`, served with GitHub Pages at https://uoa-eresearch.github.io/timeout/ (Settings → Pages → deploy from branch `main`, folder `/docs`). The analysis workflow regenerates it whenever the Excel results or the coding rules change.
+
 ## Dataset Statistics
 
 **Supplements dataset:**

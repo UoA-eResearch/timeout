@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menopause Supplement Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #FAF9F7; --surface: #FFFFFF; --ink: #26241F; --ink-2: #5C574D; --ink-3: #8A8478;
+  --line: #E6E2DA; --accent: #C8892F;
+  --c-ig: #B04FC8; --c-tt: #1E9E9E; --c-yt: #CC4B43; --c-fb: #4472CA;
+  --c-kept: #C8892F; --c-sink: #A6ADB5; --c-sink2: #7A8794;
+  --flow-op: 0.45; --flow-op-hover: 0.72;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161A20; --surface: #1D222A; --ink: #E8E6E1; --ink-2: #A9A498; --ink-3: #7B766B;
+    --line: #2C323C; --accent: #BC842E;
+    --c-ig: #B85BD0; --c-tt: #21A8A8; --c-yt: #D5564C; --c-fb: #5581DB;
+    --c-kept: #BC842E; --c-sink: #59616C; --c-sink2: #76828F;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); margin: 0;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif; line-height: 1.55;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 40px 28px 64px; }
+header { margin-bottom: 8px; }
+h1 {
+  font-family: 'IBM Plex Serif', Georgia, serif; font-weight: 600;
+  font-size: 1.9rem; margin: 0 0 6px; text-wrap: balance;
+}
+.meta { color: var(--ink-2); font-size: 0.95rem; margin: 0 0 4px; max-width: 68ch; }
+.meta strong { color: var(--ink); font-weight: 600; }
+.figure { overflow-x: auto; margin: 20px 0 8px; }
+.figure svg { min-width: 980px; width: 100%; height: auto; display: block; }
+.stage { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; fill: var(--ink); }
+.stagecount { font-size: 12.5px; font-family: 'IBM Plex Mono', monospace; fill: var(--ink-2); }
+.nlabel { font-size: 13px; fill: var(--ink); }
+.nlabel-sm { font-size: 12px; fill: var(--ink-2); }
+.ncount { font-size: 13px; font-weight: 500; font-family: 'IBM Plex Mono', monospace; fill: var(--ink); }
+.ncount-inline { font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
+.flow { fill-opacity: var(--flow-op); transition: fill-opacity 120ms; }
+@media (prefers-reduced-motion: reduce) { .flow { transition: none; } }
+.flow:hover { fill-opacity: var(--flow-op-hover); }
+.f-ig { fill: var(--c-ig); } .f-tt { fill: var(--c-tt); }
+.f-yt { fill: var(--c-yt); } .f-fb { fill: var(--c-fb); }
+.f-kept { fill: var(--c-kept); } .f-sink { fill: var(--c-sink); } .f-sink2 { fill: var(--c-sink2); }
+.node { stroke: var(--bg); stroke-width: 1; }
+.n-ig { fill: var(--c-ig); } .n-tt { fill: var(--c-tt); }
+.n-yt { fill: var(--c-yt); } .n-fb { fill: var(--c-fb); }
+.n-kept { fill: var(--c-kept); } .n-sink { fill: var(--c-sink); } .n-sink2 { fill: var(--c-sink2); }
+#tooltip {
+  position: fixed; pointer-events: none; display: none; z-index: 10;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 6px; padding: 7px 11px; font-size: 0.85rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.14); max-width: 320px;
+}
+.notes { margin-top: 28px; }
+h2 {
+  font-family: 'IBM Plex Serif', Georgia, serif; font-weight: 600;
+  font-size: 1.15rem; margin: 32px 0 10px;
+}
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 7px 14px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+td.num, th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; white-space: nowrap; }
+.tablewrap { overflow-x: auto; }
+details { margin-top: 18px; }
+summary { cursor: pointer; color: var(--ink-2); font-size: 0.92rem; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fineprint { color: var(--ink-3); font-size: 0.82rem; margin-top: 26px; max-width: 78ch; }
+.fineprint code { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Menopause Supplement Pipeline</h1>
+<p class="meta">How <strong>18,579</strong> Google search results become <strong>2,934</strong> unique menopause-targeted posts that mention supplements, divided into 10 product categories. Counts as of 21 August 2026.</p>
+</header>
+
+<div class="figure">
+<svg viewBox="0 0 1395 780" role="img" aria-labelledby="sankey-title" font-family="'IBM Plex Sans', system-ui, sans-serif">
+<title id="sankey-title">Sankey diagram: 18,579 Google search links filtered to 2,934 menopause posts mentioning supplements, divided into 10 supplement categories</title>
+<text x="150" y="28" text-anchor="start" class="stage">GOOGLE SEARCH</text>
+<text x="150" y="46" text-anchor="start" class="stagecount">18,579 links</text>
+<text x="347.0" y="28" text-anchor="middle" class="stage">DOWNLOAD + LLM</text>
+<text x="347.0" y="46" text-anchor="middle" class="stagecount">12,213 kept</text>
+<text x="537.0" y="28" text-anchor="middle" class="stage">MENOPAUSE SCREEN</text>
+<text x="537.0" y="46" text-anchor="middle" class="stagecount">4,447 kept</text>
+<text x="727.0" y="28" text-anchor="middle" class="stage">DEDUPLICATION</text>
+<text x="727.0" y="46" text-anchor="middle" class="stagecount">4,338 kept</text>
+<text x="917.0" y="28" text-anchor="middle" class="stage">SUPPLEMENT SCREEN</text>
+<text x="917.0" y="46" text-anchor="middle" class="stagecount">2,934 kept</text>
+<text x="1100" y="28" text-anchor="start" class="stage">PRIMARY CATEGORY</text>
+<text x="1100" y="46" text-anchor="start" class="stagecount">10 groups</text>
+<path d="M164.0,70.0 C252.0,70.0 252.0,70.0 340.0,70.0 L340.0,75.1 C252.0,75.1 252.0,75.1 164.0,75.1 Z" class="flow f-ig" data-tip="Instagram → Downloaded & LLM-processed: 151 posts (2.6%)"/>
+<path d="M164.0,75.1 C252.0,75.1 252.0,524.1 340.0,524.1 L340.0,712.3 C252.0,712.3 252.0,263.2 164.0,263.2 Z" class="flow f-sink" data-tip="Instagram → Not retrievable / not processed: 5,548 posts (97.4%)"/>
+<path d="M164.0,273.2 C252.0,273.2 252.0,75.1 340.0,75.1 L340.0,238.5 C252.0,238.5 252.0,436.7 164.0,436.7 Z" class="flow f-tt" data-tip="TikTok → Downloaded & LLM-processed: 4,819 posts (93.0%)"/>
+<path d="M164.0,436.7 C252.0,436.7 252.0,712.3 340.0,712.3 L340.0,724.6 C252.0,724.6 252.0,449.0 164.0,449.0 Z" class="flow f-sink" data-tip="TikTok → Not retrievable / not processed: 363 posts (7.0%)"/>
+<path d="M164.0,459.0 C252.0,459.0 252.0,238.5 340.0,238.5 L340.0,368.9 C252.0,368.9 252.0,589.3 164.0,589.3 Z" class="flow f-yt" data-tip="YouTube → Downloaded & LLM-processed: 3,845 posts (97.9%)"/>
+<path d="M164.0,589.3 C252.0,589.3 252.0,724.6 340.0,724.6 L340.0,727.4 C252.0,727.4 252.0,592.2 164.0,592.2 Z" class="flow f-sink" data-tip="YouTube → Not retrievable / not processed: 84 posts (2.1%)"/>
+<path d="M164.0,602.2 C252.0,602.2 252.0,368.9 340.0,368.9 L340.0,484.1 C252.0,484.1 252.0,717.4 164.0,717.4 Z" class="flow f-fb" data-tip="Facebook → Downloaded & LLM-processed: 3,398 posts (90.2%)"/>
+<path d="M164.0,717.4 C252.0,717.4 252.0,727.4 340.0,727.4 L340.0,740.0 C252.0,740.0 252.0,730.0 164.0,730.0 Z" class="flow f-sink" data-tip="Facebook → Not retrievable / not processed: 371 posts (9.8%)"/>
+<path d="M354.0,70.0 C442.0,70.0 442.0,70.0 530.0,70.0 L530.0,220.8 C442.0,220.8 442.0,220.8 354.0,220.8 Z" class="flow f-kept" data-tip="Downloaded & LLM-processed → Menopause-targeted: 4,447 posts (36.4%)"/>
+<path d="M354.0,220.8 C442.0,220.8 442.0,260.8 530.0,260.8 L530.0,524.1 C442.0,524.1 442.0,484.1 354.0,484.1 Z" class="flow f-sink" data-tip="Downloaded & LLM-processed → Not menopause-targeted: 7,766 posts (63.6%)"/>
+<path d="M544.0,70.0 C632.0,70.0 632.0,70.0 720.0,70.0 L720.0,217.1 C632.0,217.1 632.0,217.1 544.0,217.1 Z" class="flow f-kept" data-tip="Menopause-targeted → Unique posts: 4,338 posts (97.5%)"/>
+<path d="M544.0,217.1 C632.0,217.1 632.0,257.1 720.0,257.1 L720.0,261.1 C632.0,261.1 632.0,220.8 544.0,220.8 Z" class="flow f-sink" data-tip="Menopause-targeted → Cross-platform duplicates: 109 posts (2.5%)"/>
+<path d="M734.0,70.0 C822.0,70.0 822.0,70.0 910.0,70.0 L910.0,169.5 C822.0,169.5 822.0,169.5 734.0,169.5 Z" class="flow f-kept" data-tip="Unique posts → Mentions supplements: 2,934 posts (67.6%)"/>
+<path d="M734.0,169.5 C822.0,169.5 822.0,209.5 910.0,209.5 L910.0,257.1 C822.0,257.1 822.0,217.1 734.0,217.1 Z" class="flow f-sink2" data-tip="Unique posts → No supplements mentioned: 1,404 posts (32.4%)"/>
+<path d="M924.0,70.0 C1012.0,70.0 1012.0,70.0 1100.0,70.0 L1100.0,98.4 C1012.0,98.4 1012.0,98.4 924.0,98.4 Z" class="flow f-kept" data-tip="Mentions supplements → Manual review queue: 838 posts (28.6%)"/>
+<path d="M924.0,98.4 C1012.0,98.4 1012.0,107.4 1100.0,107.4 L1100.0,133.2 C1012.0,133.2 1012.0,124.2 924.0,124.2 Z" class="flow f-kept" data-tip="Mentions supplements → Vitamins & minerals: 759 posts (25.9%)"/>
+<path d="M924.0,124.2 C1012.0,124.2 1012.0,142.2 1100.0,142.2 L1100.0,157.6 C1012.0,157.6 1012.0,139.6 924.0,139.6 Z" class="flow f-kept" data-tip="Mentions supplements → Branded menopause formulations: 457 posts (15.6%)"/>
+<path d="M924.0,139.6 C1012.0,139.6 1012.0,166.6 1100.0,166.6 L1100.0,175.6 C1012.0,175.6 1012.0,148.6 924.0,148.6 Z" class="flow f-kept" data-tip="Mentions supplements → Hormone therapies: 263 posts (9.0%)"/>
+<path d="M924.0,148.6 C1012.0,148.6 1012.0,184.6 1100.0,184.6 L1100.0,191.4 C1012.0,191.4 1012.0,155.4 924.0,155.4 Z" class="flow f-kept" data-tip="Mentions supplements → Protein, amino acids & creatine: 202 posts (6.9%)"/>
+<path d="M924.0,155.4 C1012.0,155.4 1012.0,200.4 1100.0,200.4 L1100.0,206.7 C1012.0,206.7 1012.0,161.7 924.0,161.7 Z" class="flow f-kept" data-tip="Mentions supplements → Herbals & botanicals: 186 posts (6.3%)"/>
+<path d="M924.0,161.7 C1012.0,161.7 1012.0,215.7 1100.0,215.7 L1100.0,219.7 C1012.0,219.7 1012.0,164.2 924.0,164.2 Z" class="flow f-kept" data-tip="Mentions supplements → Gut / microbiome: 72 posts (2.5%)"/>
+<path d="M924.0,164.2 C1012.0,164.2 1012.0,228.7 1100.0,228.7 L1100.0,232.7 C1012.0,232.7 1012.0,166.4 924.0,166.4 Z" class="flow f-kept" data-tip="Mentions supplements → Vague or non-classifiable: 67 posts (2.3%)"/>
+<path d="M924.0,166.4 C1012.0,166.4 1012.0,241.7 1100.0,241.7 L1100.0,245.7 C1012.0,245.7 1012.0,168.4 924.0,168.4 Z" class="flow f-kept" data-tip="Mentions supplements → Fatty acids & oils: 57 posts (1.9%)"/>
+<path d="M924.0,168.4 C1012.0,168.4 1012.0,254.7 1100.0,254.7 L1100.0,258.7 C1012.0,258.7 1012.0,169.5 924.0,169.5 Z" class="flow f-kept" data-tip="Mentions supplements → Prescription & OTC medicines: 33 posts (1.1%)"/>
+<rect x="150" y="70.0" width="14" height="193.2" rx="2" class="node n-ig" data-tip="Instagram: 5,699 (30.7% of search links)"/>
+<rect x="150" y="273.2" width="14" height="175.7" rx="2" class="node n-tt" data-tip="TikTok: 5,182 (27.9% of search links)"/>
+<rect x="150" y="459.0" width="14" height="133.2" rx="2" class="node n-yt" data-tip="YouTube: 3,929 (21.1% of search links)"/>
+<rect x="150" y="602.2" width="14" height="127.8" rx="2" class="node n-fb" data-tip="Facebook: 3,769 (20.3% of search links)"/>
+<rect x="340" y="70.0" width="14" height="414.1" rx="2" class="node n-kept" data-tip="Downloaded & LLM-processed: 12,213 (65.7% of search links)"/>
+<rect x="340" y="524.1" width="14" height="215.9" rx="2" class="node n-sink" data-tip="Not retrievable / not processed: 6,366 (34.3% of search links)"/>
+<rect x="530" y="70.0" width="14" height="150.8" rx="2" class="node n-kept" data-tip="Menopause-targeted: 4,447 (23.9% of search links)"/>
+<rect x="530" y="260.8" width="14" height="263.3" rx="2" class="node n-sink" data-tip="Not menopause-targeted: 7,766 (41.8% of search links)"/>
+<rect x="720" y="70.0" width="14" height="147.1" rx="2" class="node n-kept" data-tip="Unique posts: 4,338 (23.3% of search links)"/>
+<rect x="720" y="257.1" width="14" height="4.0" rx="2" class="node n-sink" data-tip="Cross-platform duplicates: 109 (0.6% of search links)"/>
+<rect x="910" y="70.0" width="14" height="99.5" rx="2" class="node n-kept" data-tip="Mentions supplements: 2,934 (15.8% of search links)"/>
+<rect x="910" y="209.5" width="14" height="47.6" rx="2" class="node n-sink2" data-tip="No supplements mentioned: 1,404 (7.6% of search links)"/>
+<rect x="1100" y="70.0" width="14" height="28.4" rx="2" class="node n-kept" data-tip="Manual review queue: 838 (4.5% of search links)"/>
+<rect x="1100" y="107.4" width="14" height="25.7" rx="2" class="node n-kept" data-tip="Vitamins & minerals: 759 (4.1% of search links)"/>
+<rect x="1100" y="142.2" width="14" height="15.5" rx="2" class="node n-kept" data-tip="Branded menopause formulations: 457 (2.5% of search links)"/>
+<rect x="1100" y="166.6" width="14" height="8.9" rx="2" class="node n-kept" data-tip="Hormone therapies: 263 (1.4% of search links)"/>
+<rect x="1100" y="184.6" width="14" height="6.8" rx="2" class="node n-kept" data-tip="Protein, amino acids & creatine: 202 (1.1% of search links)"/>
+<rect x="1100" y="200.4" width="14" height="6.3" rx="2" class="node n-kept" data-tip="Herbals & botanicals: 186 (1.0% of search links)"/>
+<rect x="1100" y="215.7" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Gut / microbiome: 72 (0.4% of search links)"/>
+<rect x="1100" y="228.7" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Vague or non-classifiable: 67 (0.4% of search links)"/>
+<rect x="1100" y="241.7" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Fatty acids & oils: 57 (0.3% of search links)"/>
+<rect x="1100" y="254.7" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Prescription & OTC medicines: 33 (0.2% of search links)"/>
+<text x="140" y="163.6" text-anchor="end" class="nlabel">Instagram</text>
+<text x="140" y="180.6" text-anchor="end" class="ncount">5,699</text>
+<text x="140" y="358.1" text-anchor="end" class="nlabel">TikTok</text>
+<text x="140" y="375.1" text-anchor="end" class="ncount">5,182</text>
+<text x="140" y="522.6" text-anchor="end" class="nlabel">YouTube</text>
+<text x="140" y="539.6" text-anchor="end" class="ncount">3,929</text>
+<text x="140" y="663.1" text-anchor="end" class="nlabel">Facebook</text>
+<text x="140" y="680.1" text-anchor="end" class="ncount">3,769</text>
+<text x="362" y="552.1" class="ncount">6,366</text>
+<text x="362" y="567.1" class="nlabel-sm">not retrievable or</text>
+<text x="362" y="580.1" class="nlabel-sm">not processed</text>
+<text x="552" y="288.8" class="ncount">7,766</text>
+<text x="552" y="303.8" class="nlabel-sm">not menopause-</text>
+<text x="552" y="316.8" class="nlabel-sm">targeted</text>
+<text x="742" y="257.1" class="ncount">109</text>
+<text x="742" y="272.1" class="nlabel-sm">cross-platform</text>
+<text x="742" y="285.1" class="nlabel-sm">duplicates</text>
+<text x="917.0" y="275.1" text-anchor="middle" class="ncount">1,404</text>
+<text x="917.0" y="289.1" text-anchor="middle" class="nlabel-sm">no supplements mentioned</text>
+<text x="917.0" y="302.1" text-anchor="middle" class="nlabel-sm">(symptom &amp; experience posts)</text>
+<text x="1122" y="88.2" class="nlabel"><tspan class="ncount-inline">838</tspan>  Manual review queue</text>
+<text x="1122" y="124.3" class="nlabel"><tspan class="ncount-inline">759</tspan>  Vitamins & minerals</text>
+<text x="1122" y="153.9" class="nlabel"><tspan class="ncount-inline">457</tspan>  Branded menopause formulations</text>
+<text x="1122" y="175.1" class="nlabel"><tspan class="ncount-inline">263</tspan>  Hormone therapies</text>
+<text x="1122" y="192.0" class="nlabel"><tspan class="ncount-inline">202</tspan>  Protein, amino acids & creatine</text>
+<text x="1122" y="207.6" class="nlabel"><tspan class="ncount-inline">186</tspan>  Herbals & botanicals</text>
+<text x="1122" y="221.7" class="nlabel"><tspan class="ncount-inline">72</tspan>  Gut / microbiome</text>
+<text x="1122" y="234.7" class="nlabel"><tspan class="ncount-inline">67</tspan>  Vague or non-classifiable</text>
+<text x="1122" y="247.7" class="nlabel"><tspan class="ncount-inline">57</tspan>  Fatty acids & oils</text>
+<text x="1122" y="260.7" class="nlabel"><tspan class="ncount-inline">33</tspan>  Prescription & OTC medicines</text>
+</svg>
+</div>
+<div id="tooltip" role="status"></div>
+
+<div class="notes">
+<h2>Stage rules</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Stage</th><th>Rule</th><th class="num">In</th><th class="num">Kept</th><th class="num">Removed</th></tr></thead>
+<tbody>
+
+<tr><td>Google search</td><td>Daily scrape across 13 search terms; links from YouTube, TikTok, Facebook, Instagram</td><td class="num">—</td><td class="num">18,579</td><td class="num">—</td></tr>
+<tr><td>Download + LLM</td><td>Video retrieved by yt-dlp and processed by Nemotron&nbsp;3 Nano Omni; drops unretrievable links (most Instagram), audio-only files and processing failures</td><td class="num">18,579</td><td class="num">12,213</td><td class="num">6,366</td></tr>
+<tr><td>Menopause screen</td><td>LLM field <em>menopause</em> = True (post targets the supplement toward menopause-related symptoms)</td><td class="num">12,213</td><td class="num">4,447</td><td class="num">7,766</td></tr>
+<tr><td>Deduplication</td><td>Same normalised title (≥ 15 chars) and duration across platforms; copy with most views kept</td><td class="num">4,447</td><td class="num">4,338</td><td class="num">109</td></tr>
+<tr><td>Supplement screen</td><td>Post names at least one supplement; the 1,404 without are retained separately as symptom-and-experience posts</td><td class="num">4,338</td><td class="num">2,934</td><td class="num">1,404</td></tr>
+<tr><td>Primary category</td><td>Modal status category of the post's supplement terms, per the team's nine-category coding framework; unmatched terms go to the manual review queue</td><td class="num">2,934</td><td class="num">2,934</td><td class="num">—</td></tr>
+
+</tbody>
+</table>
+</div>
+
+<details>
+<summary>All flows as a table</summary>
+<div class="tablewrap">
+<table>
+<thead><tr><th>From</th><th>To</th><th class="num">Posts</th><th class="num">% of source</th></tr></thead>
+<tbody>
+<tr><td>Instagram</td><td>Downloaded & LLM-processed</td><td class="num">151</td><td class="num">2.6%</td></tr>
+<tr><td>Instagram</td><td>Not retrievable / not processed</td><td class="num">5,548</td><td class="num">97.4%</td></tr>
+<tr><td>TikTok</td><td>Downloaded & LLM-processed</td><td class="num">4,819</td><td class="num">93.0%</td></tr>
+<tr><td>TikTok</td><td>Not retrievable / not processed</td><td class="num">363</td><td class="num">7.0%</td></tr>
+<tr><td>YouTube</td><td>Downloaded & LLM-processed</td><td class="num">3,845</td><td class="num">97.9%</td></tr>
+<tr><td>YouTube</td><td>Not retrievable / not processed</td><td class="num">84</td><td class="num">2.1%</td></tr>
+<tr><td>Facebook</td><td>Downloaded & LLM-processed</td><td class="num">3,398</td><td class="num">90.2%</td></tr>
+<tr><td>Facebook</td><td>Not retrievable / not processed</td><td class="num">371</td><td class="num">9.8%</td></tr>
+<tr><td>Downloaded & LLM-processed</td><td>Menopause-targeted</td><td class="num">4,447</td><td class="num">36.4%</td></tr>
+<tr><td>Downloaded & LLM-processed</td><td>Not menopause-targeted</td><td class="num">7,766</td><td class="num">63.6%</td></tr>
+<tr><td>Menopause-targeted</td><td>Unique posts</td><td class="num">4,338</td><td class="num">97.5%</td></tr>
+<tr><td>Menopause-targeted</td><td>Cross-platform duplicates</td><td class="num">109</td><td class="num">2.5%</td></tr>
+<tr><td>Unique posts</td><td>Mentions supplements</td><td class="num">2,934</td><td class="num">67.6%</td></tr>
+<tr><td>Unique posts</td><td>No supplements mentioned</td><td class="num">1,404</td><td class="num">32.4%</td></tr>
+<tr><td>Mentions supplements</td><td>Manual review queue</td><td class="num">838</td><td class="num">28.6%</td></tr>
+<tr><td>Mentions supplements</td><td>Vitamins & minerals</td><td class="num">759</td><td class="num">25.9%</td></tr>
+<tr><td>Mentions supplements</td><td>Branded menopause formulations</td><td class="num">457</td><td class="num">15.6%</td></tr>
+<tr><td>Mentions supplements</td><td>Hormone therapies</td><td class="num">263</td><td class="num">9.0%</td></tr>
+<tr><td>Mentions supplements</td><td>Protein, amino acids & creatine</td><td class="num">202</td><td class="num">6.9%</td></tr>
+<tr><td>Mentions supplements</td><td>Herbals & botanicals</td><td class="num">186</td><td class="num">6.3%</td></tr>
+<tr><td>Mentions supplements</td><td>Gut / microbiome</td><td class="num">72</td><td class="num">2.5%</td></tr>
+<tr><td>Mentions supplements</td><td>Vague or non-classifiable</td><td class="num">67</td><td class="num">2.3%</td></tr>
+<tr><td>Mentions supplements</td><td>Fatty acids & oils</td><td class="num">57</td><td class="num">1.9%</td></tr>
+<tr><td>Mentions supplements</td><td>Prescription & OTC medicines</td><td class="num">33</td><td class="num">1.1%</td></tr>
+</tbody>
+</table>
+</div>
+</details>
+
+<p class="fineprint">Bands are proportional to post counts; nodes smaller than 117 posts are drawn at a 4px minimum so they stay visible. Category assignment gives each post the most frequent status category among its supplement terms (ties resolved away from the manual-review flag). Generated by <code>src/generate_sankey.py</code> from <code>data/supplements.csv</code> (search links), <code>data/supplements_LLM_results.xlsx</code> (LLM output), <code>src/clean_supplements.py</code> (category coding) and <code>src/analyze_data.py</code> (platform filter and deduplication).</p>
+</div>
+
+<script>
+(function () {
+  var tip = document.getElementById('tooltip');
+  document.querySelectorAll('[data-tip]').forEach(function (el) {
+    el.addEventListener('mousemove', function (e) {
+      tip.textContent = el.getAttribute('data-tip');
+      tip.style.display = 'block';
+      var x = e.clientX + 14, y = e.clientY + 12;
+      if (x + 330 > window.innerWidth) x = e.clientX - 330;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    });
+    el.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
+  });
+})();
+</script>
+</body>
+</html>
