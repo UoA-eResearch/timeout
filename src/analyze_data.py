@@ -15,6 +15,8 @@ import re
 from collections import Counter
 import warnings
 
+from clean_supplements import canonicalize
+
 warnings.filterwarnings('ignore')
 
 # Set plot style
@@ -27,6 +29,26 @@ PLOTS_DIR = Path("plots")
 PLOTS_DIR.mkdir(exist_ok=True)
 
 README_PATH = Path("README.md")
+
+
+def remove_duplicates(df):
+    """Remove cross-platform duplicate posts.
+
+    A post is considered a duplicate when another post has the same
+    normalized title (>= 15 chars, so generic titles are never merged) and
+    the same duration rounded to the nearest second. The copy with the
+    highest view count is kept.
+    """
+    df = df.copy()
+    title_norm = df['title'].fillna('').str.lower().str.strip()
+    duration = df['duration'].round() if 'duration' in df.columns else 0
+    df['_dedup_key'] = title_norm + '|' + duration.astype(str)
+    eligible = title_norm.str.len() >= 15
+    dupes = df[eligible].sort_values('view_count', ascending=False)
+    drop_idx = dupes[dupes.duplicated('_dedup_key', keep='first')].index
+    if len(drop_idx):
+        print(f"Removing {len(drop_idx)} duplicate posts (same title and duration)")
+    return df.drop(index=drop_idx).drop(columns='_dedup_key')
 
 
 def load_and_filter_data():
@@ -61,6 +83,12 @@ def load_and_filter_data():
     # Filter datasets by menopause/timeout columns
     supplements_filtered = supplements_df[supplements_df['menopause'] == True].copy()
     print(f"Filtered supplements (menopause=True): {len(supplements_filtered)} rows")
+
+    # Remove duplicates (same video posted across multiple platforms).
+    # Conservative heuristic: same normalized title and same duration; the
+    # copy with the highest view count is kept.
+    supplements_filtered = remove_duplicates(supplements_filtered)
+    print(f"After duplicate removal: {len(supplements_filtered)} rows")
 
     timeout_filtered = timeout_df[timeout_df['timeout'] == True].copy()
     print(f"Filtered timeout (timeout=True): {len(timeout_filtered)} rows")
@@ -223,11 +251,9 @@ def analyze_supplements(df):
                 supplement = supplement.lower()
                 if supplement.lower() in sentinel_values:
                     continue
-                if supplement in ["vitamin d", "vitamin d3"]:
-                    supplement = "Vitamin D"
-                if supplement in ["magnesium", "magnesium glycinate"]:
-                    supplement = "Magnesium"
-                all_supplements.append(supplement.title())
+                # Collapse spelling/formulation/synonym variants to their
+                # canonical grouping (see clean_supplements.py)
+                all_supplements.append(canonicalize(supplement))
 
     supplement_counts = Counter(all_supplements)
     top_supplements = supplement_counts.most_common(10)
@@ -270,8 +296,10 @@ def analyze_supplements(df):
             for supp_list in period_df['supplements'].dropna():
                 if isinstance(supp_list, str):
                     items = [s.strip().strip("'\"") for s in supp_list.strip('[]').split(',')]
-                    # Filter out sentinel values
-                    period_supplements.extend([s for s in items if s and s.lower() not in sentinel_values])
+                    # Filter out sentinel values and canonicalize, matching the top-10 counting
+                    period_supplements.extend([
+                        canonicalize(s) for s in items if s and s.lower() not in sentinel_values
+                    ])
 
             period_counts = Counter(period_supplements)
             for name in top_3_names:
