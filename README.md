@@ -355,7 +355,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-08-20 21:38:11 UTC*
+*Last updated: 2026-08-20 23:59:46 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -366,47 +366,47 @@ This section contains automated analysis of the LLM-processed video data. The an
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=4447 videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=4338 videos).
 
 #### Key Findings
 
 **Video Distribution by Platform:**
-| extractor   |   count |       like_count |   view_count |   comment_count |
-|:------------|--------:|-----------------:|-------------:|----------------:|
-| tiktok      |    1731 |      4.84567e+06 |  1.78358e+08 |          210923 |
-| youtube     |    1472 | 979835           |  3.49965e+07 |           39489 |
-| facebook    |    1162 |      0           |  2.63453e+08 |               0 |
-| instagram   |      82 |  18614           | 64           |            1660 |
+| extractor   |   count |      like_count |   view_count |   comment_count |
+|:------------|--------:|----------------:|-------------:|----------------:|
+| tiktok      |    1723 |      4.8303e+06 |  1.77925e+08 |          210515 |
+| youtube     |    1462 | 979825          |  3.49954e+07 |           39488 |
+| facebook    |    1071 |      0          |  1.51698e+08 |               0 |
+| instagram   |      82 |  18614          | 64           |            1660 |
 
 
 **Top 10 Supplements Promoted:**
-| Supplement   |   Video Count |
-|:-------------|--------------:|
-| Vitamin D    |           485 |
-| Magnesium    |           447 |
-| Omega-3      |           169 |
-| Calcium      |           162 |
-| Creatine     |           144 |
-| Black Cohosh |           125 |
-| Vitamin C    |           116 |
-| Collagen     |           109 |
-| Ashwagandha  |           105 |
-| Vitamin E    |            83 |
+| Supplement                  |   Video Count |
+|:----------------------------|--------------:|
+| Vitamin D                   |           595 |
+| Magnesium                   |           561 |
+| Omega-3 / marine oils       |           370 |
+| B vitamins                  |           321 |
+| Collagen                    |           232 |
+| Calcium                     |           160 |
+| Microbiome products         |           147 |
+| Creatine                    |           142 |
+| Black cohosh                |           133 |
+| Hormone replacement therapy |           130 |
 
 
 **Top 10 Symptoms Targeted:**
 | Symptom      |   Mention Count |
 |:-------------|----------------:|
-| Mood Changes |            1985 |
-| Hot Flashes  |            1213 |
-| Night Sweats |             641 |
-| Brain Fog    |             509 |
-| Fatigue      |             403 |
-| Weight Gain  |             354 |
-| Insomnia     |             264 |
-| Low Energy   |             259 |
-| Joint Pain   |             234 |
-| Inflammation |             220 |
+| Mood Changes |            1916 |
+| Hot Flashes  |            1182 |
+| Night Sweats |             624 |
+| Brain Fog    |             505 |
+| Fatigue      |             397 |
+| Weight Gain  |             339 |
+| Insomnia     |             258 |
+| Low Energy   |             243 |
+| Joint Pain   |             231 |
+| Inflammation |             209 |
 
 #### Visualizations
 
