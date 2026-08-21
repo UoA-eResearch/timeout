@@ -82,6 +82,14 @@ def update_readme_stats(supplements_df, timeout_df):
     except Exception as e:
         print(f"Warning: Could not update README.md: {e}")
 
+def strip_google_abuse(url):
+    """Remove the google_abuse exemption query parameter Google sometimes appends to result links"""
+    if not isinstance(url, str) or "google_abuse=" not in url:
+        return url
+    url = re.sub(r"([?&])google_abuse=[^&]*&?", r"\1", url)
+    return url.rstrip("?&")
+
+
 errors = 0
 
 def save_error_screenshot(driver, error_name):
@@ -161,7 +169,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
     parsed_results = []
     for result in tqdm(results, desc="Parsing results"):
         try:
-            link = result.find_elements(By.TAG_NAME, "a")[0].get_attribute("href")
+            link = strip_google_abuse(result.find_elements(By.TAG_NAME, "a")[0].get_attribute("href"))
             bits = result.text.split("\n")
 
             # Ensure we have at least 3 elements in bits
@@ -293,6 +301,7 @@ def main():
         if os.path.exists("data/supplements.csv"):
             print("\nLoading previous results...")
             old_df = pd.read_csv("data/supplements.csv")
+            old_df.link = old_df.link.map(strip_google_abuse)
             print(f"Previous results: {len(old_df)} rows")
 
             # Combine with old data
@@ -308,6 +317,7 @@ def main():
         # Calculate new results after filtering
         if os.path.exists("data/supplements.csv"):
             old_df = pd.read_csv("data/supplements.csv")
+            old_df.link = old_df.link.map(strip_google_abuse)
             new_results = df[~df.link.isin(old_df.link)]
             supplements_new = len(new_results)
             print(f"New results (after filtering): {supplements_new} rows")
@@ -354,6 +364,7 @@ def main():
             if os.path.exists("data/timeout.csv"):
                 print("\nLoading previous timeout results...")
                 old_df_timeout = pd.read_csv("data/timeout.csv")
+                old_df_timeout.link = old_df_timeout.link.map(strip_google_abuse)
                 print(f"Previous timeout results: {len(old_df_timeout)} rows")
 
                 # Combine with old data
@@ -369,6 +380,7 @@ def main():
             # Calculate new timeout results after filtering
             if os.path.exists("data/timeout.csv"):
                 old_df_timeout = pd.read_csv("data/timeout.csv")
+                old_df_timeout.link = old_df_timeout.link.map(strip_google_abuse)
                 new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
                 timeout_new = len(new_timeout_results)
                 print(f"New timeout results (after filtering): {timeout_new} rows")
