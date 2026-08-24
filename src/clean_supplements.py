@@ -37,8 +37,8 @@ CANONICAL_PATTERNS = [
     (r"vitamin\s*d3?\b|cholecalciferol|ergocalciferol|\bd3\b", "Vitamin D"),
     (r"magnesium", "Magnesium"),
     (r"omega[\s-]*3|fish oil|krill oil|cod liver oil", "Omega-3 / marine oils"),
-    (r"\bb[\s-]*(vitamins?|complex)|vitamin b\s*(complex|12|6|5|2|1)?\b|\bb12\b|\bb6\b|folate|folic acid|methylcobalamin|thiamine", "B vitamins"),
-    (r"black cohosh", "Black cohosh"),
+    (r"\bb[\s-]*(vitamins?|complex)|vitamin b\s*\d*\b|\bb\s*(1|2|3|5|6|12)\b|folate|folic acid|biotin|riboflavin|niacin|pantothenic|methylcobalamin|thiamine", "B vitamins"),
+    (r"black cohosh|racemosa", "Black cohosh"),
     (r"chasteberry|vitex|chaste tree", "Vitex / chasteberry"),
     (r"\bmaca\b", "Maca"),
     (r"collagen", "Collagen"),
@@ -101,7 +101,7 @@ STATUS_CATEGORIES = {
         "multivitamins", "vitamins and minerals",
     ],
     "Herbals, botanicals and phytoestrogenic products": [
-        "black cohosh", "black cohosh root", "ashwagandha", "turmeric",
+        "black cohosh", "black cohosh root", "racemosa", "ashwagandha", "turmeric",
         "curcumin", "shatavari", "red clover", "maca", "maca root",
         "maca powder", "sage", "dong quai", "chasteberry", "vitex",
         "chaste tree", "chaste tree berry", "soy", "soy isoflavones",
@@ -193,7 +193,8 @@ def status_category(term):
     if t in _STATUS_LOOKUP:
         return _STATUS_LOOKUP[t]
     # formulation/spelling variant fallbacks
-    if re.search(r"vitamin\s*[a-ek]\d*\b|\bk2\b|folate|folic acid", t):
+    if re.search(r"vitamin\s*[a-ek]\d*\b|\bk2\b|\bb\s*(1|2|3|5|6|12)\b|b vitamins|b complex"
+                 r"|folate|folic acid|biotin|riboflavin|niacin|pantothenic|thiamine|methylcobalamin", t):
         return "Vitamins and minerals"
     if re.search(r"magnesium|calcium|zinc|iron\b|selenium|multivitamin", t):
         return "Vitamins and minerals"

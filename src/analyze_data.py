@@ -133,6 +133,17 @@ def analyze_supplements(df):
     analysis_results['tables']['form_analysis'] = form_analysis
     analysis_results['summary'].append(f"**Video Distribution by Platform:**\n{form_analysis.to_markdown()}")
 
+    # 1.5. Division 1: content type (informative / marketing / other)
+    if 'content_type' in df.columns:
+        print("\n1.5. Division 1: Content Type")
+        ct = (df['content_type'].astype(str).str.strip().str.lower()
+              .value_counts().rename_axis('Content type').reset_index(name='Post Count'))
+        print(f"Total posts after filtering: {len(df)}")
+        print(ct.to_string(index=False))
+        analysis_results['tables']['content_type_counts'] = ct
+        analysis_results['summary'].append(
+            f"\n**Division 1 — Content Type ({len(df)} posts total):**\n{ct.to_markdown(index=False)}")
+
     # 2. Sentiment trends over time
     print("\n2. Sentiment Trends Over Time")
     sentiment_order = ['negative', 'neutral', 'positive']
