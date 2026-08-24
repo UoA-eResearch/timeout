@@ -1,0 +1,20 @@
+{
+  "pass_name": "codebook",
+  "codebook_version": "1.0.0",
+  "schema_hash": "bebaef8e3c204daa",
+  "prompt_hash": "87a65d5cbc259fd3",
+  "model": "nemotron_3_nano_omni",
+  "model_revision": "nemotron_3_nano_omni@created=1787276873",
+  "base_url": "https://ai.cer-sandbox.cloud.edu.au/v1",
+  "temperature": 0.0,
+  "top_p": 1.0,
+  "seed": 20260821,
+  "evidence_version": "v1",
+  "evidence_manifest_sha": "3a318cf0f2be2c97",
+  "started_at": "2026-08-21T01:47:53+00:00",
+  "git_commit": "a01462c",
+  "host": "triton",
+  "user": "ubuntu",
+  "python": "3.12.3",
+  "finished_at": "2026-08-21T05:11:45+00:00"
+}

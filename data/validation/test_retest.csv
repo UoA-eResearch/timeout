@@ -1,0 +1,11 @@
+variable,videos,identical_across_runs_pct
+content_type,40,100.0
+primary_focus,40,100.0
+symptom_categories,40,90.0
+symptom_framing,40,70.0
+health_framework,40,97.5
+speaker_role,40,95.0
+commercial_intent,40,90.0
+information_quality,40,95.0
+misleading_level,40,92.5
+emotional_tone,40,70.0

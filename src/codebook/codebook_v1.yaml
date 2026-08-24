@@ -1,0 +1,379 @@
+# =============================================================================
+# Menopause supplement content-analysis codebook
+# =============================================================================
+# This file is the SINGLE SOURCE OF TRUTH for the study's variables.
+#
+#   - schema.py compiles it into a JSON Schema used for constrained decoding,
+#     so the model physically cannot emit a value outside these lists.
+#   - sample_for_coding.py renders it into the workbook human coders use.
+#   - report.py reads the definitions to label its own charts.
+#
+# Model and human coders therefore read the SAME definitions. When a coder
+# disagrees with a label, the fix is to sharpen the wording HERE, which
+# improves both at once.
+#
+# Bump `version` on ANY change. Output files are keyed by version, so two
+# codebook versions can never silently mix in one spreadsheet.
+# =============================================================================
+
+version: "1.0.0"
+name: menopause_supplement_codebook
+updated: "2026-08-21"
+
+provenance_note: >
+  Every variable below is derived from the video transcript and genuine platform
+  metadata only (title, post text, channel name, platform, duration). Engagement
+  metrics and upload dates are deliberately withheld from the model so they can
+  serve as independent outcome variables at analysis time. No previously-inferred
+  label is used as input.
+
+# The escape hatch present on every categorical variable. Coders and the model
+# are instructed to use it rather than guess.
+insufficient: "insufficient evidence"
+
+# -----------------------------------------------------------------------------
+# PASS 1 — relevance gate.
+# Cheap two-field pass over the whole corpus. Only videos passing
+# is_about_menopause continue to the full codebook, which is what stops the
+# pipeline spending 61% of its compute labelling off-topic material.
+# -----------------------------------------------------------------------------
+gate:
+  instructions: >
+    You are screening short social-media videos for a study of menopause
+    supplement content. Read the evidence provided and answer only the questions
+    below. Judge ONLY from the evidence given. Do not infer, guess, or draw on
+    outside knowledge about the channel.
+  variables:
+    - name: is_about_menopause
+      type: boolean
+      question: >
+        Does this video discuss menopause, perimenopause, or menopausal symptoms
+        (for example hot flushes, night sweats, or the menopausal transition)?
+        Answer true only if menopause is actually discussed, not merely if the
+        speaker is a woman of menopausal age.
+    - name: mentions_supplements
+      type: boolean
+      question: >
+        Does this video mention any supplement, vitamin, herbal product, or
+        medication by name or by clear description?
+    - name: gate_evidence_span
+      type: quote
+      question: >
+        Quote the exact words from the evidence that most justify your answers.
+        If nothing in the evidence supports them, write "no supporting evidence".
+
+# -----------------------------------------------------------------------------
+# PASS 2 — full codebook, video level. One value per video.
+# -----------------------------------------------------------------------------
+video_level:
+  instructions: >
+    You are coding a short social-media video about menopause for an academic
+    content analysis. Apply the codebook below strictly. Use exactly the
+    category labels given. Judge ONLY from the evidence provided; if the
+    evidence does not support a category, choose "insufficient evidence" rather
+    than guessing. For every field ending in _evidence, quote the exact words
+    from the transcript or post text that justify your choice.
+
+  variables:
+
+    - name: content_type
+      label: Content type
+      rq: "How are symptoms and supplements portrayed?"
+      type: enum
+      question: What is this video predominantly?
+      values:
+        - value: predominantly informative
+          definition: Mainly conveys information, explanation or education about menopause, symptoms or products.
+        - value: predominantly marketing
+          definition: Mainly promotes a specific purchasable product, brand, programme or service.
+        - value: predominantly personal commentary
+          definition: Mainly an individual sharing opinion, lifestyle content or general chat, without substantive information and without promoting a specific product.
+      evidence: true
+
+    - name: primary_focus
+      label: Primary focus
+      rq: "How are symptoms and supplements portrayed?"
+      type: enum
+      question: Is the video predominantly about the experience of menopause, or about supplements and remedies?
+      values:
+        - value: symptoms and experience
+          definition: Mainly about what menopause feels like, its symptoms, or living through it.
+        - value: supplements and remedies
+          definition: Mainly about products, ingredients or remedies taken for menopause.
+        - value: both equally
+          definition: Gives substantial attention to both, with neither dominant.
+        - value: neither
+          definition: About menopause in some other sense (for example policy, workplace, relationships).
+      evidence: false
+
+    - name: symptom_categories
+      label: Symptom categories
+      rq: "What symptoms are the supplement products targeting?"
+      type: multi_enum
+      max_items: 5
+      question: >
+        Which categories of menopause symptom or health concern does the video
+        mention? Select every category that is actually mentioned.
+      values:
+        - value: vasomotor
+          definition: Hot flushes, night sweats, flushing.
+        - value: physical
+          definition: Genitourinary symptoms, musculoskeletal discomfort, joint or bone problems, skin and hair changes, headaches, insomnia.
+        - value: psychological
+          definition: Mental health, brain fog, mood, anxiety, irritability, depression.
+        - value: health and metabolic
+          definition: Cardiovascular health, metabolism, glucose control, cholesterol, weight, energy.
+        - value: prevention of disease
+          definition: Framed as preventing a future disease (for example osteoporosis or heart disease) rather than relieving a current symptom.
+        - value: no menopause symptoms mentioned
+          definition: No specific symptom or health concern is named, or what is named is non-specific.
+      evidence: true
+
+    - name: symptom_framing
+      label: Symptom framing
+      rq: "How are symptoms portrayed? (primary RQ)"
+      type: multi_enum
+      max_items: 3
+      question: >
+        What kind of language does the video use about menopause symptoms?
+        Select every framing that is present. This is about HOW symptoms are
+        talked about, not whether they are present.
+      values:
+        - value: burden or suffering
+          definition: Symptoms framed as suffering, struggle, misery, or something being endured. E.g. "wrecking my life", "unbearable".
+        - value: loss or decline
+          definition: Framed as losing something — youth, femininity, vitality, one's former self.
+        - value: deficiency or imbalance
+          definition: Framed as a hormone deficiency, imbalance, or something depleted that must be restored.
+        - value: general ageing
+          definition: Framed as an ordinary part of getting older, not menopause-specific.
+        - value: normalised
+          definition: Framed as a normal, expected life stage — matter of fact or positive, not a problem to be fixed.
+        - value: not applicable
+          definition: The video does not discuss symptoms.
+      evidence: true
+
+    - name: health_framework
+      label: Knowledge system
+      rq: "Western lens hypothesis"
+      type: enum
+      question: What health or medical knowledge system does the content draw on?
+      values:
+        - value: western biomedical
+          definition: Appeals to conventional medicine, clinical trials, doctors, physiology as taught in Western medicine.
+        - value: traditional chinese medicine
+          definition: Appeals to TCM concepts, Chinese herbal traditions, qi, meridians.
+        - value: ayurvedic
+          definition: Appeals to Ayurvedic concepts, doshas, named Ayurvedic herbs in that framing.
+        - value: naturopathic or holistic
+          definition: Appeals to natural, holistic, whole-body or detox framings without a specific named tradition.
+        - value: other traditional or indigenous
+          definition: Appeals to another named traditional or indigenous knowledge system.
+        - value: mixed
+          definition: Draws substantially on more than one of the above.
+      evidence: true
+
+    - name: speaker_role
+      label: Speaker role
+      rq: "Sources of information and credibility"
+      type: enum
+      question: >
+        What is the main speaker, based ONLY on what is stated in the evidence
+        or visible in the channel name? Do not guess from tone or confidence.
+      values:
+        - value: qualified health professional
+          definition: States or displays a clinical qualification (doctor, nurse, dietitian, pharmacist, physiotherapist).
+        - value: researcher or academic
+          definition: States a research or academic role.
+        - value: company or brand account
+          definition: The account is a company or brand rather than an individual.
+        - value: influencer or content creator
+          definition: Presents as a content creator with no stated health qualification.
+        - value: personal experience only
+          definition: An individual speaking purely from their own experience, with no claimed expertise.
+      evidence: true
+
+    - name: commercial_intent
+      label: Commercial intent
+      rq: "Sources of information and credibility"
+      type: enum
+      question: Is the video trying to sell something, and is that disclosed?
+      values:
+        - value: none apparent
+          definition: No product, brand, programme or service is being promoted.
+        - value: disclosed promotion
+          definition: Promotes a product AND discloses the commercial relationship (ad, sponsored, affiliate, "my product").
+        - value: undisclosed promotion
+          definition: Promotes a specific purchasable product with no disclosure of any commercial relationship.
+        - value: sells own product
+          definition: The speaker or account is the seller of the product discussed.
+      evidence: true
+
+    - name: information_quality
+      label: Information quality
+      rq: "Misleading vs credible content"
+      type: enum
+      question: >
+        How well supported is the health information in this video? Judge the
+        support offered, not whether you agree with it.
+      values:
+        - value: specific and supported
+          definition: Makes specific claims AND points to a named source, study, guideline or physiological mechanism.
+        - value: general but sound
+          definition: Broadly accurate but non-specific; no source offered, nothing that contradicts mainstream advice.
+        - value: unsupported assertion
+          definition: Makes definite health claims with no source, mechanism or evidence of any kind offered.
+        - value: contradicts mainstream advice
+          definition: Makes claims that run against mainstream clinical advice, or discourages conventional care.
+      evidence: true
+
+    - name: misleading_level
+      label: Misleading content
+      rq: "Misleading vs credible content"
+      type: enum
+      question: >
+        To what extent could this video mislead a viewer about menopause or
+        supplements? Judge the content, not the speaker.
+      values:
+        - value: none apparent
+          definition: Nothing likely to mislead.
+        - value: minor imprecision
+          definition: Loose or oversimplified wording that a careful viewer would not be harmed by.
+        - value: materially misleading
+          definition: Would likely give a viewer a false belief about what a product does or about menopause itself.
+        - value: potentially harmful
+          definition: Could lead a viewer to harm — discouraging medical care, unsafe doses, or contraindicated combinations.
+      evidence: true
+
+    - name: emotional_tone
+      label: Emotional tone
+      rq: "How are symptoms and supplements portrayed?"
+      type: multi_enum
+      max_items: 3
+      question: What is the dominant emotional tone of the main speaker? Select at most three.
+      values:
+        - {value: hopeful, definition: Expresses optimism about improvement.}
+        - {value: relieved, definition: Expresses relief at having found something that helped.}
+        - {value: enthusiastic, definition: Excited, high-energy advocacy.}
+        - {value: reassuring, definition: Calming, telling the viewer it will be alright.}
+        - {value: empathetic, definition: Expresses understanding of the viewer's difficulty.}
+        - {value: neutral, definition: Flat, factual delivery without evident emotion.}
+        - {value: concerned, definition: Expresses worry or caution.}
+        - {value: frustrated, definition: Expresses annoyance, anger or exasperation.}
+        - {value: dismissive, definition: Dismisses a concern, a product, or other people's views.}
+        - {value: humorous, definition: Joking, satirical or comedic.}
+      evidence: false
+
+# -----------------------------------------------------------------------------
+# PASS 2 — per-supplement claims. Repeated for each supplement mentioned.
+#
+# These are the docx's "second pass" questions. They are per supplement, not per
+# video: one video can make a strong cure claim about magnesium and mention
+# black cohosh only in passing. In the delivered table these become
+# pipe-separated lists, aligned in the same order as supplement_name_raw.
+# -----------------------------------------------------------------------------
+per_supplement:
+  max_items: 12
+  instructions: >
+    List every supplement, vitamin, herbal product or medication named in the
+    video, in the order first mentioned. For each one, answer the fields below
+    about THAT supplement specifically. If the video names no supplement,
+    return an empty list.
+  variables:
+
+    - name: supplement_name_raw
+      label: Supplement (as said)
+      type: verbatim
+      question: The supplement name exactly as it appears in the evidence, normalised only for capitalisation.
+
+    - name: supplement_group
+      label: Supplement group
+      rq: "Types of non-medication products promoted"
+      type: enum
+      question: Which group does this supplement belong to? Exactly one.
+      values:
+        - value: medicines and hormone therapies
+          definition: A prescription or pharmaceutical product, including HRT, oestrogen, progesterone, testosterone, antidepressants.
+        - value: menopause formulation
+          definition: A branded multi-ingredient product explicitly marketed for menopause or perimenopause.
+        - value: functional product
+          definition: A branded multi-ingredient product marketed for a body system or symptom rather than a named ingredient — gut, sleep, skin, hair, bone, mood, energy.
+        - value: single ingredient
+          definition: A product identified by one substance rather than a brand or symptom — magnesium, vitamin D, collagen, black cohosh, creatine.
+        - value: general or unclear
+          definition: Mentioned too vaguely to classify — "my supplements", "a multivitamin", an unnamed product.
+
+    - name: ingredient_type
+      label: Substance type
+      type: enum
+      question: If this is a single ingredient, what type of substance is it? Otherwise "not applicable".
+      values:
+        - {value: vitamin, definition: A named vitamin.}
+        - {value: mineral, definition: A named mineral.}
+        - {value: herbal or botanical, definition: A plant-derived preparation.}
+        - {value: amino acid or derivative, definition: An amino acid or close derivative.}
+        - {value: protein or peptide, definition: A protein or peptide, including collagen.}
+        - {value: fatty acid, definition: A fatty acid such as omega-3.}
+        - {value: probiotic, definition: A live-culture product.}
+        - {value: hormone precursor, definition: A precursor such as DHEA or pregnenolone.}
+        - {value: other, definition: A single ingredient not covered above.}
+        - {value: not applicable, definition: Not a single-ingredient product.}
+
+    - name: claim_target
+      label: Claim target
+      rq: "Match the supplement to the symptom"
+      type: enum
+      question: What is this supplement claimed to help with in this video?
+      values:
+        - {value: vasomotor, definition: Hot flushes, night sweats.}
+        - {value: physical, definition: Joint, bone, genitourinary, skin, hair, insomnia.}
+        - {value: psychological, definition: Mood, mental health, anxiety, brain fog.}
+        - {value: health and metabolic, definition: Energy, cardiovascular health, cholesterol, weight, glucose.}
+        - {value: antioxidant, definition: Framed as antioxidant or anti-inflammatory action.}
+        - {value: hormone regulation, definition: Framed as balancing, regulating or replacing hormones.}
+        - {value: general health and wellness, definition: Non-specific wellbeing benefit.}
+        - {value: no claim, definition: Mentioned without any benefit being claimed.}
+
+    - name: claim_type
+      label: Claim type
+      rq: "What type of claim"
+      type: enum
+      question: What kind of statement is made about this supplement?
+      values:
+        - {value: benefit, definition: Asserts it does something good.}
+        - {value: risk, definition: Warns about a harm, side effect or interaction.}
+        - {value: informational, definition: Describes or explains it without asserting benefit or harm.}
+        - {value: no claim, definition: Named only in passing.}
+
+    - name: claim_strength
+      label: Claim strength
+      rq: "Claim strength"
+      type: enum
+      question: How strongly is the claim worded? Use the strongest wording actually used.
+      values:
+        - {value: cures, definition: Says it cures or fixes.}
+        - {value: eliminates, definition: Says it stops, ends or gets rid of a symptom.}
+        - {value: reduces, definition: Says it reduces, improves or lessens.}
+        - {value: supports, definition: Says it supports, aids or helps maintain.}
+        - {value: may help, definition: Hedged — may, might, could, some people find.}
+        - {value: no claim, definition: No benefit claim is made.}
+
+    - name: evidence_type
+      label: Evidence offered
+      rq: "Classify posts based on evidence"
+      type: enum
+      question: What kind of evidence, if any, is offered for this supplement?
+      values:
+        - {value: a study, definition: Refers to research, a trial, or "studies show".}
+        - {value: a guideline, definition: Refers to a clinical guideline or official body.}
+        - {value: mechanism, definition: Explains a physiological reason why it would work.}
+        - {value: testimonial, definition: Personal experience — the speaker's or someone else's.}
+        - {value: traditional use, definition: Appeals to long-standing or traditional use.}
+        - {value: no evidence, definition: No support of any kind is offered.}
+
+    - name: claim_quote
+      label: Justifying quote
+      type: verbatim
+      question: >
+        Quote the exact words from the evidence that justify the claim fields
+        above for THIS supplement. If there are none, write "no supporting evidence".

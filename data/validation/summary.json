@@ -1,0 +1,9 @@
+{
+  "out_of_vocabulary_total": 0,
+  "alignment": {
+    "rows_checked": 8063,
+    "misaligned_rows": 0,
+    "aligned_pct": 100.0
+  },
+  "retest_min_pct": 70.0
+}

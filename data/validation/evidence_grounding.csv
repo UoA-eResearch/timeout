@@ -1,0 +1,10 @@
+quote_field,quotes_checked,declined_to_quote,verbatim_pct,near_verbatim_pct
+content_type_evidence,8107,0,87.4,99.0
+symptom_categories_evidence,8077,0,79.4,97.7
+symptom_framing_evidence,8069,0,79.2,96.7
+health_framework_evidence,8075,6,80.6,92.6
+speaker_role_evidence,8225,4,71.9,77.6
+commercial_intent_evidence,8136,2,86.3,93.5
+information_quality_evidence,8064,1,83.0,97.7
+misleading_level_evidence,8075,2,79.7,90.7
+claim_quote,7509,6393,92.0,99.8

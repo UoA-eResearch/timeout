@@ -1,0 +1,8 @@
+variable,tier_A_n,tier_B_n,total_variation_distance
+content_type,7280,783,0.249
+primary_focus,7280,783,0.301
+health_framework,7280,783,0.267
+speaker_role,7280,783,0.48
+commercial_intent,7280,783,0.117
+information_quality,7280,783,0.221
+misleading_level,7280,783,0.223
