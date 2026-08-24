@@ -355,7 +355,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-08-20 23:59:46 UTC*
+*Last updated: 2026-08-24 21:57:40 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -366,47 +366,55 @@ This section contains automated analysis of the LLM-processed video data. The an
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=4338 videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=3804 videos).
 
 #### Key Findings
 
 **Video Distribution by Platform:**
-| extractor   |   count |      like_count |   view_count |   comment_count |
-|:------------|--------:|----------------:|-------------:|----------------:|
-| tiktok      |    1723 |      4.8303e+06 |  1.77925e+08 |          210515 |
-| youtube     |    1462 | 979825          |  3.49954e+07 |           39488 |
-| facebook    |    1071 |      0          |  1.51698e+08 |               0 |
-| instagram   |      82 |  18614          | 64           |            1660 |
+| extractor   |   count |       like_count |   view_count |   comment_count |
+|:------------|--------:|-----------------:|-------------:|----------------:|
+| tiktok      |    1600 |      4.19835e+06 |  1.60706e+08 |          162048 |
+| youtube     |    1190 | 792359           |  2.84717e+07 |           28360 |
+| facebook    |     935 |      0           |  1.35088e+08 |               0 |
+| instagram   |      79 |  18285           | 82           |            1056 |
+
+
+**Division 1 — Content Type (3804 posts total):**
+| Content type                      |   Post Count |
+|:----------------------------------|-------------:|
+| predominantly informative         |         2433 |
+| predominantly marketing           |          834 |
+| predominantly personal commentary |          537 |
 
 
 **Top 10 Supplements Promoted:**
-| Supplement                  |   Video Count |
-|:----------------------------|--------------:|
-| Vitamin D                   |           595 |
-| Magnesium                   |           561 |
-| Omega-3 / marine oils       |           370 |
-| B vitamins                  |           321 |
-| Collagen                    |           232 |
-| Calcium                     |           160 |
-| Microbiome products         |           147 |
-| Creatine                    |           142 |
-| Black cohosh                |           133 |
-| Hormone replacement therapy |           130 |
+| Supplement            |   Video Count |
+|:----------------------|--------------:|
+| Vitamin D             |           558 |
+| Magnesium             |           554 |
+| Omega-3 / marine oils |           371 |
+| B vitamins            |           360 |
+| Collagen              |           233 |
+| Microbiome products   |           160 |
+| Calcium               |           132 |
+| Creatine              |           129 |
+| Black cohosh          |           126 |
+| Ashwagandha           |           109 |
 
 
 **Top 10 Symptoms Targeted:**
 | Symptom      |   Mention Count |
 |:-------------|----------------:|
-| Mood Changes |            1916 |
-| Hot Flashes  |            1182 |
-| Night Sweats |             624 |
-| Brain Fog    |             505 |
-| Fatigue      |             397 |
-| Weight Gain  |             339 |
-| Insomnia     |             258 |
-| Low Energy   |             243 |
-| Joint Pain   |             231 |
-| Inflammation |             209 |
+| Mood Changes |            1525 |
+| Hot Flashes  |             973 |
+| Night Sweats |             556 |
+| Brain Fog    |             400 |
+| Insomnia     |             328 |
+| Fatigue      |             324 |
+| Weight Gain  |             255 |
+| Low Energy   |             202 |
+| Joint Pain   |             182 |
+| Inflammation |             164 |
 
 #### Visualizations
 
