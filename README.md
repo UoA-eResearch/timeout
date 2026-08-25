@@ -355,7 +355,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-08-24 21:57:40 UTC*
+*Last updated: 2026-08-25 23:38:56 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -382,18 +382,18 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 **Division 1 — Content Type (3804 posts total):**
 | Content type                      |   Post Count |
 |:----------------------------------|-------------:|
-| predominantly informative         |         2433 |
-| predominantly marketing           |          834 |
+| predominantly informative         |         2432 |
+| predominantly marketing           |          835 |
 | predominantly personal commentary |          537 |
 
 
 **Top 10 Supplements Promoted:**
 | Supplement            |   Video Count |
 |:----------------------|--------------:|
-| Vitamin D             |           558 |
-| Magnesium             |           554 |
+| Vitamin D             |           557 |
+| Magnesium             |           553 |
 | Omega-3 / marine oils |           371 |
-| B vitamins            |           360 |
+| B vitamins            |           359 |
 | Collagen              |           233 |
 | Microbiome products   |           160 |
 | Calcium               |           132 |
@@ -409,7 +409,7 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 | Hot Flashes  |             973 |
 | Night Sweats |             556 |
 | Brain Fog    |             400 |
-| Insomnia     |             328 |
+| Insomnia     |             329 |
 | Fatigue      |             324 |
 | Weight Gain  |             255 |
 | Low Energy   |             202 |
