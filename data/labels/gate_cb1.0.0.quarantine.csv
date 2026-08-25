@@ -1,8 +1,2 @@
 video_id,error
-7224188532288523563,JSONDecodeError: Invalid control character at: line 4 column 424 (char 487)
-1501872021469280,"JSONDecodeError: Expecting ',' delimiter: line 4 column 13659 (char 13722)"
-7482771537842490654,"JSONDecodeError: Expecting ',' delimiter: line 1322 column 2 (char 4445)"
-3549356992032792,"JSONDecodeError: Expecting ',' delimiter: line 4 column 126956 (char 127019)"
 2049938885804089,"JSONDecodeError: Expecting ',' delimiter: line 1346 column 2 (char 4287)"
-F1DEB3BnnRM,"JSONDecodeError: Expecting ',' delimiter: line 1331 column 2 (char 4471)"
-7653427918579698975,"JSONDecodeError: Expecting ',' delimiter: line 1328 column 2 (char 4463)"

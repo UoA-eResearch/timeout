@@ -22,7 +22,7 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-PY="${PY:-/mnt/.venv/bin/python}"
+PY="${PY:-python}"
 WORKERS="${WORKERS:-24}"
 DEV_FLAG=""
 REPORT_ONLY=0

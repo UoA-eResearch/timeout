@@ -1,9 +1,9 @@
 {
   "evidence_version": "v1",
-  "built_at": "2026-08-20T23:44:24+00:00",
+  "built_at": "2026-08-24T23:50:21+00:00",
   "source_xlsx": "data/supplements_LLM_results.xlsx",
-  "source_sha256": "592f9d0159943b2141296cf990f2840854bd78e187410f3d715a97ac30136876",
-  "n_rows": 12213,
+  "source_sha256": "c9294f9b0e4bbd0301ae92aea08b42d6438db454c471bff81f3983ab65c1320c",
+  "n_rows": 12177,
   "include_visual": false,
   "fields_shown_to_model": [
     "title",
@@ -23,14 +23,22 @@
   "inferred_columns_dropped": [
     "AI_description",
     "active_ingredients",
+    "active_ingredients_categories",
     "alternative_strategies",
+    "claim_strength",
+    "claim_target_categories",
+    "claim_types",
     "content_type",
+    "content_type_evidence",
     "credentials",
     "credentials_evidence",
     "criticism",
     "cultural_background",
     "emotional_intensity",
     "emotional_tone",
+    "evidence",
+    "evidence_quote",
+    "health_claims",
     "health_framework",
     "ingredient_types",
     "job",
@@ -43,12 +51,17 @@
     "personal_experience",
     "primary_focus",
     "primary_supplement_category",
+    "problem_solution",
     "quality",
     "quality_reason",
     "sentiment",
     "supplement_categories",
     "supplement_sentiment",
+    "supplement_types",
     "supplements",
+    "supplements_categories",
+    "symptom_categories",
+    "symptom_framing",
     "symptoms",
     "tone",
     "transcript",
@@ -56,9 +69,9 @@
     "usefulness_reason"
   ],
   "evidence_tiers": {
-    "A": 10522,
-    "B": 1486,
-    "C": 205
+    "A": 10494,
+    "B": 1470,
+    "C": 213
   },
-  "corpus_sha256": "3a318cf0f2be2c971b40c9bc6fec4c7f682f692402ea5fdb9637a9f5570c3e02"
+  "corpus_sha256": "c5e77c4ce859afbcf4654f1f92ff5302a702b9947b570d6701d684e3e851b6dd"
 }
