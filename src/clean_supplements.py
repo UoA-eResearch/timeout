@@ -29,6 +29,8 @@ from pathlib import Path
 
 import pandas as pd
 
+ALLOWED_PLATFORMS = ["youtube", "tiktok", "facebook", "instagram"]
+
 # ---------------------------------------------------------------------------
 # Layer 1: canonical ingredient grouping (Table 1 of coding instructions)
 # ---------------------------------------------------------------------------
@@ -283,6 +285,29 @@ def target_group(term):
 
 
 # ---------------------------------------------------------------------------
+# Post-level cleaning
+# ---------------------------------------------------------------------------
+def remove_duplicates(df):
+    """Remove cross-platform duplicate posts.
+
+    A post is considered a duplicate when another post has the same
+    normalized title (>= 15 chars, so generic titles are never merged) and
+    the same duration rounded to the nearest second. The copy with the
+    highest view count is kept.
+    """
+    df = df.copy()
+    title_norm = df['title'].fillna('').str.lower().str.strip()
+    duration = df['duration'].round() if 'duration' in df.columns else 0
+    df['_dedup_key'] = title_norm + '|' + duration.astype(str)
+    eligible = title_norm.str.len() >= 15
+    dupes = df[eligible].sort_values('view_count', ascending=False)
+    drop_idx = dupes[dupes.duplicated('_dedup_key', keep='first')].index
+    if len(drop_idx):
+        print(f"Removing {len(drop_idx)} duplicate posts (same title and duration)")
+    return df.drop(index=drop_idx).drop(columns='_dedup_key')
+
+
+# ---------------------------------------------------------------------------
 # Post-level processing
 # ---------------------------------------------------------------------------
 SENTINEL_VALUES = {
@@ -297,6 +322,30 @@ def split_supplements(value):
         return []
     items = [s.strip().strip("'\"") for s in value.strip("[]").split(",")]
     return [s for s in items if s and s.lower() not in SENTINEL_VALUES]
+
+
+def _primary(supplements_value, coder, tiebreak_last):
+    """Most frequent code among a post's supplement terms.
+
+    Ties resolve away from `tiebreak_last` (the catch-all code) so a post
+    with one specific and one vague term is categorised by the specific one.
+    """
+    terms = split_supplements(supplements_value)
+    if not terms:
+        return None
+    cats = Counter(coder(t) for t in terms)
+    ranked = sorted(cats.items(), key=lambda kv: (-kv[1], kv[0] == tiebreak_last))
+    return ranked[0][0]
+
+
+def primary_category(v):
+    """One status category per post: the modal category of its terms."""
+    return _primary(v, status_category, UNMATCHED)
+
+
+def primary_target(v):
+    """One marketing/target group per post: the modal group of its terms."""
+    return _primary(v, target_group, GENERAL_TARGET)
 
 
 def code_dataset(df):
@@ -335,10 +384,15 @@ def main():
     df = pd.read_excel(data_path)
     print(f"Loaded {len(df)} posts")
 
-    # menopause==True scope, per the dividing data plan
+    # Same population as the pipeline Sankey: allowed platforms,
+    # menopause==True, duplicates removed
+    df["extractor"] = df["extractor"].str.lower()
+    df = df[df["extractor"].isin(ALLOWED_PLATFORMS)].copy()
     if "menopause" in df.columns:
         df = df[df["menopause"] == True].copy()
         print(f"menopause=True posts: {len(df)}")
+    df = remove_duplicates(df)
+    print(f"unique posts: {len(df)}")
 
     coded = code_dataset(df)
     print(f"Coded {len(coded)} supplement mentions "
@@ -347,12 +401,38 @@ def main():
     unmatched = coded[coded["status_category"] == UNMATCHED]["raw_term"].nunique()
     print(f"Raw terms flagged for manual review: {unmatched}")
 
+    # primary (one-per-post) counts; these reconcile with the Sankey figures
+    supp_mask = df["supplements"].apply(lambda v: len(split_supplements(v)) > 0)
+    supp_posts = df[supp_mask]
+    primary = pd.DataFrame({
+        "id": supp_posts["id"],
+        "like_count": supp_posts["like_count"],
+        "view_count": supp_posts["view_count"],
+        "primary_category": supp_posts["supplements"].apply(primary_category),
+        "primary_target": supp_posts["supplements"].apply(primary_target),
+    })
+
+    def primary_summary(col):
+        # each row is one post, so count rows (ids can be missing or shared)
+        return primary.groupby(col).agg(
+            post_count=("id", "size"),
+            total_likes=("like_count", "sum"),
+            total_views=("view_count", "sum"),
+        ).sort_values("post_count", ascending=False)
+
     out_path = Path("data/supplement_categories.xlsx")
     with pd.ExcelWriter(out_path) as writer:
+        # any-mention counts: a post appears under every category it mentions,
+        # so these columns sum to more than the number of posts
         group_summary(coded, "status_category").to_excel(
             writer, sheet_name="category_counts")
         group_summary(coded, "target_group").to_excel(
             writer, sheet_name="target_counts")
+        # primary counts: one category/target per post, matching the Sankey
+        primary_summary("primary_category").to_excel(
+            writer, sheet_name="primary_category_counts")
+        primary_summary("primary_target").to_excel(
+            writer, sheet_name="primary_target_counts")
         # posts in rows grouped under each category, as requested
         coded.sort_values(["status_category", "canonical"]).to_excel(
             writer, sheet_name="posts_by_category", index=False)

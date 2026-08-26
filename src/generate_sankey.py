@@ -22,15 +22,14 @@ Dependencies: clean_supplements.py (category coding), analyze_data.py
 (duplicate removal).
 """
 
-from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 
-from analyze_data import remove_duplicates
-from clean_supplements import (GENERAL_TARGET, UNMATCHED, split_supplements,
-                               status_category, target_group)
+from clean_supplements import (GENERAL_TARGET, UNMATCHED, primary_category,
+                               primary_target, remove_duplicates,
+                               split_supplements)
 
 # ---------------------------------------------------------------------------
 # Diagram constants
@@ -80,28 +79,6 @@ TARGET_SHORT = {
 
 def fmt(n):
     return f"{n:,}"
-
-
-def _primary(supplements_value, coder, tiebreak_last):
-    """Most frequent code among a post's supplement terms.
-
-    Ties resolve away from `tiebreak_last` (the catch-all code) so a post
-    with one specific and one vague term is categorised by the specific one.
-    """
-    terms = split_supplements(supplements_value)
-    if not terms:
-        return None
-    cats = Counter(coder(t) for t in terms)
-    ranked = sorted(cats.items(), key=lambda kv: (-kv[1], kv[0] == tiebreak_last))
-    return ranked[0][0]
-
-
-def primary_category(v):
-    return _primary(v, status_category, UNMATCHED)
-
-
-def primary_target(v):
-    return _primary(v, target_group, GENERAL_TARGET)
 
 
 def compute_counts():

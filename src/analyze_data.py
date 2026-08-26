@@ -15,7 +15,7 @@ import re
 from collections import Counter
 import warnings
 
-from clean_supplements import canonicalize
+from clean_supplements import canonicalize, remove_duplicates
 
 warnings.filterwarnings('ignore')
 
@@ -29,26 +29,6 @@ PLOTS_DIR = Path("plots")
 PLOTS_DIR.mkdir(exist_ok=True)
 
 README_PATH = Path("README.md")
-
-
-def remove_duplicates(df):
-    """Remove cross-platform duplicate posts.
-
-    A post is considered a duplicate when another post has the same
-    normalized title (>= 15 chars, so generic titles are never merged) and
-    the same duration rounded to the nearest second. The copy with the
-    highest view count is kept.
-    """
-    df = df.copy()
-    title_norm = df['title'].fillna('').str.lower().str.strip()
-    duration = df['duration'].round() if 'duration' in df.columns else 0
-    df['_dedup_key'] = title_norm + '|' + duration.astype(str)
-    eligible = title_norm.str.len() >= 15
-    dupes = df[eligible].sort_values('view_count', ascending=False)
-    drop_idx = dupes[dupes.duplicated('_dedup_key', keep='first')].index
-    if len(drop_idx):
-        print(f"Removing {len(drop_idx)} duplicate posts (same title and duration)")
-    return df.drop(index=drop_idx).drop(columns='_dedup_key')
 
 
 def load_and_filter_data():
