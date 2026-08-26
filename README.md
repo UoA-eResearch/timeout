@@ -355,7 +355,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-08-25 23:38:56 UTC*
+*Last updated: 2026-08-26 00:16:02 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
