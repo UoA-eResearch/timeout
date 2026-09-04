@@ -355,7 +355,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-08-26 00:21:59 UTC*
+*Last updated: 2026-09-04 04:41:43 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -382,9 +382,9 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 **Division 1 — Content Type (3804 posts total):**
 | Content type                      |   Post Count |
 |:----------------------------------|-------------:|
-| predominantly informative         |         2432 |
-| predominantly marketing           |          835 |
-| predominantly personal commentary |          537 |
+| predominantly informative         |         2434 |
+| predominantly marketing           |          834 |
+| predominantly personal commentary |          536 |
 
 
 **Top 10 Supplements Promoted:**
@@ -405,12 +405,12 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 **Top 10 Symptoms Targeted:**
 | Symptom      |   Mention Count |
 |:-------------|----------------:|
-| Mood Changes |            1525 |
-| Hot Flashes  |             973 |
-| Night Sweats |             556 |
+| Mood Changes |            1528 |
+| Hot Flashes  |             975 |
+| Night Sweats |             557 |
 | Brain Fog    |             400 |
 | Insomnia     |             329 |
-| Fatigue      |             324 |
+| Fatigue      |             325 |
 | Weight Gain  |             255 |
 | Low Energy   |             202 |
 | Joint Pain   |             182 |
