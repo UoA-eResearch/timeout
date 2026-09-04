@@ -40,14 +40,18 @@ jobs:
         run: |
           python3 src/analyze_data.py
 
-      - name: Generate pipeline Sankey page
+      - name: Code supplement categories
+        run: |
+          python3 src/clean_supplements.py
+
+      - name: Generate pipeline Sankey page and stage export
         run: |
           python3 src/generate_sankey.py
 
       - name: Check for changes
         id: check_changes
         run: |
-          if git status --porcelain README.md plots/ docs/ | grep -q .; then
+          if git status --porcelain README.md plots/ docs/ data/supplement_categories.xlsx data/pipeline_stages.xlsx | grep -q .; then
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "Changes detected"
           else
@@ -61,7 +65,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
-          git add README.md plots/ docs/
+          git add README.md plots/ docs/ data/supplement_categories.xlsx data/pipeline_stages.xlsx
           git commit -m "Update data analysis results [skip ci]"
           git push
 

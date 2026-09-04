@@ -300,7 +300,9 @@ def remove_duplicates(df):
     duration = df['duration'].round() if 'duration' in df.columns else 0
     df['_dedup_key'] = title_norm + '|' + duration.astype(str)
     eligible = title_norm.str.len() >= 15
-    dupes = df[eligible].sort_values('view_count', ascending=False)
+    # stable sort with id tie-break so the kept copy is deterministic
+    dupes = df[eligible].sort_values(['view_count', 'id'],
+                                     ascending=[False, True], kind='mergesort')
     drop_idx = dupes[dupes.duplicated('_dedup_key', keep='first')].index
     if len(drop_idx):
         print(f"Removing {len(drop_idx)} duplicate posts (same title and duration)")
