@@ -304,12 +304,12 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 ## Dataset Statistics
 
 **Supplements dataset:**
-- Total videos: 20540
+- Total videos: 21406
 - Breakdown by source:
-- Instagram    6180
-- TikTok       5454
-- YouTube      4595
-- Facebook     4311
+- Instagram    6407
+- TikTok       5549
+- YouTube      4889
+- Facebook     4561
 
 **Timeout dataset:**
 - Total videos: 3178
@@ -319,7 +319,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 - Facebook      539
 - YouTube       176
 
-*Last updated: 2026-09-07 02:15:37 UTC*
+*Last updated: 2026-09-10 02:12:59 UTC*
 
 
 ## Repository Structure
