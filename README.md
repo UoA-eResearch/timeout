@@ -304,22 +304,22 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 ## Dataset Statistics
 
 **Supplements dataset:**
-- Total videos: 25153
+- Total videos: 25374
 - Breakdown by source:
-- Instagram    7275
-- YouTube      6183
-- TikTok       6119
-- Facebook     5576
+- Instagram    7334
+- YouTube      6260
+- TikTok       6153
+- Facebook     5627
 
 **Timeout dataset:**
-- Total videos: 5299
+- Total videos: 5643
 - Breakdown by source:
-- Instagram    2036
-- TikTok       1499
-- Facebook     1069
-- YouTube       695
+- Instagram    2136
+- TikTok       1579
+- Facebook     1147
+- YouTube       781
 
-*Last updated: 2026-10-16 02:08:43 UTC*
+*Last updated: 2026-10-17 02:09:13 UTC*
 
 
 ## Repository Structure
