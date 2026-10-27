@@ -68,6 +68,7 @@ python3 src/run_googlesearch.py --use-tor
 1. Searches the Google "Short videos" section for the specified search terms
 2. Scrolls to load more results and clicks "More results" button
 3. Scrapes video metadata: link, duration, title, source, author
+   - `https://www.google.com/goto?url=...` redirect links are resolved to the destination URL
 4. Combines results with previous data
 5. Filters to include only Instagram, TikTok, YouTube, and Facebook videos
 6. Saves results to CSV and text files
@@ -308,22 +309,22 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 ## Dataset Statistics
 
 **Supplements dataset:**
-- Total videos: 31272
+- Total videos: 24412
 - Breakdown by source:
-- Instagram    8959
-- YouTube      8199
-- Facebook     7296
-- TikTok       6818
+- Instagram    7275
+- TikTok       6138
+- YouTube      5616
+- Facebook     5383
 
 **Timeout dataset:**
-- Total videos: 8390
+- Total videos: 4152
 - Breakdown by source:
-- Instagram    2891
-- TikTok       2212
-- Facebook     1833
-- YouTube      1454
+- Instagram    1694
+- TikTok       1197
+- Facebook      872
+- YouTube       389
 
-*Last updated: 2026-10-27 22:20:42 UTC*
+*Last updated: 2026-10-27 22:48:49 UTC*
 
 
 ## Repository Structure

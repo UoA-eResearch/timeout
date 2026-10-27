@@ -18,9 +18,16 @@ from datetime import datetime
 import shutil
 import subprocess
 import re
+import requests
 from selenium_recaptcha_solver import RecaptchaSolver
 
 pd.set_option("display.max_colwidth", None)
+
+USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+
+# HTTP session used to resolve Google redirect links without a browser
+session = requests.Session()
+session.headers["User-Agent"] = USER_AGENT
 
 
 def update_readme_stats(supplements_df, timeout_df):
@@ -88,6 +95,22 @@ def strip_google_abuse(url):
         return url
     url = re.sub(r"([?&])google_abuse=[^&]*&?", r"\1", url)
     return url.rstrip("?&")
+
+def resolve_google_goto(url, retries=3):
+    """Resolve a https://www.google.com/goto?url=... redirect link to its destination, returning the original URL if that fails"""
+    if not isinstance(url, str) or not url.startswith("https://www.google.com/goto?"):
+        return url
+    for attempt in range(retries):
+        try:
+            response = session.get(url, allow_redirects=False, timeout=15)
+            location = response.headers.get("location", "")
+            if response.is_redirect and location.startswith("http") and "google.com/sorry" not in location:
+                return strip_google_abuse(location)
+        except requests.RequestException:
+            pass
+        time.sleep(2 ** attempt)
+    print(f"Could not resolve: {url}")
+    return url
 
 
 errors = 0
@@ -169,7 +192,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
     parsed_results = []
     for result in tqdm(results, desc="Parsing results"):
         try:
-            link = strip_google_abuse(result.find_elements(By.TAG_NAME, "a")[0].get_attribute("href"))
+            link = resolve_google_goto(strip_google_abuse(result.find_elements(By.TAG_NAME, "a")[0].get_attribute("href")))
             bits = result.text.split("\n")
 
             # Ensure we have at least 3 elements in bits
@@ -238,11 +261,12 @@ def main():
     options.add_argument('--disable-gpu')
     options.add_argument('--window-size=1920,1080')
     options.add_argument('--disable-blink-features=AutomationControlled')
-    options.add_argument('--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+    options.add_argument(f'--user-agent={USER_AGENT}')
 
     # Add Tor proxy configuration if requested
     if args.use_tor:
         options.add_argument('--proxy-server=socks5://localhost:9050')
+        session.proxies = {"http": "socks5h://localhost:9050", "https": "socks5h://localhost:9050"}
 
     print("\nStarting Chrome driver...")
 
