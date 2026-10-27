@@ -316,14 +316,14 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 - TikTok       6818
 
 **Timeout dataset:**
-- Total videos: 8042
+- Total videos: 8390
 - Breakdown by source:
-- Instagram    2794
-- TikTok       2130
-- Facebook     1741
-- YouTube      1377
+- Instagram    2891
+- TikTok       2212
+- Facebook     1833
+- YouTube      1454
 
-*Last updated: 2026-10-27 02:13:03 UTC*
+*Last updated: 2026-10-27 22:20:42 UTC*
 
 
 ## Repository Structure
