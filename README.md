@@ -69,6 +69,7 @@ python3 src/run_googlesearch.py --use-tor
 2. Scrolls to load more results and clicks "More results" button
 3. Scrapes video metadata: link, duration, title, source, author
    - `https://www.google.com/goto?url=...` redirect links are resolved to the destination URL
+   - Query parameters that don't identify the video (`hl`, `si`, `utm_*` etc.) are stripped so duplicates match; only `v`, `story_fbid`, `fbid` and `id` are kept
 4. Combines results with previous data
 5. Filters to include only Instagram, TikTok, YouTube, and Facebook videos
 6. Saves results to CSV and text files
@@ -309,22 +310,22 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 ## Dataset Statistics
 
 **Supplements dataset:**
-- Total videos: 24412
+- Total videos: 23894
 - Breakdown by source:
-- Instagram    7275
-- TikTok       6138
-- YouTube      5616
-- Facebook     5383
+- Instagram    7002
+- TikTok       6106
+- YouTube      5404
+- Facebook     5382
 
 **Timeout dataset:**
-- Total videos: 4152
+- Total videos: 3933
 - Breakdown by source:
-- Instagram    1694
-- TikTok       1197
-- Facebook      872
-- YouTube       389
+- Instagram    1606
+- TikTok       1158
+- Facebook      870
+- YouTube       299
 
-*Last updated: 2026-10-27 22:48:49 UTC*
+*Last updated: 2026-10-27 22:56:46 UTC*
 
 
 ## Repository Structure

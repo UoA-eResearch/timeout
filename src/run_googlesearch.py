@@ -18,6 +18,7 @@ from datetime import datetime
 import shutil
 import subprocess
 import re
+from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 import requests
 from selenium_recaptcha_solver import RecaptchaSolver
 
@@ -89,12 +90,18 @@ def update_readme_stats(supplements_df, timeout_df):
     except Exception as e:
         print(f"Warning: Could not update README.md: {e}")
 
-def strip_google_abuse(url):
-    """Remove the google_abuse exemption query parameter Google sometimes appends to result links"""
-    if not isinstance(url, str) or "google_abuse=" not in url:
+# Query parameters that identify the content (e.g. youtube.com/watch?v=...); all others are
+# tracking/locale noise (hl, lang, si, xstg, utm_*, google_abuse...) that masks duplicate links
+KEEP_QUERY_PARAMS = {"v", "story_fbid", "fbid", "id"}
+
+def strip_query(url):
+    """Remove query parameters that don't identify the content, so the same video always gets the same link"""
+    if not isinstance(url, str) or "?" not in url:
         return url
-    url = re.sub(r"([?&])google_abuse=[^&]*&?", r"\1", url)
-    return url.rstrip("?&")
+    keep = {"url"} if url.startswith("https://www.google.com/goto?") else KEEP_QUERY_PARAMS
+    parts = urlsplit(url)
+    query = urlencode([(k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True) if k in keep])
+    return urlunsplit(parts._replace(query=query))
 
 def resolve_google_goto(url, retries=3):
     """Resolve a https://www.google.com/goto?url=... redirect link to its destination, returning the original URL if that fails"""
@@ -105,7 +112,7 @@ def resolve_google_goto(url, retries=3):
             response = session.get(url, allow_redirects=False, timeout=15)
             location = response.headers.get("location", "")
             if response.is_redirect and location.startswith("http") and "google.com/sorry" not in location:
-                return strip_google_abuse(location)
+                return strip_query(location)
         except requests.RequestException:
             pass
         time.sleep(2 ** attempt)
@@ -192,7 +199,7 @@ def search_and_scrape(driver, query, max_scrolls=10):
     parsed_results = []
     for result in tqdm(results, desc="Parsing results"):
         try:
-            link = resolve_google_goto(strip_google_abuse(result.find_elements(By.TAG_NAME, "a")[0].get_attribute("href")))
+            link = resolve_google_goto(strip_query(result.find_elements(By.TAG_NAME, "a")[0].get_attribute("href")))
             bits = result.text.split("\n")
 
             # Ensure we have at least 3 elements in bits
@@ -329,7 +336,7 @@ def main():
             if os.path.exists("data/supplements.csv"):
                 print("\nLoading previous results...")
                 old_df = pd.read_csv("data/supplements.csv")
-                old_df.link = old_df.link.map(strip_google_abuse)
+                old_df.link = old_df.link.map(strip_query)
                 print(f"Previous results: {len(old_df)} rows")
 
                 # Combine with old data
@@ -345,7 +352,7 @@ def main():
             # Calculate new results after filtering
             if os.path.exists("data/supplements.csv"):
                 old_df = pd.read_csv("data/supplements.csv")
-                old_df.link = old_df.link.map(strip_google_abuse)
+                old_df.link = old_df.link.map(strip_query)
                 new_results = df[~df.link.isin(old_df.link)]
                 supplements_new = len(new_results)
                 print(f"New results (after filtering): {supplements_new} rows")
@@ -393,7 +400,7 @@ def main():
                 if os.path.exists("data/timeout.csv"):
                     print("\nLoading previous timeout results...")
                     old_df_timeout = pd.read_csv("data/timeout.csv")
-                    old_df_timeout.link = old_df_timeout.link.map(strip_google_abuse)
+                    old_df_timeout.link = old_df_timeout.link.map(strip_query)
                     print(f"Previous timeout results: {len(old_df_timeout)} rows")
 
                     # Combine with old data
@@ -409,7 +416,7 @@ def main():
                 # Calculate new timeout results after filtering
                 if os.path.exists("data/timeout.csv"):
                     old_df_timeout = pd.read_csv("data/timeout.csv")
-                    old_df_timeout.link = old_df_timeout.link.map(strip_google_abuse)
+                    old_df_timeout.link = old_df_timeout.link.map(strip_query)
                     new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
                     timeout_new = len(new_timeout_results)
                     print(f"New timeout results (after filtering): {timeout_new} rows")
