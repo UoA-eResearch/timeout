@@ -119,6 +119,31 @@ def resolve_google_goto(url, retries=3):
     print(f"Could not resolve: {url}")
     return url
 
+# Regexes extracting each platform's video ID, so different URL forms of the same video match
+# (e.g. youtube /shorts/ID vs /watch?v=ID, instagram /p/ID/ vs /reel/ID/ vs /user/reel/ID/)
+VIDEO_ID_PATTERNS = [
+    ("youtube", r"(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|live/|embed/)|youtu\.be/)([\w-]{11})"),
+    ("instagram", r"instagram\.com/(?:[\w.]+/)?(?:p|reels?|tv)/([\w-]+)"),
+    ("tiktok", r"tiktok\.com/@[^/]*/(?:video|photo)/(\d+)"),
+    ("facebook", r"facebook\.com/(?:.+/)?(?:videos|posts|reel)/(?:[^/]+/)?(\d+|pfbid\w+)/?$"),
+    ("facebook", r"facebook\.com/watch/?\?(?:.*&)?v=(\d+)"),
+]
+
+def video_key(url):
+    """Identify the video a link points to as platform:id, falling back to the link itself"""
+    for platform, pattern in VIDEO_ID_PATTERNS:
+        match = re.search(pattern, url)
+        if match:
+            return f"{platform}:{match.group(1)}"
+    return url
+
+def drop_duplicate_videos(df):
+    """Drop rows that are the same video, keeping the first www. link alphabetically so the choice is stable between runs
+    (www. first because yt-dlp can't download secure./www-fallback. instagram links)"""
+    df = df.drop_duplicates(subset="link", keep="first")
+    df = df.assign(not_www=~df.link.str.startswith("https://www.")).sort_values(by=["not_www", "link"]).drop(columns="not_www")
+    return df[~df.link.map(video_key).duplicated(keep="first")]
+
 
 errors = 0
 
@@ -329,7 +354,7 @@ def main():
 
             # Combine results
             print("\nCombining results...")
-            df = pd.concat(dfs).drop_duplicates(subset="link", keep="first")
+            df = drop_duplicate_videos(pd.concat(dfs))
             print(f"Combined unique results: {len(df)} rows")
 
             # Load old data if exists
@@ -340,7 +365,7 @@ def main():
                 print(f"Previous results: {len(old_df)} rows")
 
                 # Combine with old data
-                df = pd.concat([df, old_df]).drop_duplicates(subset="link", keep="first")
+                df = drop_duplicate_videos(pd.concat([df, old_df]))
                 print(f"Total unique results: {len(df)} rows")
 
             # Save results
@@ -353,7 +378,7 @@ def main():
             if os.path.exists("data/supplements.csv"):
                 old_df = pd.read_csv("data/supplements.csv")
                 old_df.link = old_df.link.map(strip_query)
-                new_results = df[~df.link.isin(old_df.link)]
+                new_results = df[~df.link.map(video_key).isin(old_df.link.map(video_key))]
                 supplements_new = len(new_results)
                 print(f"New results (after filtering): {supplements_new} rows")
             else:
@@ -393,7 +418,7 @@ def main():
             # Combine timeout results
             if not df_timeout1.empty or not df_timeout2.empty:
                 print("\nCombining timeout results...")
-                df_timeout = pd.concat([df_timeout1, df_timeout2]).drop_duplicates(subset="link", keep="first")
+                df_timeout = drop_duplicate_videos(pd.concat([df_timeout1, df_timeout2]))
                 print(f"Combined unique timeout results: {len(df_timeout)} rows")
 
                 # Load old timeout data if exists
@@ -404,7 +429,7 @@ def main():
                     print(f"Previous timeout results: {len(old_df_timeout)} rows")
 
                     # Combine with old data
-                    df_timeout = pd.concat([df_timeout, old_df_timeout]).drop_duplicates(subset="link", keep="first")
+                    df_timeout = drop_duplicate_videos(pd.concat([df_timeout, old_df_timeout]))
                     print(f"Total unique timeout results: {len(df_timeout)} rows")
 
                 # Save timeout results
@@ -417,7 +442,7 @@ def main():
                 if os.path.exists("data/timeout.csv"):
                     old_df_timeout = pd.read_csv("data/timeout.csv")
                     old_df_timeout.link = old_df_timeout.link.map(strip_query)
-                    new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
+                    new_timeout_results = df_timeout[~df_timeout.link.map(video_key).isin(old_df_timeout.link.map(video_key))]
                     timeout_new = len(new_timeout_results)
                     print(f"New timeout results (after filtering): {timeout_new} rows")
                 else:
