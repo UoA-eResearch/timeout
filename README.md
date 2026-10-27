@@ -52,6 +52,10 @@ This script scrapes Google search results for short videos related to:
 # Normal execution (scrapes both datasets)
 python3 src/run_googlesearch.py
 
+# Scrape only one dataset
+python3 src/run_googlesearch.py --dataset timeout
+python3 src/run_googlesearch.py --dataset supplements
+
 # With Tor (if IP blocked)
 torsocks python3 src/run_googlesearch.py
 

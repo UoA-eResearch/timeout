@@ -213,10 +213,13 @@ def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Google Search Scraper for Menopause Supplements/Vitamins and Parenting Timeout')
     parser.add_argument('--use-tor', action='store_true', help='Use Tor SOCKS proxy for scraping')
+    parser.add_argument('--dataset', nargs='+', choices=['supplements', 'timeout'], default=['supplements', 'timeout'],
+                        help='Dataset(s) to scrape for (default: both)')
     args = parser.parse_args()
 
     print("=" * 80)
     print("Google Search Scraper for Menopause Supplements/Vitamins and Parenting Timeout")
+    print(f"Datasets: {', '.join(args.dataset)}")
     if args.use_tor:
         print("Using Tor SOCKS proxy (localhost:9050)")
     print("=" * 80)
@@ -275,130 +278,132 @@ def main():
         sys.exit(1)
 
     try:
-        dfs = []
-        search_terms = pd.read_table("data/supplements_search_terms.txt", header=None)[0]
-        random.shuffle(search_terms)
-        for search_term in search_terms:
-            print(f"\nRunning search for: {search_term}")
-            df = search_and_scrape(driver, search_term)
+        if "supplements" in args.dataset:
+            dfs = []
+            search_terms = pd.read_table("data/supplements_search_terms.txt", header=None)[0]
+            random.shuffle(search_terms)
+            for search_term in search_terms:
+                print(f"\nRunning search for: {search_term}")
+                df = search_and_scrape(driver, search_term)
 
-            if df.empty:
-                print("\nNo results found. Might be IP blocked or rate limited.")
-                print("Try running with: torsocks python3 run_googlesearch.py")
-                save_error_screenshot(driver, "no_results")
-                break
+                if df.empty:
+                    print("\nNo results found. Might be IP blocked or rate limited.")
+                    print("Try running with: torsocks python3 run_googlesearch.py")
+                    save_error_screenshot(driver, "no_results")
+                    break
 
-            print(f"\nResults from {search_term}: {len(df)} rows")
-            print(df.source.value_counts())
-            dfs.append(df)
+                print(f"\nResults from {search_term}: {len(df)} rows")
+                print(df.source.value_counts())
+                dfs.append(df)
 
-        # Combine results
-        print("\nCombining results...")
-        df = pd.concat(dfs).drop_duplicates(subset="link", keep="first")
-        print(f"Combined unique results: {len(df)} rows")
+            # Combine results
+            print("\nCombining results...")
+            df = pd.concat(dfs).drop_duplicates(subset="link", keep="first")
+            print(f"Combined unique results: {len(df)} rows")
 
-        # Load old data if exists
-        if os.path.exists("data/supplements.csv"):
-            print("\nLoading previous results...")
-            old_df = pd.read_csv("data/supplements.csv")
-            old_df.link = old_df.link.map(strip_google_abuse)
-            print(f"Previous results: {len(old_df)} rows")
-
-            # Combine with old data
-            df = pd.concat([df, old_df]).drop_duplicates(subset="link", keep="first")
-            print(f"Total unique results: {len(df)} rows")
-
-        # Save results
-        print("\nSaving results...")
-        df.sort_values(by="link", inplace=True)
-        df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
-        supplements_total = len(df)
-
-        # Calculate new results after filtering
-        if os.path.exists("data/supplements.csv"):
-            old_df = pd.read_csv("data/supplements.csv")
-            old_df.link = old_df.link.map(strip_google_abuse)
-            new_results = df[~df.link.isin(old_df.link)]
-            supplements_new = len(new_results)
-            print(f"New results (after filtering): {supplements_new} rows")
-        else:
-            # If no old data exists, all results are new
-            supplements_new = len(df)
-
-        os.makedirs("data", exist_ok=True)
-        df.to_csv("data/supplements.csv", index=False)
-        df.link.drop_duplicates().to_csv("data/supplements_links.txt", index=False, header=False)
-        print("Saved to: data/supplements.csv and data/supplements_links.txt")
-
-        # Now collect timeout data
-        print("\n" + "=" * 80)
-        print("Starting timeout collection...")
-        print("=" * 80)
-
-        # Search for parenting timeout
-        df_timeout1 = search_and_scrape(driver, "parenting timeout")
-
-        if df_timeout1.empty:
-            print("\nNo results found for parenting timeout. Might be IP blocked or rate limited.")
-            save_error_screenshot(driver, "no_results_timeout_first_search")
-        else:
-            print(f"\nResults from 'parenting timeout': {len(df_timeout1)} rows")
-            print(df_timeout1.source.value_counts())
-
-        # Search for gentleparenting timeout
-        df_timeout2 = search_and_scrape(driver, "gentleparenting timeout")
-
-        if df_timeout2.empty:
-            print("\nNo results found for gentleparenting timeout.")
-        else:
-            print(f"\nResults from 'gentleparenting timeout': {len(df_timeout2)} rows")
-            print(df_timeout2.source.value_counts())
-
-        # Combine timeout results
-        if not df_timeout1.empty or not df_timeout2.empty:
-            print("\nCombining timeout results...")
-            df_timeout = pd.concat([df_timeout1, df_timeout2]).drop_duplicates(subset="link", keep="first")
-            print(f"Combined unique timeout results: {len(df_timeout)} rows")
-
-            # Load old timeout data if exists
-            if os.path.exists("data/timeout.csv"):
-                print("\nLoading previous timeout results...")
-                old_df_timeout = pd.read_csv("data/timeout.csv")
-                old_df_timeout.link = old_df_timeout.link.map(strip_google_abuse)
-                print(f"Previous timeout results: {len(old_df_timeout)} rows")
+            # Load old data if exists
+            if os.path.exists("data/supplements.csv"):
+                print("\nLoading previous results...")
+                old_df = pd.read_csv("data/supplements.csv")
+                old_df.link = old_df.link.map(strip_google_abuse)
+                print(f"Previous results: {len(old_df)} rows")
 
                 # Combine with old data
-                df_timeout = pd.concat([df_timeout, old_df_timeout]).drop_duplicates(subset="link", keep="first")
-                print(f"Total unique timeout results: {len(df_timeout)} rows")
+                df = pd.concat([df, old_df]).drop_duplicates(subset="link", keep="first")
+                print(f"Total unique results: {len(df)} rows")
 
-            # Save timeout results
-            print("\nSaving timeout results...")
-            df_timeout.sort_values(by="link", inplace=True)
-            df_timeout = df_timeout[df_timeout.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
-            timeout_total = len(df_timeout)
+            # Save results
+            print("\nSaving results...")
+            df.sort_values(by="link", inplace=True)
+            df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
+            supplements_total = len(df)
 
-            # Calculate new timeout results after filtering
-            if os.path.exists("data/timeout.csv"):
-                old_df_timeout = pd.read_csv("data/timeout.csv")
-                old_df_timeout.link = old_df_timeout.link.map(strip_google_abuse)
-                new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
-                timeout_new = len(new_timeout_results)
-                print(f"New timeout results (after filtering): {timeout_new} rows")
+            # Calculate new results after filtering
+            if os.path.exists("data/supplements.csv"):
+                old_df = pd.read_csv("data/supplements.csv")
+                old_df.link = old_df.link.map(strip_google_abuse)
+                new_results = df[~df.link.isin(old_df.link)]
+                supplements_new = len(new_results)
+                print(f"New results (after filtering): {supplements_new} rows")
             else:
                 # If no old data exists, all results are new
-                timeout_new = len(df_timeout)
+                supplements_new = len(df)
 
             os.makedirs("data", exist_ok=True)
-            df_timeout.to_csv("data/timeout.csv", index=False)
-            df_timeout.link.drop_duplicates().to_csv("data/timeout_links.txt", index=False, header=False)
-            print("Saved to: data/timeout.csv and data/timeout_links.txt")
-        else:
-            # No new timeout data collected, but may have existing data
-            if os.path.exists("data/timeout.csv"):
-                old_df_timeout = pd.read_csv("data/timeout.csv")
-                timeout_total = len(old_df_timeout)
-                timeout_new = 0
-                print(f"No new timeout data collected. Existing: {timeout_total} rows")
+            df.to_csv("data/supplements.csv", index=False)
+            df.link.drop_duplicates().to_csv("data/supplements_links.txt", index=False, header=False)
+            print("Saved to: data/supplements.csv and data/supplements_links.txt")
+
+        if "timeout" in args.dataset:
+            # Now collect timeout data
+            print("\n" + "=" * 80)
+            print("Starting timeout collection...")
+            print("=" * 80)
+
+            # Search for parenting timeout
+            df_timeout1 = search_and_scrape(driver, "parenting timeout")
+
+            if df_timeout1.empty:
+                print("\nNo results found for parenting timeout. Might be IP blocked or rate limited.")
+                save_error_screenshot(driver, "no_results_timeout_first_search")
+            else:
+                print(f"\nResults from 'parenting timeout': {len(df_timeout1)} rows")
+                print(df_timeout1.source.value_counts())
+
+            # Search for gentleparenting timeout
+            df_timeout2 = search_and_scrape(driver, "gentleparenting timeout")
+
+            if df_timeout2.empty:
+                print("\nNo results found for gentleparenting timeout.")
+            else:
+                print(f"\nResults from 'gentleparenting timeout': {len(df_timeout2)} rows")
+                print(df_timeout2.source.value_counts())
+
+            # Combine timeout results
+            if not df_timeout1.empty or not df_timeout2.empty:
+                print("\nCombining timeout results...")
+                df_timeout = pd.concat([df_timeout1, df_timeout2]).drop_duplicates(subset="link", keep="first")
+                print(f"Combined unique timeout results: {len(df_timeout)} rows")
+
+                # Load old timeout data if exists
+                if os.path.exists("data/timeout.csv"):
+                    print("\nLoading previous timeout results...")
+                    old_df_timeout = pd.read_csv("data/timeout.csv")
+                    old_df_timeout.link = old_df_timeout.link.map(strip_google_abuse)
+                    print(f"Previous timeout results: {len(old_df_timeout)} rows")
+
+                    # Combine with old data
+                    df_timeout = pd.concat([df_timeout, old_df_timeout]).drop_duplicates(subset="link", keep="first")
+                    print(f"Total unique timeout results: {len(df_timeout)} rows")
+
+                # Save timeout results
+                print("\nSaving timeout results...")
+                df_timeout.sort_values(by="link", inplace=True)
+                df_timeout = df_timeout[df_timeout.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
+                timeout_total = len(df_timeout)
+
+                # Calculate new timeout results after filtering
+                if os.path.exists("data/timeout.csv"):
+                    old_df_timeout = pd.read_csv("data/timeout.csv")
+                    old_df_timeout.link = old_df_timeout.link.map(strip_google_abuse)
+                    new_timeout_results = df_timeout[~df_timeout.link.isin(old_df_timeout.link)]
+                    timeout_new = len(new_timeout_results)
+                    print(f"New timeout results (after filtering): {timeout_new} rows")
+                else:
+                    # If no old data exists, all results are new
+                    timeout_new = len(df_timeout)
+
+                os.makedirs("data", exist_ok=True)
+                df_timeout.to_csv("data/timeout.csv", index=False)
+                df_timeout.link.drop_duplicates().to_csv("data/timeout_links.txt", index=False, header=False)
+                print("Saved to: data/timeout.csv and data/timeout_links.txt")
+            else:
+                # No new timeout data collected, but may have existing data
+                if os.path.exists("data/timeout.csv"):
+                    old_df_timeout = pd.read_csv("data/timeout.csv")
+                    timeout_total = len(old_df_timeout)
+                    timeout_new = 0
+                    print(f"No new timeout data collected. Existing: {timeout_total} rows")
 
         # Update README with dataset statistics
         if os.path.exists("data/supplements.csv") and os.path.exists("data/timeout.csv"):
@@ -413,8 +418,10 @@ def main():
         # Output summary for GitHub Actions to use in commit message
         print("\n" + "=" * 80)
         print("SUMMARY FOR COMMIT MESSAGE:")
-        print(f"Supplements: +{supplements_new} new, {supplements_total} total")
-        print(f"Timeout: +{timeout_new} new, {timeout_total} total")
+        if "supplements" in args.dataset:
+            print(f"Supplements: +{supplements_new} new, {supplements_total} total")
+        if "timeout" in args.dataset:
+            print(f"Timeout: +{timeout_new} new, {timeout_total} total")
         print("=" * 80)
 
         print(f"Total errors encountered: {errors}")
