@@ -311,22 +311,22 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 ## Dataset Statistics
 
 **Supplements dataset:**
-- Total videos: 24115
+- Total videos: 24194
 - Breakdown by source:
-- Instagram    6995
-- TikTok       6165
-- Facebook     5501
-- YouTube      5454
+- Instagram    7017
+- TikTok       6183
+- Facebook     5527
+- YouTube      5467
 
 **Timeout dataset:**
-- Total videos: 3857
+- Total videos: 3906
 - Breakdown by source:
-- Instagram    1541
-- TikTok       1158
-- Facebook      871
-- YouTube       287
+- Instagram    1554
+- TikTok       1170
+- Facebook      892
+- YouTube       290
 
-*Last updated: 2026-10-28 02:23:38 UTC*
+*Last updated: 2026-10-30 02:11:37 UTC*
 
 
 ## Repository Structure
