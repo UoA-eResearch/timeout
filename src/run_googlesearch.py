@@ -24,6 +24,11 @@ from selenium_recaptcha_solver import RecaptchaSolver
 
 pd.set_option("display.max_colwidth", None)
 
+# Datasets to scrape, each with its search terms in data/{name}_search_terms.txt
+DATASETS = ["supplements", "timeout", "distress"]
+# Google country code (gl parameter) to localise a dataset's search results to
+REGIONS = {"distress": "nz"}
+
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 # HTTP session used to resolve Google redirect links without a browser
@@ -31,33 +36,28 @@ session = requests.Session()
 session.headers["User-Agent"] = USER_AGENT
 
 
-def update_readme_stats(supplements_df, timeout_df):
-    """Update README.md with dataset statistics"""
+def update_readme_stats(datasets):
+    """Update README.md with statistics for each dataset (a dict of name -> DataFrame)"""
     try:
         readme_path = "README.md"
         with open(readme_path, 'r') as f:
             content = f.read()
 
         # Prepare statistics
-        supplements_breakdown = supplements_df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n- ')
-        supplements_stats = f"""**Supplements dataset:**
-- Total videos: {len(supplements_df)}
+        dataset_stats = []
+        for name, df in datasets.items():
+            breakdown = df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n- ')
+            stats = f"""**{name.capitalize()} dataset:**
+- Total videos: {len(df)}
 - Breakdown by source:
-- {supplements_breakdown}"""
-        print(supplements_stats)
-
-        timeout_breakdown = timeout_df.source.value_counts().to_string().replace("source\n","").replace('\n', '\n- ')
-        timeout_stats = f"""**Timeout dataset:**
-- Total videos: {len(timeout_df)}
-- Breakdown by source:
-- {timeout_breakdown}"""
-        print(timeout_stats)
+- {breakdown}"""
+            print(stats)
+            dataset_stats.append(stats)
+        all_stats = "\n\n".join(dataset_stats)
 
         stats_section = f"""## Dataset Statistics
 
-{supplements_stats}
-
-{timeout_stats}
+{all_stats}
 
 *Last updated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}*
 
@@ -183,13 +183,15 @@ def check_and_solve_captcha(driver):
     driver.implicitly_wait(10)
     return
 
-def search_and_scrape(driver, query, max_scrolls=10):
-    """Search Google and scrape short video results"""
+def search_and_scrape(driver, query, max_scrolls=10, region=None):
+    """Search Google and scrape short video results, optionally localised to a country (e.g. "nz")"""
     print(f"\nSearching for: {query}")
     solver = RecaptchaSolver(driver=driver)
 
     # Navigate to Google
     url = f"https://www.google.com/search?udm=39&q={query}"
+    if region:
+        url += f"&gl={region}"
     print(url)
     driver.get(url)
     time.sleep(2)
@@ -263,27 +265,69 @@ def search_and_scrape(driver, query, max_scrolls=10):
     return pd.DataFrame(parsed_results)
 
 
+def scrape_dataset(driver, name):
+    """Run each of a dataset's search terms and merge the results into data/{name}.csv, returning (new, total) row counts"""
+    search_terms = pd.read_table(f"data/{name}_search_terms.txt", header=None)[0].tolist()
+    random.shuffle(search_terms)
+    dfs = []
+    for search_term in search_terms:
+        print(f"\nRunning search for: {search_term}")
+        df = search_and_scrape(driver, search_term, region=REGIONS.get(name))
+
+        if df.empty:
+            print("\nNo results found. Might be IP blocked or rate limited.")
+            print("Try running with: torsocks python3 run_googlesearch.py")
+            save_error_screenshot(driver, f"no_results_{name}")
+            break
+
+        print(f"\nResults from {search_term}: {len(df)} rows")
+        print(df.source.value_counts())
+        dfs.append(df)
+
+    # Load old data if exists
+    csv_path = f"data/{name}.csv"
+    old_df = None
+    if os.path.exists(csv_path):
+        print("\nLoading previous results...")
+        old_df = pd.read_csv(csv_path)
+        # Retry any goto links that failed to resolve on a previous run
+        old_df.link = old_df.link.map(strip_query).map(resolve_google_goto)
+        print(f"Previous results: {len(old_df)} rows")
+
+    if not dfs:
+        total = 0 if old_df is None else len(old_df)
+        print(f"No new {name} data collected. Existing: {total} rows")
+        return 0, total
+
+    # Combine with old data, keeping the newly scraped row for links seen before
+    print("\nCombining results...")
+    df = drop_duplicate_videos(pd.concat(dfs if old_df is None else dfs + [old_df]))
+    df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])].sort_values(by="link")
+    new = len(df) if old_df is None else (~df.link.map(video_key).isin(old_df.link.map(video_key))).sum()
+    print(f"Total unique results: {len(df)} rows, new (after filtering): {new} rows")
+
+    os.makedirs("data", exist_ok=True)
+    df.to_csv(csv_path, index=False)
+    df.link.drop_duplicates().to_csv(f"data/{name}_links.txt", index=False, header=False)
+    print(f"Saved to: {csv_path} and data/{name}_links.txt")
+    return new, len(df)
+
+
 def main():
     """Main execution function"""
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Google Search Scraper for Menopause Supplements/Vitamins and Parenting Timeout')
+    parser = argparse.ArgumentParser(description='Google Search Scraper for Menopause Supplements/Vitamins, Parenting Timeout and Youth Psychological Distress')
     parser.add_argument('--use-tor', action='store_true', help='Use Tor SOCKS proxy for scraping')
-    parser.add_argument('--dataset', nargs='+', choices=['supplements', 'timeout'], default=['supplements', 'timeout'],
-                        help='Dataset(s) to scrape for (default: both)')
+    parser.add_argument('--dataset', nargs='+', choices=DATASETS, default=DATASETS,
+                        help='Dataset(s) to scrape for (default: all)')
     args = parser.parse_args()
 
     print("=" * 80)
-    print("Google Search Scraper for Menopause Supplements/Vitamins and Parenting Timeout")
+    print("Google Search Scraper for Menopause Supplements/Vitamins, Parenting Timeout and Youth Psychological Distress")
     print(f"Datasets: {', '.join(args.dataset)}")
     if args.use_tor:
         print("Using Tor SOCKS proxy (localhost:9050)")
     print("=" * 80)
-
-    # Variables to track new results for commit message
-    supplements_new = 0
-    supplements_total = 0
-    timeout_new = 0
-    timeout_total = 0
 
     # Configure Chrome options for headless mode
     options = uc.ChromeOptions()
@@ -334,138 +378,16 @@ def main():
         sys.exit(1)
 
     try:
-        if "supplements" in args.dataset:
-            dfs = []
-            search_terms = pd.read_table("data/supplements_search_terms.txt", header=None)[0]
-            random.shuffle(search_terms)
-            for search_term in search_terms:
-                print(f"\nRunning search for: {search_term}")
-                df = search_and_scrape(driver, search_term)
-
-                if df.empty:
-                    print("\nNo results found. Might be IP blocked or rate limited.")
-                    print("Try running with: torsocks python3 run_googlesearch.py")
-                    save_error_screenshot(driver, "no_results")
-                    break
-
-                print(f"\nResults from {search_term}: {len(df)} rows")
-                print(df.source.value_counts())
-                dfs.append(df)
-
-            # Combine results
-            print("\nCombining results...")
-            df = drop_duplicate_videos(pd.concat(dfs))
-            print(f"Combined unique results: {len(df)} rows")
-
-            # Load old data if exists
-            if os.path.exists("data/supplements.csv"):
-                print("\nLoading previous results...")
-                old_df = pd.read_csv("data/supplements.csv")
-                old_df.link = old_df.link.map(strip_query)
-                print(f"Previous results: {len(old_df)} rows")
-
-                # Combine with old data
-                df = drop_duplicate_videos(pd.concat([df, old_df]))
-                print(f"Total unique results: {len(df)} rows")
-
-            # Save results
-            print("\nSaving results...")
-            df.sort_values(by="link", inplace=True)
-            df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
-            supplements_total = len(df)
-
-            # Calculate new results after filtering
-            if os.path.exists("data/supplements.csv"):
-                old_df = pd.read_csv("data/supplements.csv")
-                old_df.link = old_df.link.map(strip_query)
-                new_results = df[~df.link.map(video_key).isin(old_df.link.map(video_key))]
-                supplements_new = len(new_results)
-                print(f"New results (after filtering): {supplements_new} rows")
-            else:
-                # If no old data exists, all results are new
-                supplements_new = len(df)
-
-            os.makedirs("data", exist_ok=True)
-            df.to_csv("data/supplements.csv", index=False)
-            df.link.drop_duplicates().to_csv("data/supplements_links.txt", index=False, header=False)
-            print("Saved to: data/supplements.csv and data/supplements_links.txt")
-
-        if "timeout" in args.dataset:
-            # Now collect timeout data
+        # Track new/total results for the commit message
+        summary = {}
+        for name in args.dataset:
             print("\n" + "=" * 80)
-            print("Starting timeout collection...")
+            print(f"Starting {name} collection...")
             print("=" * 80)
-
-            # Search for parenting timeout
-            df_timeout1 = search_and_scrape(driver, "parenting timeout")
-
-            if df_timeout1.empty:
-                print("\nNo results found for parenting timeout. Might be IP blocked or rate limited.")
-                save_error_screenshot(driver, "no_results_timeout_first_search")
-            else:
-                print(f"\nResults from 'parenting timeout': {len(df_timeout1)} rows")
-                print(df_timeout1.source.value_counts())
-
-            # Search for gentleparenting timeout
-            df_timeout2 = search_and_scrape(driver, "gentleparenting timeout")
-
-            if df_timeout2.empty:
-                print("\nNo results found for gentleparenting timeout.")
-            else:
-                print(f"\nResults from 'gentleparenting timeout': {len(df_timeout2)} rows")
-                print(df_timeout2.source.value_counts())
-
-            # Combine timeout results
-            if not df_timeout1.empty or not df_timeout2.empty:
-                print("\nCombining timeout results...")
-                df_timeout = drop_duplicate_videos(pd.concat([df_timeout1, df_timeout2]))
-                print(f"Combined unique timeout results: {len(df_timeout)} rows")
-
-                # Load old timeout data if exists
-                if os.path.exists("data/timeout.csv"):
-                    print("\nLoading previous timeout results...")
-                    old_df_timeout = pd.read_csv("data/timeout.csv")
-                    old_df_timeout.link = old_df_timeout.link.map(strip_query)
-                    print(f"Previous timeout results: {len(old_df_timeout)} rows")
-
-                    # Combine with old data
-                    df_timeout = drop_duplicate_videos(pd.concat([df_timeout, old_df_timeout]))
-                    print(f"Total unique timeout results: {len(df_timeout)} rows")
-
-                # Save timeout results
-                print("\nSaving timeout results...")
-                df_timeout.sort_values(by="link", inplace=True)
-                df_timeout = df_timeout[df_timeout.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])]
-                timeout_total = len(df_timeout)
-
-                # Calculate new timeout results after filtering
-                if os.path.exists("data/timeout.csv"):
-                    old_df_timeout = pd.read_csv("data/timeout.csv")
-                    old_df_timeout.link = old_df_timeout.link.map(strip_query)
-                    new_timeout_results = df_timeout[~df_timeout.link.map(video_key).isin(old_df_timeout.link.map(video_key))]
-                    timeout_new = len(new_timeout_results)
-                    print(f"New timeout results (after filtering): {timeout_new} rows")
-                else:
-                    # If no old data exists, all results are new
-                    timeout_new = len(df_timeout)
-
-                os.makedirs("data", exist_ok=True)
-                df_timeout.to_csv("data/timeout.csv", index=False)
-                df_timeout.link.drop_duplicates().to_csv("data/timeout_links.txt", index=False, header=False)
-                print("Saved to: data/timeout.csv and data/timeout_links.txt")
-            else:
-                # No new timeout data collected, but may have existing data
-                if os.path.exists("data/timeout.csv"):
-                    old_df_timeout = pd.read_csv("data/timeout.csv")
-                    timeout_total = len(old_df_timeout)
-                    timeout_new = 0
-                    print(f"No new timeout data collected. Existing: {timeout_total} rows")
+            summary[name] = scrape_dataset(driver, name)
 
         # Update README with dataset statistics
-        if os.path.exists("data/supplements.csv") and os.path.exists("data/timeout.csv"):
-            supplements_final = pd.read_csv("data/supplements.csv")
-            timeout_final = pd.read_csv("data/timeout.csv")
-            update_readme_stats(supplements_final, timeout_final)
+        update_readme_stats({name: pd.read_csv(f"data/{name}.csv") for name in DATASETS if os.path.exists(f"data/{name}.csv")})
 
         print("\n" + "=" * 80)
         print("SUCCESS!")
@@ -474,10 +396,8 @@ def main():
         # Output summary for GitHub Actions to use in commit message
         print("\n" + "=" * 80)
         print("SUMMARY FOR COMMIT MESSAGE:")
-        if "supplements" in args.dataset:
-            print(f"Supplements: +{supplements_new} new, {supplements_total} total")
-        if "timeout" in args.dataset:
-            print(f"Timeout: +{timeout_new} new, {timeout_total} total")
+        for name, (new, total) in summary.items():
+            print(f"{name.capitalize()}: +{new} new, {total} total")
         print("=" * 80)
 
         print(f"Total errors encountered: {errors}")

@@ -43,8 +43,11 @@ System packages (for Tor support):
 ### 1. Google Search Scraper (`src/run_googlesearch.py`)
 
 This script scrapes Google search results for short videos related to:
-- **Timeout dataset**: `#parenting #timeout` and `#gentleparenting #timeout`
+- **Timeout dataset**: see `data/timeout_search_terms.txt`
 - **Supplements dataset**: see `data/supplements_search_terms.txt`
+- **Distress dataset**: how young people in New Zealand talk about psychological distress; see `data/distress_search_terms.txt`. Searches are localised to NZ (Google `gl=nz`)
+
+Each dataset's search terms live in `data/{dataset}_search_terms.txt`, one per line; to add a dataset, create that file and add its name to `DATASETS` in `src/run_googlesearch.py` (and to `REGIONS` to localise its results to a country).
 
 #### Run the scraper locally:
 
@@ -55,6 +58,7 @@ python3 src/run_googlesearch.py
 # Scrape only one dataset
 python3 src/run_googlesearch.py --dataset timeout
 python3 src/run_googlesearch.py --dataset supplements
+python3 src/run_googlesearch.py --dataset distress
 
 # With Tor (if IP blocked)
 torsocks python3 src/run_googlesearch.py
@@ -84,6 +88,10 @@ python3 src/run_googlesearch.py --use-tor
 **Supplements dataset:**
 - `data/supplements.csv` - Full results with columns: link, duration, title, source, author
 - `data/supplements_links.txt` - Just the links, one per line
+
+**Distress dataset:**
+- `data/distress.csv` - Full results with columns: link, duration, title, source, author
+- `data/distress_links.txt` - Just the links, one per line
 
 #### IP Blocking Protection:
 
@@ -326,7 +334,15 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 - Facebook      951
 - YouTube       299
 
-*Last updated: 2026-11-03 02:12:29 UTC*
+**Distress dataset:**
+- Total videos: 1369
+- Breakdown by source:
+- Facebook     598
+- Instagram    485
+- YouTube      156
+- TikTok       130
+
+*Last updated: 2026-11-03 23:33:06 UTC*
 
 
 ## Repository Structure
@@ -348,6 +364,9 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 │   ├── timeout_links.txt       # Timeout video links only
 │   ├── supplements.csv         # Supplements video links and metadata
 │   ├── supplements_links.txt   # Supplements video links only
+│   ├── distress.csv            # Youth psychological distress (NZ) video links and metadata
+│   ├── distress_links.txt      # Distress video links only
+│   ├── *_search_terms.txt      # Search terms for each dataset
 │   ├── timeout_LLM_results.xlsx      # Analyzed timeout results
 │   └── supplements_LLM_results.xlsx  # Analyzed supplements results
 ├── plots/                      # Analysis plots (auto-generated)

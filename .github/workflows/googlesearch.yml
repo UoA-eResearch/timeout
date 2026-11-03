@@ -74,7 +74,8 @@ jobs:
         id: check_changes
         if: always()
         run: |
-          if git diff --quiet data/supplements.csv data/supplements_links.txt data/timeout.csv data/timeout_links.txt 2>/dev/null; then
+          # Includes untracked files, so a newly added dataset's first results count
+          if [ -z "$(git status --porcelain -- 'data/*.csv' 'data/*_links.txt')" ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected"
           else
@@ -86,16 +87,13 @@ jobs:
         id: extract_summary
         if: steps.check_changes.outputs.changed == 'true'
         run: |
-          # Extract the summary lines from the scraper output
-          if [ -f scraper_output.log ]; then
-            SUPPLEMENTS_LINE=$(grep "Supplements:" scraper_output.log | tail -1 || echo "Supplements: stats unavailable")
-            TIMEOUT_LINE=$(grep "Timeout:" scraper_output.log | tail -1 || echo "Timeout: stats unavailable")
-            echo "supplements_summary=$SUPPLEMENTS_LINE" >> $GITHUB_OUTPUT
-            echo "timeout_summary=$TIMEOUT_LINE" >> $GITHUB_OUTPUT
-          else
-            echo "supplements_summary=Supplements: stats unavailable" >> $GITHUB_OUTPUT
-            echo "timeout_summary=Timeout: stats unavailable" >> $GITHUB_OUTPUT
-          fi
+          # Extract the per-dataset summary lines (e.g. "Timeout: +3 new, 3844 total") from the scraper output
+          SUMMARY=$(sed -n '/SUMMARY FOR COMMIT MESSAGE:/,$p' scraper_output.log 2>/dev/null | grep -E '^[A-Z][a-z]+: \+[0-9]+ new, [0-9]+ total$' || true)
+          {
+            echo "summary<<EOF"
+            echo "${SUMMARY:-Stats unavailable}"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
       - name: Commit and push results
         if: steps.check_changes.outputs.changed == 'true'
@@ -103,10 +101,10 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git pull
+          git add data/*.csv data/*_links.txt
           git commit -am "Update Google search results [skip ci]
 
-          ${{ steps.extract_summary.outputs.supplements_summary }}
-          ${{ steps.extract_summary.outputs.timeout_summary }}"
+          ${{ steps.extract_summary.outputs.summary }}"
           git push
 
       - name: Upload results as artifact
@@ -119,5 +117,7 @@ jobs:
             data/supplements_links.txt
             data/timeout.csv
             data/timeout_links.txt
+            data/distress.csv
+            data/distress_links.txt
             error-screenshot-*.png
           retention-days: 30
