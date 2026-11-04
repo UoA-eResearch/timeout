@@ -358,14 +358,14 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 - YouTube       299
 
 **Distress dataset:**
-- Total videos: 1369
+- Total videos: 9002
 - Breakdown by source:
-- Facebook     598
-- Instagram    485
-- YouTube      156
-- TikTok       130
+- Facebook     3129
+- Instagram    2801
+- YouTube      1763
+- TikTok       1309
 
-*Last updated: 2026-11-03 23:33:06 UTC*
+*Last updated: 2026-11-04 05:44:08 UTC*
 
 
 ## Repository Structure
