@@ -137,8 +137,8 @@ yt-dlp --download-archive timeout_archive.log --write-info-json --output "%(titl
 # Download supplements videos
 yt-dlp --download-archive supplements_archive.log --write-info-json --output "%(title).100B [%(id)s].%(ext)s" --batch-file data/supplements_links.txt --paths supplements_videos
 
-# Download distress videos
-yt-dlp --download-archive distress_archive.log --write-info-json --output "%(title).100B [%(id)s].%(ext)s" --batch-file data/distress_links.txt --paths distress_videos
+# Download distress videos (preferring <=720p H.264, which keeps files small and avoids AV1, which the LLM server can't decode)
+yt-dlp --download-archive distress_archive.log --write-info-json --output "%(title).100B [%(id)s].%(ext)s" -S "res:720,vcodec:h264" --batch-file data/distress_links.txt --paths distress_videos
 ```
 
 This downloads:
@@ -153,6 +153,7 @@ This script processes downloaded videos using the Nemotron-3-Nano-Omni-30B-A3B-R
 
 - Downloaded videos (see "Downloading Videos" section above)
 - GPU with sufficient VRAM (approximately 78GB required)
+- The model served with vLLM's OpenAI-compatible API. The server setup used for this project (vLLM 0.33.0, the `opencv` video backend and `--trust-request-mm-kwargs`, plus Caddy and Open WebUI) is the Docker Compose file in [UoA-eResearch/nemotron_3_nano_omni](https://github.com/UoA-eResearch/nemotron_3_nano_omni/blob/4673992/compose.yml) (pinned to the commit used; see [main](https://github.com/UoA-eResearch/nemotron_3_nano_omni/blob/main/compose.yml) for the latest). `batch_LLM.py` sends each video with `use_audio_in_video`, which needs `--trust-request-mm-kwargs`, and transcodes videos the server can't take (AV1, which its OpenCV decoder can't read, or over 20MB) to H.264 first. Its endpoint is set by `base_url` in `src/batch_LLM.py`
 
 #### Run the video analysis:
 
