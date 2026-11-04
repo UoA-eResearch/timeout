@@ -2,7 +2,7 @@
 """
 Join LLM result JSON files with video metadata and save to Excel.
 
-For each dataset (timeout, supplements), this script:
+For each dataset (timeout, supplements, distress), this script:
   1. Reads AI result JSON files from {dataset}_results/
   2. Joins them with the corresponding metadata from {dataset}_videos/*.info.json
   3. Saves the combined data to data/{dataset}_LLM_results.xlsx
@@ -89,13 +89,13 @@ def main():
     parser.add_argument(
         "--dataset",
         type=str,
-        choices=["timeout", "supplements", "all"],
+        choices=["timeout", "supplements", "distress", "all"],
         default="all",
         help="Dataset to process (default: all)",
     )
     args = parser.parse_args()
 
-    datasets = ["timeout", "supplements"] if args.dataset == "all" else [args.dataset]
+    datasets = ["timeout", "supplements", "distress"] if args.dataset == "all" else [args.dataset]
 
     os.makedirs("data", exist_ok=True)
 

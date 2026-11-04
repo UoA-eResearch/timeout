@@ -147,10 +147,11 @@ def drop_duplicate_videos(df):
 
 errors = 0
 
-def save_error_screenshot(driver, error_name):
-    """Save a screenshot when an error occurs"""
+def save_error_screenshot(driver, error_name, count_error=True):
+    """Save a screenshot (and the page HTML) when an error occurs"""
     global errors
-    errors += 1
+    if count_error:
+        errors += 1
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"error-screenshot-{error_name}-{timestamp}.png"
@@ -163,64 +164,96 @@ def save_error_screenshot(driver, error_name):
         print(f"Failed to save screenshot: {e}")
 
 def check_and_solve_captcha(driver):
+    """Solve a reCAPTCHA if Google shows one. Returns True if a CAPTCHA was found (solved or not), as the page has then changed"""
     driver.implicitly_wait(0)
+    found = False
     try:
-        driver.find_element(By.CSS_SELECTOR, "form[id*=captcha]")
-        raise ValueError("Unsolvable CAPTCHA found")
-    except:
-        pass
-    try:
-        captcha_iframe = [
+        captcha_iframes = [
             iframe for iframe in driver.find_elements(By.TAG_NAME, "iframe")
             if "captcha" in (iframe.get_attribute("title") or "").lower()
-        ][0]
-        print("Solving recaptcha")
-        solver = RecaptchaSolver(driver=driver)
-        solver.click_recaptcha_v2(iframe=captcha_iframe)
-        time.sleep(1)
+        ]
+        if captcha_iframes:
+            found = True
+            print("Solving recaptcha")
+            solver = RecaptchaSolver(driver=driver)
+            solver.click_recaptcha_v2(iframe=captcha_iframes[0])
+            time.sleep(1)
+        elif "/sorry/" in driver.current_url or driver.find_elements(By.CSS_SELECTOR, "form[id*=captcha]"):
+            found = True
+            print("Blocked by an unsolvable CAPTCHA")
     except Exception as e:
-        pass
+        print(f"Could not solve recaptcha: {e}")
     driver.implicitly_wait(10)
-    return
+    return found
 
-def search_and_scrape(driver, query, max_scrolls=10, region=None):
-    """Search Google and scrape short video results, optionally localised to a country (e.g. "nz")"""
-    print(f"\nSearching for: {query}")
-    solver = RecaptchaSolver(driver=driver)
+# Result card selectors: cards are normally wrapped in div.MjjYud, but pages loaded after a CAPTCHA
+# leave most cards unwrapped, so also look for the card itself and use whichever finds more
+RESULT_SELECTORS = ["div.MjjYud", "div.Z1YvVd"]
 
-    # Navigate to Google
-    url = f"https://www.google.com/search?udm=39&q={query}"
-    if region:
-        url += f"&gl={region}"
+def find_results(driver):
+    """Find the short video result cards on the page"""
+    driver.implicitly_wait(0)
+    results = max((driver.find_elements(By.CSS_SELECTOR, selector) for selector in RESULT_SELECTORS), key=len)
+    driver.implicitly_wait(10)
+    return results
+
+def load_all_results(driver, url, max_scrolls=10):
+    """Open a search and load all of its results, returning False if a CAPTCHA interrupted it"""
     print(url)
     driver.get(url)
     time.sleep(2)
-    check_and_solve_captcha(driver)
+    if check_and_solve_captcha(driver):
+        return False
 
     # Scroll to load more results
     print(f"Scrolling to load more results...")
     for i in range(max_scrolls):
         ActionChains(driver).scroll_by_amount(0, 10000).perform()
         time.sleep(1)
-        check_and_solve_captcha(driver)
+        if check_and_solve_captcha(driver):
+            return False
 
-    # Click "More results" until no more available
+    # Click "More results" until there's no button, then scroll until no new results load
+    # (some layouts load results by continuous scrolling instead of the button)
     print("Loading more results...")
-    while True:
+    count = len(find_results(driver))
+    for i in range(200):
         try:
             driver.find_element(By.LINK_TEXT, "More results").click()
-            results_count = len(driver.find_elements(By.CSS_SELECTOR, "div.MjjYud"))
-            print(f"Results: {results_count}")
-            time.sleep(1.5)
-            check_and_solve_captcha(driver)
-        except Exception as e:
-            print(f"No more results")
+            clicked = True
+        except Exception:
+            ActionChains(driver).scroll_by_amount(0, 10000).perform()
+            clicked = False
+        time.sleep(1.5)
+        if check_and_solve_captcha(driver):
+            return False
+        new_count = len(find_results(driver))
+        print(f"Results: {new_count}")
+        if not clicked and new_count == count:
             break
+        count = new_count
+    print("No more results")
+    return True
+
+def search_and_scrape(driver, query, max_scrolls=10, region=None):
+    """Search Google and scrape short video results, optionally localised to a country (e.g. "nz")"""
+    print(f"\nSearching for: {query}")
+
+    # Navigate to Google, starting again if a CAPTCHA interrupts loading (solving one redirects the page)
+    url = f"https://www.google.com/search?udm=39&q={query}"
+    if region:
+        url += f"&gl={region}"
+    for attempt in range(3):
+        if load_all_results(driver, url, max_scrolls):
+            break
+        print("CAPTCHA interrupted the search, reloading")
+    else:
+        print("Search kept being interrupted by CAPTCHAs")
+        return pd.DataFrame()
 
     # Get all results
-    results = driver.find_elements(By.CSS_SELECTOR, "div.MjjYud")
+    results = find_results(driver)
     print(f"\nTotal results found: {len(results)}")
-    check_and_solve_captcha(driver)
 
     # Parse results
     parsed_results = []
@@ -265,24 +298,13 @@ def search_and_scrape(driver, query, max_scrolls=10, region=None):
     return pd.DataFrame(parsed_results)
 
 
-def scrape_dataset(driver, name):
-    """Run each of a dataset's search terms and merge the results into data/{name}.csv, returning (new, total) row counts"""
+def scrape_dataset(driver, name, use_tor=False, retries=3, delay=30):
+    """Run each of a dataset's search terms and merge the results into data/{name}.csv after each one.
+    A term with no results is retried with a fresh browser after a growing wait (1, 2, 4... minutes), since that
+    usually means Google is blocking us; if it still fails the dataset is abandoned.
+    Returns (new, total) row counts and the driver, which may have been restarted"""
     search_terms = pd.read_table(f"data/{name}_search_terms.txt", header=None)[0].tolist()
     random.shuffle(search_terms)
-    dfs = []
-    for search_term in search_terms:
-        print(f"\nRunning search for: {search_term}")
-        df = search_and_scrape(driver, search_term, region=REGIONS.get(name))
-
-        if df.empty:
-            print("\nNo results found. Might be IP blocked or rate limited.")
-            print("Try running with: torsocks python3 run_googlesearch.py")
-            save_error_screenshot(driver, f"no_results_{name}")
-            break
-
-        print(f"\nResults from {search_term}: {len(df)} rows")
-        print(df.source.value_counts())
-        dfs.append(df)
 
     # Load old data if exists
     csv_path = f"data/{name}.csv"
@@ -294,41 +316,58 @@ def scrape_dataset(driver, name):
         old_df.link = old_df.link.map(strip_query).map(resolve_google_goto)
         print(f"Previous results: {len(old_df)} rows")
 
+    dfs = []
+    new, total = 0, 0 if old_df is None else len(old_df)
+    for i, search_term in enumerate(search_terms, 1):
+        if i > 1:
+            # Pause between searches (randomised) to avoid looking automated
+            pause = random.uniform(0.5, 1.5) * delay
+            print(f"\nWaiting {pause:.0f}s before the next search...")
+            time.sleep(pause)
+        print(f"\nRunning search {i}/{len(search_terms)}: {search_term}")
+
+        for attempt in range(1, retries + 1):
+            df = search_and_scrape(driver, search_term, region=REGIONS.get(name))
+            if not df.empty:
+                break
+            print(f"\nNo results found (attempt {attempt}/{retries}). Might be IP blocked or rate limited.")
+            if attempt == retries:
+                break
+            save_error_screenshot(driver, f"no_results_{name}_attempt{attempt}", count_error=False)
+            wait = 60 * 2 ** (attempt - 1)
+            print(f"Restarting the browser and retrying in {wait}s...")
+            driver.quit()
+            time.sleep(wait)
+            driver = start_driver(use_tor)
+
+        if df.empty:
+            print("Giving up. Try running with: torsocks python3 run_googlesearch.py")
+            save_error_screenshot(driver, f"no_results_{name}")
+            break
+
+        print(f"\nResults from {search_term}: {len(df)} rows")
+        print(df.source.value_counts())
+        dfs.append(df)
+
+        # Combine with old data, keeping the newly scraped row for links seen before, and save progress
+        df = drop_duplicate_videos(pd.concat(dfs if old_df is None else dfs + [old_df]))
+        df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])].sort_values(by="link")
+        new = len(df) if old_df is None else (~df.link.map(video_key).isin(old_df.link.map(video_key))).sum()
+        total = len(df)
+        print(f"Total unique results: {total} rows, new (after filtering): {new} rows")
+
+        os.makedirs("data", exist_ok=True)
+        df.to_csv(csv_path, index=False)
+        df.link.drop_duplicates().to_csv(f"data/{name}_links.txt", index=False, header=False)
+        print(f"Saved to: {csv_path} and data/{name}_links.txt")
+
     if not dfs:
-        total = 0 if old_df is None else len(old_df)
         print(f"No new {name} data collected. Existing: {total} rows")
-        return 0, total
-
-    # Combine with old data, keeping the newly scraped row for links seen before
-    print("\nCombining results...")
-    df = drop_duplicate_videos(pd.concat(dfs if old_df is None else dfs + [old_df]))
-    df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])].sort_values(by="link")
-    new = len(df) if old_df is None else (~df.link.map(video_key).isin(old_df.link.map(video_key))).sum()
-    print(f"Total unique results: {len(df)} rows, new (after filtering): {new} rows")
-
-    os.makedirs("data", exist_ok=True)
-    df.to_csv(csv_path, index=False)
-    df.link.drop_duplicates().to_csv(f"data/{name}_links.txt", index=False, header=False)
-    print(f"Saved to: {csv_path} and data/{name}_links.txt")
-    return new, len(df)
+    return new, total, driver
 
 
-def main():
-    """Main execution function"""
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Google Search Scraper for Menopause Supplements/Vitamins, Parenting Timeout and Youth Psychological Distress')
-    parser.add_argument('--use-tor', action='store_true', help='Use Tor SOCKS proxy for scraping')
-    parser.add_argument('--dataset', nargs='+', choices=DATASETS, default=DATASETS,
-                        help='Dataset(s) to scrape for (default: all)')
-    args = parser.parse_args()
-
-    print("=" * 80)
-    print("Google Search Scraper for Menopause Supplements/Vitamins, Parenting Timeout and Youth Psychological Distress")
-    print(f"Datasets: {', '.join(args.dataset)}")
-    if args.use_tor:
-        print("Using Tor SOCKS proxy (localhost:9050)")
-    print("=" * 80)
-
+def start_driver(use_tor=False):
+    """Start a Chrome session (undetected-chromedriver) matching the installed Chrome version"""
     # Configure Chrome options for headless mode
     options = uc.ChromeOptions()
     #options.add_argument('--headless=new')
@@ -340,9 +379,8 @@ def main():
     options.add_argument(f'--user-agent={USER_AGENT}')
 
     # Add Tor proxy configuration if requested
-    if args.use_tor:
+    if use_tor:
         options.add_argument('--proxy-server=socks5://localhost:9050')
-        session.proxies = {"http": "socks5h://localhost:9050", "https": "socks5h://localhost:9050"}
 
     print("\nStarting Chrome driver...")
 
@@ -364,15 +402,43 @@ def main():
         except Exception as e:
             print(f"Could not detect Chrome version: {e}")
 
+    # Pass version_main to ensure ChromeDriver matches installed Chrome
+    if chrome_version:
+        driver = uc.Chrome(options=options, version_main=chrome_version, use_subprocess=False)
+    else:
+        # Fallback to auto-detection if version detection failed
+        driver = uc.Chrome(options=options, use_subprocess=False)
+    driver.implicitly_wait(10)
+    driver.set_page_load_timeout(15)
+    return driver
+
+
+def main():
+    """Main execution function"""
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Google Search Scraper for Menopause Supplements/Vitamins, Parenting Timeout and Youth Psychological Distress')
+    parser.add_argument('--use-tor', action='store_true', help='Use Tor SOCKS proxy for scraping')
+    parser.add_argument('--dataset', nargs='+', choices=DATASETS, default=DATASETS,
+                        help='Dataset(s) to scrape for (default: all)')
+    parser.add_argument('--retries', type=int, default=3,
+                        help='Attempts per search term before giving up on a dataset, with a fresh browser and a growing wait between attempts (default: 3)')
+    parser.add_argument('--delay', type=float, default=30,
+                        help='Average seconds to wait between searches, randomised by +/-50%% (default: 30)')
+    args = parser.parse_args()
+
+    print("=" * 80)
+    print("Google Search Scraper for Menopause Supplements/Vitamins, Parenting Timeout and Youth Psychological Distress")
+    print(f"Datasets: {', '.join(args.dataset)}")
+    if args.use_tor:
+        print("Using Tor SOCKS proxy (localhost:9050)")
+    print("=" * 80)
+
+    # Add Tor proxy configuration if requested
+    if args.use_tor:
+        session.proxies = {"http": "socks5h://localhost:9050", "https": "socks5h://localhost:9050"}
+
     try:
-        # Pass version_main to ensure ChromeDriver matches installed Chrome
-        if chrome_version:
-            driver = uc.Chrome(options=options, version_main=chrome_version, use_subprocess=False)
-        else:
-            # Fallback to auto-detection if version detection failed
-            driver = uc.Chrome(options=options, use_subprocess=False)
-        driver.implicitly_wait(10)
-        driver.set_page_load_timeout(15)
+        driver = start_driver(args.use_tor)
     except Exception as e:
         print(f"Error starting Chrome: {e}")
         sys.exit(1)
@@ -384,7 +450,8 @@ def main():
             print("\n" + "=" * 80)
             print(f"Starting {name} collection...")
             print("=" * 80)
-            summary[name] = scrape_dataset(driver, name)
+            new, total, driver = scrape_dataset(driver, name, args.use_tor, args.retries, args.delay)
+            summary[name] = (new, total)
 
         # Update README with dataset statistics
         update_readme_stats({name: pd.read_csv(f"data/{name}.csv") for name in DATASETS if os.path.exists(f"data/{name}.csv")})

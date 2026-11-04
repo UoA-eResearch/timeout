@@ -96,9 +96,12 @@ python3 src/run_googlesearch.py --use-tor
 #### IP Blocking Protection:
 
 The scraper includes automatic protection against IP blocking:
-1. First attempts to run without Tor
-2. If that fails (likely due to IP blocking), automatically retries with Tor/torsocks
-3. Tor provides anonymity and helps avoid rate limiting
+1. Waits a randomised `--delay` (default ~30s) between searches
+2. Solves Google's reCAPTCHA when it appears, then reloads the search
+3. Retries a search that returns no results (`--retries`, default 3 attempts) with a fresh browser after a growing wait (1, 2, 4... minutes), saving results after every search term so progress isn't lost
+4. In GitHub Actions, if a run still fails (likely due to IP blocking), automatically retries with Tor/torsocks
+
+For a long local run that should get through every term, raise the retries and delay, e.g. `python3 src/run_googlesearch.py --dataset distress --retries 6 --delay 45`.
 
 #### Automated Execution:
 
@@ -133,6 +136,9 @@ yt-dlp --download-archive timeout_archive.log --write-info-json --output "%(titl
 
 # Download supplements videos
 yt-dlp --download-archive supplements_archive.log --write-info-json --output "%(title).100B [%(id)s].%(ext)s" --batch-file data/supplements_links.txt --paths supplements_videos
+
+# Download distress videos
+yt-dlp --download-archive distress_archive.log --write-info-json --output "%(title).100B [%(id)s].%(ext)s" --batch-file data/distress_links.txt --paths distress_videos
 ```
 
 This downloads:
@@ -156,6 +162,9 @@ python3 src/batch_LLM.py --dataset timeout
 
 # Process supplements dataset
 python3 src/batch_LLM.py --dataset supplements
+
+# Process distress dataset
+python3 src/batch_LLM.py --dataset distress
 ```
 
 #### How it works:
@@ -198,11 +207,22 @@ python3 src/batch_LLM.py --dataset supplements
 - Usefulness, misleading content, and quality ratings
 - Personal experiences shared
 
+**For distress videos** (a first draft of the coding scheme, to be refined):
+- Video description, transcript and on-screen text
+- Screening: whether the video is about psychological distress, whether the speaker appears to be a young person, and evidence of a New Zealand connection
+- Content type, speaker perspective and who is communicating (young person, health service, campaign, etc.)
+- Distress experiences and their categories, quoted distress terms, and vocabulary register (clinical, everyday, slang, metaphor, te reo Māori)
+- Algospeak and euphemisms (e.g. "unalive"), use of humour, and te reo Māori words
+- Framing of distress, help-seeking, support sources, coping strategies and calls to action
+- Public health messages, intended audience, safe messaging adherence for suicide/self-harm content, and self-disclosed risk
+- Emotional tone and intensity, speaker's profession, usefulness, misleading content, and quality ratings
+
 #### Output files:
 
 Results are saved as JSON files in:
 - `timeout_results/` - Analysis results for timeout videos
 - `supplements_results/` - Analysis results for supplements videos
+- `distress_results/` - Analysis results for distress videos
 
 ### 4. Joining Results (`src/join_results.py`)
 
@@ -211,18 +231,20 @@ After running `batch_LLM.py`, this script merges the per-video AI result JSON fi
 #### Run join_results locally:
 
 ```bash
-# Join results for both datasets
+# Join results for all datasets
 python3 src/join_results.py
 
 # Join results for a single dataset
 python3 src/join_results.py --dataset timeout
 python3 src/join_results.py --dataset supplements
+python3 src/join_results.py --dataset distress
 ```
 
 #### Output files:
 
 - `data/timeout_LLM_results.xlsx` - Combined timeout results
 - `data/supplements_LLM_results.xlsx` - Combined supplements results
+- `data/distress_LLM_results.xlsx` - Combined distress results
 
 ---
 
@@ -245,12 +267,13 @@ python3 src/join_results.py --dataset supplements
 #### Run the pipeline
 
 ```bash
-# Process both datasets
+# Process all datasets
 ./run_pipeline.sh
 
 # Process a single dataset
 ./run_pipeline.sh timeout
 ./run_pipeline.sh supplements
+./run_pipeline.sh distress
 ```
 
 #### Environment variables

@@ -8,7 +8,7 @@
 #   4. Commit and push changes back to the repository
 #
 # Usage:
-#   ./run_pipeline.sh [timeout|supplements|all]
+#   ./run_pipeline.sh [timeout|supplements|distress|all]
 #
 # The optional argument selects which dataset to process (default: all).
 #
@@ -20,13 +20,13 @@ set -euo pipefail
 
 DATASET="${1:-all}"
 
-if [[ "$DATASET" != "timeout" && "$DATASET" != "supplements" && "$DATASET" != "all" ]]; then
-    echo "Usage: $0 [timeout|supplements|all]"
+if [[ "$DATASET" != "timeout" && "$DATASET" != "supplements" && "$DATASET" != "distress" && "$DATASET" != "all" ]]; then
+    echo "Usage: $0 [timeout|supplements|distress|all]"
     exit 1
 fi
 
 if [[ "$DATASET" == "all" ]]; then
-    DATASETS=("timeout" "supplements")
+    DATASETS=("timeout" "supplements" "distress")
 else
     DATASETS=("$DATASET")
 fi
