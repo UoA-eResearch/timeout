@@ -14,6 +14,8 @@ import argparse
 from tqdm.contrib.concurrent import thread_map
 import ffmpeg
 import tempfile
+import time
+import statistics
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Process videos with LLM')
@@ -21,12 +23,14 @@ parser.add_argument('--dataset', type=str, choices=['timeout', 'supplements', 'd
                     required=True, help='Dataset to process (timeout, supplements or distress)')
 parser.add_argument('--max_workers', type=int, default=16, help='Maximum number of worker threads')
 parser.add_argument('--think', action='store_true', default=False, help='Enable thinking steps')
+parser.add_argument('--videos_dir', type=str, help='Folder of downloaded videos (default: {dataset}_videos)')
+parser.add_argument('--results_dir', type=str, help='Folder to write results to (default: {dataset}_results, or {dataset}_results_think with --think)')
 args = parser.parse_args()
 
 files = []
-folder = f"{args.dataset}_videos"
-result_folder = f"{args.dataset}_results"
-if args.think:
+folder = args.videos_dir or f"{args.dataset}_videos"
+result_folder = args.results_dir or f"{args.dataset}_results"
+if args.think and not args.results_dir:
     result_folder += "_think"
 os.makedirs(result_folder, exist_ok=True)
 for f in glob(f"{folder}/*.json"):
@@ -50,21 +54,31 @@ def has_audio(video_path):
         return False
 
 # Video codecs the vLLM server's OpenCV decoder can read. Anything else (notably AV1, common in YouTube downloads)
-# is transcoded to H.264 first, as are files too big for the server's media size limit (25MB)
+# is transcoded to H.264 first, as are files too big for the server's media size limit (25MB), and videos whose
+# decoded frames would exceed its decode limit (~715MB; it samples up to 360 frames at 2 fps), which are downscaled
 DECODABLE_CODECS = {"h264", "hevc", "vp9", "vp8", "mpeg4"}
 MAX_VIDEO_MB = 20
+MAX_DECODED_BYTES = 650e6
 
 def prepare_video(video_path, ext):
     """Return the video's bytes and extension to send, transcoding to H.264 mp4 if the server can't decode it or it's too large"""
-    streams = ffmpeg.probe(video_path, select_streams='v')['streams']
-    codec = streams[0]['codec_name'] if streams else None
-    if codec in DECODABLE_CODECS and os.path.getsize(video_path) <= MAX_VIDEO_MB * 1e6:
+    probe = ffmpeg.probe(video_path, select_streams='v')
+    stream = probe['streams'][0] if probe['streams'] else {}
+    codec = stream.get('codec_name')
+    height = int(stream.get('height') or 0)
+    frames = min(360, max(1, 2 * float(probe['format'].get('duration') or 0)))
+    decoded_bytes = frames * int(stream.get('width') or 0) * height * 3
+    if codec in DECODABLE_CODECS and os.path.getsize(video_path) <= MAX_VIDEO_MB * 1e6 and decoded_bytes <= MAX_DECODED_BYTES:
         with open(video_path, "rb") as video_file:
             return video_file.read(), ext
+    # at most 1280 high, and small enough for the decoded frames to fit
+    target_height = 1280
+    if decoded_bytes > MAX_DECODED_BYTES:
+        target_height = min(target_height, int(height * (MAX_DECODED_BYTES / decoded_bytes) ** 0.5) // 2 * 2)
     with tempfile.NamedTemporaryFile(suffix=".mp4") as tmp:
         (
             ffmpeg.input(video_path)
-            .output(tmp.name, vcodec="libx264", preset="veryfast", crf=28, vf="scale=-2:'min(1280,ih)'", acodec="aac")
+            .output(tmp.name, vcodec="libx264", preset="veryfast", crf=28, vf=f"scale=-2:'min({target_height},ih)'", acodec="aac")
             .overwrite_output()
             .run(quiet=True)
         )
@@ -224,6 +238,7 @@ def get_prompt(data, dataset):
 
 
 def process_file(json_filename):
+    """Code one video, returning the seconds it took, False if every retry failed, or None if it was skipped"""
     output_filename = os.path.join(result_folder, os.path.basename(json_filename.replace(
         ".info.json", ".result.json"
     )))
@@ -245,6 +260,7 @@ def process_file(json_filename):
         print(f"{e} for {json_filename}")
         return
     video_filename = json_filename.replace("info.json", data["ext"])
+    start = time.time()
     try:
         video_bytes, ext = prepare_video(video_filename, data["ext"])
     except Exception as e:
@@ -283,9 +299,20 @@ def process_file(json_filename):
             json.loads(text)
             with open(output_filename, "w") as f:
                 f.write(text)
-            return
+            return time.time() - start
         except Exception as e:
             print(f"{e} for {video_filename}")
     print(f"All 3 retries failed for {video_filename}")
+    return False
 
-thread_map(process_file, files, max_workers=args.max_workers)
+start = time.time()
+outcomes = thread_map(process_file, files, max_workers=args.max_workers)
+elapsed = time.time() - start
+durations = [o for o in outcomes if isinstance(o, float)]
+failed = sum(o is False for o in outcomes)
+if durations:
+    # throughput summary, as recorded in the README's benchmarks
+    print(f"Coded {len(durations)} videos ({failed} failed, {len(files) - len(durations) - failed} skipped) "
+          f"in {elapsed / 60:.1f} min with {args.max_workers} workers: {len(durations) / elapsed:.3f} videos/s "
+          f"({elapsed / len(durations):.2f} s/video); time per video mean {statistics.mean(durations):.1f} s, "
+          f"median {statistics.median(durations):.1f} s")
