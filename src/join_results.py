@@ -14,6 +14,7 @@ import os
 from glob import glob
 
 import pandas as pd
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from tqdm import tqdm
 
 METADATA_KEYS = [
@@ -106,6 +107,8 @@ def main():
             print(f"No data to save for {dataset}")
             continue
         output_path = f"data/{dataset}_LLM_results.xlsx"
+        # Excel can't store some control characters that turn up in video descriptions
+        df = df.apply(lambda col: col.map(lambda v: ILLEGAL_CHARACTERS_RE.sub("", v) if isinstance(v, str) else v))
         df.to_excel(output_path, index=False)
         print(f"Saved {len(df)} rows to {output_path}")
 

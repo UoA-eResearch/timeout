@@ -225,6 +225,19 @@ Results are saved as JSON files in:
 - `supplements_results/` - Analysis results for supplements videos
 - `distress_results/` - Analysis results for distress videos
 
+#### Benchmarks
+
+Measured on one NVIDIA A100 80GB PCIe with vLLM 0.33.0 (the [compose setup](https://github.com/UoA-eResearch/nemotron_3_nano_omni/blob/4673992/compose.yml): 8 concurrent sequences, video sampled at 2 fps up to 360 frames), with `batch_LLM.py --max_workers 8`. `batch_LLM.py` prints these figures at the end of each run. Throughput is videos coded per second of wall-clock time; time per video is the wall-clock time of one video's request (including transcoding and retries), of which about 8 run at once.
+
+| Run | Videos coded | Runtime | Throughput | Wall-clock per video | Time per video (mean / median) | Conditions |
+|---|---|---|---|---|---|---|
+| Distress, main pass, no thinking | 4,856 | 9 h 43 min | 0.139 videos/s | 7.2 s | — | overnight, GPU otherwise idle |
+| Distress, all passes | 7,135 | 29.7 h start to finish | — | — | — | coded as videos downloaded, plus retries; GPU shared with the supplements validation runs |
+| Supplements validation sample, no thinking | 197–210 per run | 50–60 min | 0.056–0.070 videos/s | 14–18 s | 86–129 s / 77–102 s | four runs; GPU shared with a distress pass |
+| Supplements validation sample, `--think` | 207 | 3 h 44 min | 0.015 videos/s | 65 s | 472 s / 386 s | GPU shared with a distress pass |
+
+An average request carries about 16,000 prompt tokens (the video's frames and audio) and generates about 2,000 tokens (the JSON, including a full transcript), taking about 47 s, about three quarters of it generating. At the idle-GPU rate, the full supplements dataset (12,177 videos) takes about 24 hours without thinking; thinking mode is roughly 4–5× slower. The timeout dataset hasn't been benchmarked, as its videos aren't on this machine.
+
 ### 4. Joining Results (`src/join_results.py`)
 
 After running `batch_LLM.py`, this script merges the per-video AI result JSON files with their yt-dlp metadata and writes the combined data to the Excel files consumed by `analyze_data.py`.
