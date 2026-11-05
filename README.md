@@ -418,14 +418,14 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-09-04 04:41:43 UTC*
+*Last updated: 2026-11-05 07:14:02 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
 > **Note on Dataset Sizes:** The numbers in this Data Analysis section are smaller than those reported in the Dataset Statistics section above. This is expected and occurs for several reasons:
 > - **Download failures**: Not all videos can be successfully downloaded with yt-dlp (some may be deleted, geo-restricted, or platform-restricted)
 > - **LLM processing**: Not all downloaded videos are successfully processed by the LLM
-> - **Content filtering**: Not all scraped videos are actually about the topic of interest—sometimes search terms return unrelated videos, which are identified and filtered out by the LLM (e.g., videos where `menopause=False` or `timeout=False`)
+> - **Content filtering**: Not all scraped videos are actually about the topic of interest—sometimes search terms return unrelated videos, which are identified and filtered out by the LLM (e.g., videos where `menopause=False`, `timeout=False` or `distress=False`)
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
@@ -537,6 +537,165 @@ The timeout dataset was filtered to include only videos where `timeout=True` fro
 **Number of videos over time**
 
 ![Number of videos over time](plots/timeout_videos_over_time.png)
+
+
+### Distress Dataset Analysis (Youth Psychological Distress, New Zealand)
+
+The distress dataset was filtered to include only videos where `distress=True` from YouTube, TikTok, Facebook, and Instagram, with cross-platform duplicates removed (n=3326 videos). Its coding scheme is a first draft (see `get_prompt_distress` in `src/batch_LLM.py`), so these figures are indicative until the coding is validated. Search results favour recent videos, so counts over time reflect when the data was collected more than how posting has changed.
+
+#### Key Findings
+
+**Video Distribution by Platform:**
+| extractor   |   count |   like_count |   view_count |   comment_count |
+|:------------|--------:|-------------:|-------------:|----------------:|
+| instagram   |    1345 |  1.35173e+07 |  0           |          217385 |
+| youtube     |     805 |  2.56932e+06 |  1.43054e+08 |           61625 |
+| facebook    |     713 |  0           |  2.78934e+07 |               0 |
+| tiktok      |     463 |  2.35481e+07 |  2.36698e+08 |          271492 |
+
+
+**Speakers:** the main speaker appears to be a young person (about 12–24) in 1146 videos (34%), is unclear in 78, and 1311 videos (39%) show a New Zealand connection.
+
+
+**Who Is Communicating:**
+| messaging_source                          |   videos |
+|:------------------------------------------|---------:|
+| young person sharing their own experience |     1237 |
+| health professional                       |      947 |
+| health service or charity                 |      392 |
+| community or iwi organisation             |      243 |
+| musician or entertainer                   |      164 |
+| peer supporter or advocate                |      151 |
+| government or public health campaign      |       59 |
+| other                                     |       43 |
+
+
+**Distress Experiences Described:**
+|                         |   videos | share   |
+|:------------------------|---------:|:--------|
+| Stress or pressure      |     1345 | 40.4%   |
+| Low mood or depression  |     1312 | 39.4%   |
+| Anxiety or panic        |     1152 | 34.6%   |
+| Overwhelm               |     1096 | 33.0%   |
+| Loneliness or isolation |      754 | 22.7%   |
+| Suicidal thoughts       |      560 | 16.8%   |
+| Burnout or exhaustion   |      384 | 11.5%   |
+| Grief or loss           |      327 | 9.8%    |
+| Self-harm               |      235 | 7.1%    |
+| Trauma                  |      188 | 5.7%    |
+| Anger or irritability   |       99 | 3.0%    |
+
+
+**Vocabulary Used for Distress:**
+|                                         |   videos | share   |
+|:----------------------------------------|---------:|:--------|
+| Everyday emotional language             |     3111 | 93.5%   |
+| Clinical or diagnostic terms            |      900 | 27.1%   |
+| Metaphor or imagery                     |      260 | 7.8%    |
+| Te reo Māori or other cultural concepts |      143 | 4.3%    |
+| Slang or internet language              |       68 | 2.0%    |
+| Euphemism or algospeak                  |       48 | 1.4%    |
+
+
+**Top 10 Algospeak and Euphemisms** (in 221 videos; as quoted by the LLM, which sometimes includes plain words or helpline numbers):
+| term             |   videos |
+|:-----------------|---------:|
+| unalive          |       49 |
+| unaliving        |       22 |
+| sewerslide       |       10 |
+| 988              |        7 |
+| fucking          |        4 |
+| unalived         |        4 |
+| suicide          |        4 |
+| 1737             |        4 |
+| shout            |        3 |
+| mental breakdown |        3 |
+
+
+**Top 10 Te Reo Māori Words** (in 385 videos):
+| term           |   videos |
+|:---------------|---------:|
+| whānau         |      121 |
+| kia ora        |       37 |
+| kōrero         |       32 |
+| hauora         |       30 |
+| aotearoa       |       23 |
+| rangatahi      |       22 |
+| tamariki       |       20 |
+| wairua         |       18 |
+| taha hinengaro |       17 |
+| kaupapa        |       17 |
+
+
+**Framing of Distress:**
+|                                     |   videos | share   |
+|:------------------------------------|---------:|:--------|
+| Individual struggle                 |     2717 | 81.7%   |
+| Normal part of life                 |     1518 | 45.6%   |
+| Holistic or cultural wellbeing      |     1112 | 33.4%   |
+| Medical condition needing treatment |      703 | 21.1%   |
+| Relational or whānau context        |      527 | 15.8%   |
+| Recovery or hope                    |      338 | 10.2%   |
+| Caused by external pressures        |      205 | 6.2%    |
+| Stigma or shame                     |      116 | 3.5%    |
+
+
+**Help-seeking:**
+| help_seeking                             |   videos |
+|:-----------------------------------------|---------:|
+| encourages help-seeking                  |     2426 |
+| not mentioned                            |      780 |
+| describes the speaker's own help-seeking |       81 |
+| sceptical of or discourages help-seeking |       39 |
+
+
+**Sources of Support Mentioned:**
+|                               |   videos | share   |
+|:------------------------------|---------:|:--------|
+| Friends or peers              |     1415 | 42.5%   |
+| Whānau or family              |      968 | 29.1%   |
+| Helpline or text service      |      954 | 28.7%   |
+| Counsellor or therapist       |      857 | 25.8%   |
+| GP or doctor                  |      519 | 15.6%   |
+| School or university          |      230 | 6.9%    |
+| Cultural or spiritual support |      207 | 6.2%    |
+| Online community              |      183 | 5.5%    |
+| Medication                    |      106 | 3.2%    |
+
+
+**Safe Messaging** (the 600 videos discussing suicide or self-harm):
+| safe_messaging               |   videos |
+|:-----------------------------|---------:|
+| follows guidelines           |      516 |
+| partially follows guidelines |       58 |
+| does not follow guidelines   |       21 |
+| not applicable               |        5 |
+
+
+**Self-disclosed Risk:**
+| risk_disclosure                        |   videos |
+|:---------------------------------------|---------:|
+| no disclosure                          |     3019 |
+| past suicidal thoughts or self-harm    |      158 |
+| current suicidal thoughts or self-harm |      149 |
+
+#### Visualizations
+
+**Distress experiences described**
+
+![Distress experiences described](plots/distress_categories.png)
+
+**Vocabulary used for distress**
+
+![Vocabulary used for distress](plots/distress_vocabulary_register.png)
+
+**Who is communicating**
+
+![Who is communicating](plots/distress_messaging_source.png)
+
+**Number of videos over time**
+
+![Number of videos over time](plots/distress_videos_over_time.png)
 ## License
 
 See `LICENSE` file for details.

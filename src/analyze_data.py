@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Data Analysis Script for Timeout and Supplements Datasets
+Data Analysis Script for the Timeout, Supplements and Distress Datasets
 
 This script analyzes LLM processed data from the xlsx files, generating tables and plots
 for sentiment over time, popularity trends, and other research questions.
@@ -73,7 +73,17 @@ def load_and_filter_data():
     timeout_filtered = timeout_df[timeout_df['timeout'] == True].copy()
     print(f"Filtered timeout (timeout=True): {len(timeout_filtered)} rows")
 
-    return supplements_filtered, timeout_filtered
+    # Load distress data: videos the LLM judged to be about psychological distress
+    distress_df = pd.read_excel(DATA_DIR / "distress_LLM_results.xlsx")
+    print(f"Loaded distress dataset: {len(distress_df)} rows")
+    distress_df['extractor'] = distress_df['extractor'].str.lower()
+    distress_df = distress_df[distress_df['extractor'].isin(allowed_platforms)].copy()
+    distress_filtered = distress_df[answer(distress_df['distress']) == 'true'].copy()
+    print(f"Filtered distress (distress=True): {len(distress_filtered)} rows")
+    distress_filtered = remove_duplicates(distress_filtered)
+    print(f"After duplicate removal: {len(distress_filtered)} rows")
+
+    return supplements_filtered, timeout_filtered, distress_filtered
 
 
 def parse_upload_date(df):
@@ -467,7 +477,172 @@ def analyze_timeout(df):
     return analysis_results
 
 
-def update_readme(supplements_results, timeout_results, supplements_count, timeout_count):
+# Answer options from the distress prompt (batch_LLM.py), for fields that allow several. Some options contain
+# commas, e.g. "clinical or diagnostic terms (e.g. depression, panic disorder)", so answers are counted by
+# matching these labels rather than splitting on commas
+DISTRESS_CATEGORIES = ["stress or pressure", "anxiety or panic", "low mood or depression", "burnout or exhaustion",
+                       "overwhelm", "loneliness or isolation", "anger or irritability", "grief or loss", "trauma",
+                       "self-harm", "suicidal thoughts"]
+VOCABULARY_REGISTERS = ["clinical or diagnostic terms", "everyday emotional language", "slang or internet language",
+                        "euphemism or algospeak", "metaphor or imagery", "te reo māori or other cultural concepts"]
+SUPPORT_SOURCES = ["friends or peers", "whānau or family", "school or university", "gp or doctor",
+                   "counsellor or therapist", "helpline or text service", "online community",
+                   "cultural or spiritual support", "medication"]
+FRAMINGS = ["individual struggle", "normal part of life", "medical condition needing treatment",
+            "caused by external pressures", "relational or whānau context", "holistic or cultural wellbeing",
+            "stigma or shame", "recovery or hope"]
+
+
+def answer(series):
+    """Normalise a single-choice LLM answer for counting."""
+    return series.astype(str).str.strip().str.lower()
+
+
+def count_labels(series, labels):
+    """Number (and share) of videos whose answer includes each label."""
+    text = answer(series)
+    display = [label.replace('gp ', 'GP ').replace('māori', 'Māori') for label in labels]
+    display = [label[0].upper() + label[1:] for label in display]
+    counts = pd.DataFrame({'videos': [int(text.str.contains(label, regex=False).sum()) for label in labels]},
+                          index=display)
+    counts['share'] = (counts['videos'] / len(series) * 100).round(1).astype(str) + '%'
+    return counts.sort_values('videos', ascending=False)
+
+
+NON_ANSWERS = {'no', 'none', 'n/a', 'na', 'not applicable', 'nan'}
+
+
+def count_terms(series, none_prefix, sep):
+    """Most common free-text terms in a list field (e.g. algospeak quotes), ignoring "none" answers.
+    Returns the top 10 and the number of videos with at least one term."""
+    terms, videos = Counter(), 0
+    for value in series.dropna().astype(str):
+        if value.strip().lower().startswith(none_prefix):
+            continue
+        found = {t.strip(" '\"[]").lower() for t in value.split(sep)} - NON_ANSWERS - {''}
+        terms.update(found)
+        videos += bool(found)
+    return pd.DataFrame(terms.most_common(10), columns=['term', 'videos']), videos
+
+
+def barh_plot(counts, title, filename, color):
+    """Horizontal bar chart of a count_labels table."""
+    fig, ax = plt.subplots(figsize=(12, 6))
+    counts['videos'].iloc[::-1].plot(kind='barh', ax=ax, color=color)
+    ax.set_title(title, fontsize=16, fontweight='bold')
+    ax.set_xlabel('Number of Videos', fontsize=12)
+    plt.tight_layout()
+    plot_path = PLOTS_DIR / filename
+    plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Saved plot: {plot_path}")
+
+
+def analyze_distress(df):
+    """Analyze the youth psychological distress (NZ) dataset."""
+    print("\n" + "="*80)
+    print("DISTRESS DATASET ANALYSIS")
+    print("="*80)
+
+    df = parse_upload_date(df)
+
+    analysis_results = {
+        'tables': {},
+        'plots': [],
+        'summary': []
+    }
+
+    # Descriptive analysis
+    print("\n1. Descriptive Analysis")
+    form_analysis = df.groupby('extractor').agg({
+        'id': 'count',
+        'like_count': 'sum',
+        'view_count': 'sum',
+        'comment_count': 'sum'
+    }).rename(columns={'id': 'count'})
+    form_analysis = form_analysis.sort_values('count', ascending=False)
+    print(form_analysis)
+    analysis_results['summary'].append(f"**Video Distribution by Platform:**\n{form_analysis.to_markdown()}")
+
+    # Who is speaking, and to whom
+    print("\n2. Speakers")
+    young = answer(df['young_person']).value_counts()
+    nz = (answer(df['new_zealand']) == 'true').sum()
+    analysis_results['summary'].append(
+        f"\n**Speakers:** the main speaker appears to be a young person (about 12–24) in {young.get('yes', 0)} videos "
+        f"({young.get('yes', 0) / len(df):.0%}), is unclear in {young.get('unclear', 0)}, and {nz} videos ({nz / len(df):.0%}) "
+        f"show a New Zealand connection.")
+    source = answer(df['messaging_source']).value_counts().head(8).rename('videos')
+    print(source)
+    analysis_results['summary'].append(f"\n**Who Is Communicating:**\n{source.to_frame().to_markdown()}")
+
+    # How distress is described
+    print("\n3. Distress Experiences and Language")
+    categories = count_labels(df['distress_categories'], DISTRESS_CATEGORIES)
+    print(categories)
+    analysis_results['summary'].append(f"\n**Distress Experiences Described:**\n{categories.to_markdown()}")
+    barh_plot(categories, 'Distress Experiences Described - Distress Dataset', 'distress_categories.png', '#9467bd')
+    analysis_results['plots'].append(('distress_categories.png', 'Distress experiences described'))
+
+    registers = count_labels(df['vocabulary_register'], VOCABULARY_REGISTERS)
+    print(registers)
+    analysis_results['summary'].append(f"\n**Vocabulary Used for Distress:**\n{registers.to_markdown()}")
+    barh_plot(registers, 'Vocabulary Used for Distress - Distress Dataset', 'distress_vocabulary_register.png', '#1f77b4')
+    analysis_results['plots'].append(('distress_vocabulary_register.png', 'Vocabulary used for distress'))
+
+    algospeak, n_algospeak = count_terms(df['algospeak'], 'no algospeak', ';')
+    analysis_results['summary'].append(
+        f"\n**Top 10 Algospeak and Euphemisms** (in {n_algospeak} videos; as quoted by the LLM, which sometimes includes "
+        f"plain words or helpline numbers):\n{algospeak.to_markdown(index=False)}")
+    te_reo, n_te_reo = count_terms(df['te_reo_maori'], 'no te reo', ',')
+    analysis_results['summary'].append(
+        f"\n**Top 10 Te Reo Māori Words** (in {n_te_reo} videos):\n{te_reo.to_markdown(index=False)}")
+
+    framing = count_labels(df['framing'], FRAMINGS)
+    analysis_results['summary'].append(f"\n**Framing of Distress:**\n{framing.to_markdown()}")
+
+    # Help-seeking and public health messaging
+    print("\n4. Help-seeking and Messaging")
+    help_seeking = answer(df['help_seeking']).value_counts().rename('videos')
+    analysis_results['summary'].append(f"\n**Help-seeking:**\n{help_seeking.to_frame().to_markdown()}")
+    support = count_labels(df['support_sources'], SUPPORT_SOURCES)
+    analysis_results['summary'].append(f"\n**Sources of Support Mentioned:**\n{support.to_markdown()}")
+    suicide = df[answer(df['distress_categories']).str.contains('suicidal thoughts|self-harm')]
+    safe = answer(suicide['safe_messaging']).value_counts().rename('videos')
+    analysis_results['summary'].append(
+        f"\n**Safe Messaging** (the {len(suicide)} videos discussing suicide or self-harm):\n{safe.to_frame().to_markdown()}")
+    risk = answer(df['risk_disclosure']).value_counts().rename('videos')
+    analysis_results['summary'].append(f"\n**Self-disclosed Risk:**\n{risk.to_frame().to_markdown()}")
+
+    source_counts = source.to_frame()
+    barh_plot(source_counts, 'Who Is Communicating - Distress Dataset', 'distress_messaging_source.png', '#ff7f0e')
+    analysis_results['plots'].append(('distress_messaging_source.png', 'Who is communicating'))
+
+    # Number of videos over time
+    print("\n5. Number of Videos Over Time")
+    videos_over_time = df.groupby('year_month').size()
+    fig, ax = plt.subplots(figsize=(14, 6))
+    ax.plot(range(len(videos_over_time)), videos_over_time.values, marker='o', linewidth=2, color='#1f77b4')
+    ax.set_title('Number of Distress Videos Over Time', fontsize=16, fontweight='bold')
+    ax.set_xlabel('Month', fontsize=12)
+    ax.set_ylabel('Number of Videos', fontsize=12)
+    ax.grid(True, alpha=0.3)
+    ax.set_xticks(range(len(videos_over_time)))
+    ax.set_xticklabels(videos_over_time.index, rotation=45, ha='right')
+    # label every few months so long ranges stay readable
+    for i, label in enumerate(ax.get_xticklabels()):
+        label.set_visible(i % max(1, len(videos_over_time) // 24) == 0)
+    plt.tight_layout()
+    plot_path = PLOTS_DIR / 'distress_videos_over_time.png'
+    plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    analysis_results['plots'].append(('distress_videos_over_time.png', 'Number of videos over time'))
+    print(f"Saved plot: {plot_path}")
+
+    return analysis_results
+
+
+def update_readme(supplements_results, timeout_results, distress_results, supplements_count, timeout_count, distress_count):
     """Update README.md with analysis findings."""
     print("\nUpdating README...")
 
@@ -488,7 +663,7 @@ This section contains automated analysis of the LLM-processed video data. The an
 > **Note on Dataset Sizes:** The numbers in this Data Analysis section are smaller than those reported in the Dataset Statistics section above. This is expected and occurs for several reasons:
 > - **Download failures**: Not all videos can be successfully downloaded with yt-dlp (some may be deleted, geo-restricted, or platform-restricted)
 > - **LLM processing**: Not all downloaded videos are successfully processed by the LLM
-> - **Content filtering**: Not all scraped videos are actually about the topic of interest—sometimes search terms return unrelated videos, which are identified and filtered out by the LLM (e.g., videos where `menopause=False` or `timeout=False`)
+> - **Content filtering**: Not all scraped videos are actually about the topic of interest—sometimes search terms return unrelated videos, which are identified and filtered out by the LLM (e.g., videos where `menopause=False`, `timeout=False` or `distress=False`)
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
@@ -528,6 +703,24 @@ The timeout dataset was filtered to include only videos where `timeout=True` fro
         analysis_section += f"**{description}**\n\n"
         analysis_section += f"![{description}](plots/{plot_file})\n\n"
 
+    # Add distress analysis
+    analysis_section += f"""
+### Distress Dataset Analysis (Youth Psychological Distress, New Zealand)
+
+The distress dataset was filtered to include only videos where `distress=True` from YouTube, TikTok, Facebook, and Instagram, with cross-platform duplicates removed (n={distress_count} videos). Its coding scheme is a first draft (see `get_prompt_distress` in `src/batch_LLM.py`), so these figures are indicative until the coding is validated. Search results favour recent videos, so counts over time reflect when the data was collected more than how posting has changed.
+
+#### Key Findings
+
+"""
+
+    for item in distress_results['summary']:
+        analysis_section += item + "\n\n"
+
+    analysis_section += "#### Visualizations\n\n"
+    for plot_file, description in distress_results['plots']:
+        analysis_section += f"**{description}**\n\n"
+        analysis_section += f"![{description}](plots/{plot_file})\n\n"
+
     # Find where to insert the analysis section
     # Look for existing "## Data Analysis" section or insert before "## License"
     if "## Data Analysis" in readme_content:
@@ -554,7 +747,7 @@ def main():
     print(f"Working directory: {Path.cwd()}")
 
     # Load and filter data
-    supplements_df, timeout_df = load_and_filter_data()
+    supplements_df, timeout_df, distress_df = load_and_filter_data()
 
     # Analyze supplements dataset
     supplements_results = analyze_supplements(supplements_df)
@@ -562,8 +755,12 @@ def main():
     # Analyze timeout dataset
     timeout_results = analyze_timeout(timeout_df)
 
+    # Analyze distress dataset
+    distress_results = analyze_distress(distress_df)
+
     # Update README with counts
-    update_readme(supplements_results, timeout_results, len(supplements_df), len(timeout_df))
+    update_readme(supplements_results, timeout_results, distress_results,
+                  len(supplements_df), len(timeout_df), len(distress_df))
 
     print("\n" + "="*80)
     print("Analysis completed successfully!")

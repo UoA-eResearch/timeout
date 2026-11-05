@@ -292,14 +292,18 @@ def remove_duplicates(df):
 
     A post is considered a duplicate when another post has the same
     normalized title (>= 15 chars, so generic titles are never merged) and
-    the same duration rounded to the nearest second. The copy with the
-    highest view count is kept.
+    the same duration rounded to the nearest second. Posts without a duration
+    are never merged: many Instagram posts have no duration and a title like
+    "Video by <account>", which would merge every video from that account.
+    The copy with the highest view count is kept.
     """
     df = df.copy()
     title_norm = df['title'].fillna('').str.lower().str.strip()
     duration = df['duration'].round() if 'duration' in df.columns else 0
     df['_dedup_key'] = title_norm + '|' + duration.astype(str)
     eligible = title_norm.str.len() >= 15
+    if 'duration' in df.columns:
+        eligible &= df['duration'].notna()
     # stable sort with id tie-break so the kept copy is deterministic
     dupes = df[eligible].sort_values(['view_count', 'id'],
                                      ascending=[False, True], kind='mergesort')
