@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
 """
-Deterministic cleaning and coding of supplement terms extracted by the LLM.
+Cleaning and coding of the supplement terms and categories produced by the LLM.
 
 Implements the coding framework from the research team's documents:
   - "Dividing data plan 18.8.26" (canonical grouping, 9 categories, target groups)
   - "data_cleaning_for_combining_supplement_categories_9_categories"
   - "supplement_coding_instructions_for_data_cleaning"
   - "marketing_target_grouping_instruction_table"
+plus a separate foods category (2 Sep meeting).
 
-Three coding layers per raw term:
-  1. Canonical name  - collapse spelling/formulation/synonym variants before counting
-  2. Status category - one of nine broad product / clinical-regulatory categories
-  3. Target group    - the marketing/target-function the term is typically framed for
-
-Terms that match no rule are flagged "Unmatched (manual review)" rather than
-being forced into a category, per the coding instructions.
+Three coding layers:
+  1. Canonical name  - collapse spelling/formulation/synonym variants before counting (rules, here)
+  2. Status category - one of the broad product / clinical-regulatory categories, per supplement
+  3. Target group    - the marketing/target-function the post frames its supplements for
+Layers 2 and 3 are assigned by the LLM, which sees the whole video (see get_prompt_supplements in
+batch_LLM.py, which defines the categories with examples); this script parses its answers. Answers
+that are missing or not one of the categories are flagged "Unmatched (manual review)".
 
 Run as a script to produce data/supplement_categories.xlsx from
 data/supplements_LLM_results.xlsx:
   - counts and popularity metrics (likes, views) per category and target group
   - posts listed in rows grouped under each category / target group
-  - the full raw term -> canonical -> category -> target mapping for review
+  - the full raw term -> canonical -> category mapping for review
 """
 
+import ast
+import json
 import re
 from collections import Counter
 from pathlib import Path
@@ -64,224 +67,86 @@ def canonicalize(term):
 
 
 # ---------------------------------------------------------------------------
-# Layer 2: nine broad product / clinical-regulatory status categories
+# Layers 2 and 3: status categories and target groups, as assigned by the LLM
 # ---------------------------------------------------------------------------
-STATUS_CATEGORIES = {
-    "Hormone therapies": [
-        "hrt", "hormone replacement therapy", "hormone therapy",
-        "menopausal hormone therapy", "mht", "menopause hormone therapy",
-        "estrogen", "oestrogen", "estradiol", "estradiol patch",
-        "estrogen patch", "oral estradiol", "vaginal estrogen",
-        "topical estrogen", "estrogen cream", "estrogen gel", "progesterone",
-        "micronized progesterone", "bioidentical progesterone",
-        "progesterone cream", "progesterone pill", "testosterone",
-        "testosterone therapy", "testosterone gel", "dhea", "vaginal dhea",
-        "bioidentical hormones", "bioidenticals", "estriol", "progestin",
-        "medroxyprogesterone acetate", "premarin", "estradot", "divigel",
-        "oestrogel", "prometrium", "birth control", "birth control pills",
-    ],
-    "Prescription and over-the-counter medications": [
-        "ssri", "ssris", "snri", "snris", "antidepressant", "antidepressants",
-        "gabapentin", "clonidine", "glp-1", "glp1", "ozempic", "semaglutide",
-        "pepcid", "pepcid ac", "zyrtec", "allegra", "claritin", "flonase",
-        "antihistamine", "antihistamines", "spironolactone", "minoxidil",
-        "ibuprofen", "antibiotics", "addyi", "vyleesi", "viagra", "tretinoin",
-        "retinol",
-    ],
-    "Vitamins and minerals": [
-        "vitamin d", "vitamin d3", "vitamin d supplement", "vitamin d3 + k2",
-        "vitamin d + k2", "vitamin d3 with k2", "vitamin c", "vitamin e",
-        "vitamin k", "vitamin k2", "vitamin a", "b vitamins",
-        "vitamin b complex", "b complex", "b-complex", "b12", "vitamin b12",
-        "methylcobalamin", "b6", "vitamin b6", "b5", "b2", "b1", "thiamine",
-        "folate", "folic acid", "calcium", "calcium supplements", "magnesium",
-        "magnesium glycinate", "magnesium citrate", "magnesium l-threonate",
-        "magnesium threonate", "magnesium malate", "magnesium bisglycinate",
-        "magnesium taurate", "magnesium oil", "magnesium complex", "zinc",
-        "iron", "selenium", "chromium", "iodine", "boron", "copper",
-        "potassium", "phosphorus", "choline", "silica", "multivitamin",
-        "multivitamins", "vitamins and minerals",
-    ],
-    "Herbals, botanicals and phytoestrogenic products": [
-        "black cohosh", "black cohosh root", "racemosa", "ashwagandha", "turmeric",
-        "curcumin", "shatavari", "red clover", "maca", "maca root",
-        "maca powder", "sage", "dong quai", "chasteberry", "vitex",
-        "chaste tree", "chaste tree berry", "soy", "soy isoflavones",
-        "isoflavones", "phytoestrogens", "phytoestrogen", "rhodiola",
-        "rhodiola rosea", "ginseng", "saffron", "saffron extract",
-        "milk thistle", "quercetin", "st john's wort", "st johns wort",
-        "motherwort", "moringa", "aloe vera", "ginger", "reishi", "hops",
-        "passionflower", "valerian", "lemon balm", "wild yam",
-        "wild yam cream", "pueraria mirifica", "green tea extract",
-        "saw palmetto", "brahmi", "sea moss", "pomegranate",
-    ],
-    "Fatty acids and oils": [
-        "omega-3", "omega 3", "omega-3s", "omega-3 fatty acids",
-        "omega-3 supplement", "omega-3 fish oil", "omega 3 fish oil",
-        "fish oil", "krill oil", "krill oil softgels", "cod liver oil",
-        "omega-6", "omega 6", "evening primrose oil", "evening primrose",
-        "flaxseed oil", "flax", "flaxseed", "chia seeds", "hemp seeds",
-        "pumpkin seed oil", "sacha inchi", "mct oil",
-    ],
-    "Protein, amino acids, creatine, body-composition and sports/performance supplements": [
-        "creatine", "creatine monohydrate", "pause nutrition creatine",
-        "collagen", "collagen peptides", "collagen powder",
-        "collagen tablets", "verisol collagen", "collagen therapy",
-        "skin and bone collagen", "protein", "protein powder",
-        "protein supplement", "whey protein", "plant protein", "peptides",
-        "bcaa", "bcaas", "l-theanine", "glycine", "taurine", "tryptophan",
-        "5-htp", "gaba", "l-glutamine", "electrolytes",
-    ],
-    "Gut/microbiome products, including probiotics, prebiotics, postbiotics, symbiotics and fibre": [
-        "probiotic", "probiotics", "prebiotic", "prebiotics", "postbiotic",
-        "symbiotic", "synbiotic", "fibre", "fiber", "fibre supplement",
-        "fiber supplement", "fiber gdx", "the pause life fiber",
-        "psyllium husk", "digestive enzymes", "pancreatic enzymes",
-        "dao enzymes", "slippery elm", "marshmallow root",
-    ],
-    "Branded menopause or symptom-targeted formulations": [
-        "perimeno health", "snap perimeno health", "perimenopause health",
-        "meno-chill", "menochill", "meno chill",
-        "black girl vitamins meno-chill", "black girl vitamins",
-        "hormone harmony", "komi wellness hormone harmony", "amberen",
-        "amberen complete menopause relief", "superbalance",
-        "nello superbalance", "ever balance", "estroven", "estrovera",
-        "menopace", "menofix", "meno active",
-        "meno menopause vitamin capsules", "menopause vitamin capsules",
-        "olly mellow menopause",
-        "health & her perimenopause multi-nutrient support",
-        "a.vogel balance perimenopause multi-nutrient drink",
-        "nutrafol women's balance", "nutrafol", "sleep harmony",
-        "stress harmony", "gut harmony", "pause sleep", "daily brain boost",
-        "fabu brain", "meno vaginal moisture capsules",
-        "peach perfect menopause multivitamin",
-        "nature's bounty advanced menopause relief", "provitalize",
-        "thermella", "menovital", "cleanmarine menomin", "promensil",
-        "yuzucare menopause support", "midi supplements",
-        "kind patches menopause patches", "unbreakable bone health formula",
-        "skin & bone dietary supplement", "skin boost plus", "key collagen",
-        "beam glow", "lioness ready performance", "primal queen",
-        "revive active",
-    ],
-    "Other, vague, ambiguous or non-classifiable terms": [
-        "supplement", "supplements", "supplementation", "vitamins",
-        "minerals", "herbs", "natural supplements", "menopause supplement",
-        "menopause supplements", "menopause support", "menopause complex",
-        "natural menopause support formulas", "menopause herbs",
-        "hormone balance", "hormones", "pills", "pill", "capsules", "capsule",
-        "tablets", "gummies", "patches", "gels", "creams", "gel", "hair",
-        "micronutrients",
-    ],
-}
+# The names the LLM chooses from; keep in step with get_prompt_supplements in batch_LLM.py
+STATUS_CATEGORIES = [
+    "Hormone therapies",
+    "Prescription and over-the-counter medications",
+    "Vitamins and minerals",
+    "Herbals, botanicals and phytoestrogenic products",
+    "Fatty acids and oils",
+    "Protein, amino acids, creatine, body-composition and sports/performance supplements",
+    "Gut/microbiome products, including probiotics, prebiotics, postbiotics, symbiotics and fibre",
+    "Branded menopause or symptom-targeted formulations",
+    "Foods and dietary items",
+    "Other, vague, ambiguous or non-classifiable terms",
+]
+VAGUE = "Other, vague, ambiguous or non-classifiable terms"
+
+GENERAL_TARGET = "General menopause / multisymptom / unclear target"
+TARGET_GROUPS = [
+    "Bone / musculoskeletal support",
+    "Phytoestrogenic or hormone-modulating claims",
+    "Vasomotor symptom / hot-flush relief",
+    "Sleep / stress / mood / cognition support",
+    "Metabolic / weight / insulin framing",
+    "Gut / inflammation / detox framing",
+    "Skin / hair / beauty ageing",
+    "Sexual / vaginal symptoms",
+    GENERAL_TARGET,
+]
 
 UNMATCHED = "Unmatched (manual review)"
 
-# exact-match lookup; categories are checked in dict order so more specific
-# categories (e.g. hormone therapies) win over the vague catch-all
-_STATUS_LOOKUP = {}
-for _cat, _terms in STATUS_CATEGORIES.items():
-    for _t in _terms:
-        _STATUS_LOOKUP.setdefault(_t, _cat)
+
+def match_name(value, names):
+    """Match one LLM answer to one of `names`, tolerating case, quotes and shortened names
+    (e.g. "Gut/microbiome products" for the full gut category name). None if it matches none."""
+    v = str(value).strip().strip(".'\"[] ").lower()
+    if len(v) < 5:
+        return None
+    for name in names:
+        if v == name.lower():
+            return name
+    for name in names:
+        stem = re.split(r",| \(| - ", name.lower())[0]
+        if v.startswith(stem) or stem.startswith(v):
+            return name
+    return None
 
 
-def status_category(term):
-    """Assign a raw term to one of the nine broad status categories.
+def parse_names(value, names):
+    """Split an LLM list of category/group names into one matched name (or UNMATCHED) per entry.
 
-    Exact match on the documented term lists first; then a small set of
-    pattern fallbacks for formulation variants; unmatched terms are flagged
-    for manual review rather than forced into a category.
-    """
-    t = term.strip().lower().rstrip(".")
-    if t in _STATUS_LOOKUP:
-        return _STATUS_LOOKUP[t]
-    # formulation/spelling variant fallbacks
-    if re.search(r"vitamin\s*[a-ek]\d*\b|\bk2\b|\bb\s*(1|2|3|5|6|12)\b|b vitamins|b complex"
-                 r"|folate|folic acid|biotin|riboflavin|niacin|pantothenic|thiamine|methylcobalamin", t):
-        return "Vitamins and minerals"
-    if re.search(r"magnesium|calcium|zinc|iron\b|selenium|multivitamin", t):
-        return "Vitamins and minerals"
-    if re.search(r"omega[\s-]*[36]|fish oil|krill|cod liver|primrose|flax", t):
-        return "Fatty acids and oils"
-    if re.search(r"collagen|creatine|protein|peptide|amino acid|electrolyte", t):
-        return "Protein, amino acids, creatine, body-composition and sports/performance supplements"
-    if re.search(r"probiotic|prebiotic|postbiotic|fibre|fiber|digestive enzyme", t):
-        return "Gut/microbiome products, including probiotics, prebiotics, postbiotics, symbiotics and fibre"
-    if re.search(r"estrogen|oestrogen|estradiol|progesterone|testosterone|hormone (replacement|therapy)|\bhrt\b|\bmht\b", t):
-        return "Hormone therapies"
-    if re.search(r"meno(pause)?[\s-]", t):
-        return "Branded menopause or symptom-targeted formulations"
-    return UNMATCHED
+    Entries should be separated by semicolons, but some category names contain commas, so a
+    comma separated answer is read by finding the full names in order, falling back to splitting
+    on commas when it uses names that aren't written in full."""
+    if not isinstance(value, str) or not value.strip():
+        return []
+    v = value.strip()
+    if v.lower().startswith("no supplements"):
+        return []
+    if ";" in v:
+        parts = v.split(";")
+    else:
+        positions = sorted((m.start(), name) for name in names
+                           for m in re.finditer(re.escape(name), v, flags=re.IGNORECASE))
+        leftover = v
+        for name in names:
+            leftover = re.sub(re.escape(name), "", leftover, flags=re.IGNORECASE)
+        if positions and not leftover.strip(" ,;.'\"[]"):
+            return [name for _, name in positions]
+        parts = v.split(",")
+    parts = [p.strip(" '\"[]") for p in parts]
+    return [match_name(p, names) or UNMATCHED for p in parts if p]
 
 
-# ---------------------------------------------------------------------------
-# Layer 3: marketing/target-function groups (Division 3 table)
-# ---------------------------------------------------------------------------
-TARGET_GROUPS = {
-    "Bone / musculoskeletal support": [
-        "vitamin d", "calcium", "vitamin k2", "vitamin k", "magnesium",
-        "collagen", "creatine", "protein", "protein powder", "whey protein",
-        "bcaa", "bcaas", "electrolytes", "bone", "joint", "muscle",
-        "strength",
-    ],
-    "Phytoestrogenic or hormone-modulating claims": [
-        "soy isoflavones", "soy", "isoflavones", "red clover",
-        "phytoestrogen", "phytoestrogens", "flaxseed", "flax", "maca",
-        "wild yam", "dim", "chasteberry", "vitex", "chaste tree", "hrt",
-        "hormone replacement therapy", "estrogen", "oestrogen",
-        "progesterone", "testosterone", "dhea", "hormone balance",
-    ],
-    "Vasomotor symptom / hot-flush relief": [
-        "black cohosh", "sage", "evening primrose oil", "evening primrose",
-        "amberen", "estroven", "meno-chill", "menochill", "meno chill",
-        "hot flush", "hot flash", "night sweat", "cooling", "thermella",
-    ],
-    "Sleep / stress / mood / cognition support": [
-        "magnesium glycinate", "magnesium l-threonate", "l-theanine",
-        "melatonin", "ashwagandha", "rhodiola", "saffron", "gaba", "glycine",
-        "valerian", "passionflower", "lion's mane", "lions mane", "coq10",
-        "nmn", "5-htp", "tryptophan", "lemon balm", "sleep", "stress",
-        "mood", "brain", "calm",
-    ],
-    "Metabolic / weight / insulin framing": [
-        "berberine", "inositol", "myo-inositol", "chromium",
-        "apple cider vinegar", "mct oil", "glp-1", "glp1", "ozempic",
-        "semaglutide", "weight", "metabolism", "blood sugar", "insulin",
-    ],
-    "Gut / inflammation / detox framing": [
-        "probiotic", "probiotics", "prebiotic", "prebiotics", "postbiotic",
-        "fibre", "fiber", "psyllium husk", "digestive enzymes", "turmeric",
-        "curcumin", "milk thistle", "slippery elm", "l-glutamine",
-        "vitamin c", "gut", "detox", "bloating",
-    ],
-    "Skin / hair / beauty ageing": [
-        "collagen peptides", "biotin", "hyaluronic acid", "nutrafol", "zinc",
-        "minoxidil", "retinol", "tretinoin", "skin", "hair", "nails",
-        "beauty",
-    ],
-    "Sexual / vaginal symptoms": [
-        "vaginal estrogen", "vaginal dhea", "addyi", "vyleesi", "viagra",
-        "libido", "vaginal", "cranberry",
-    ],
-}
-
-GENERAL_TARGET = "General menopause / multisymptom / unclear target"
-
-
-def target_group(term):
-    """Assign a raw term to a marketing/target-function group.
-
-    Term-based coding: the group whose item list or keywords match the term.
-    Falls back to the general/unclear group, which the instructions specify
-    as the default when the target cannot be inferred from the term alone.
-    NB the instructions allow multi-label coding from post text; this
-    term-level pass assigns the first matching (primary) group only.
-    """
-    t = term.strip().lower().rstrip(".")
-    for group, terms in TARGET_GROUPS.items():
-        for item in terms:
-            if t == item or (len(item) > 3 and item in t):
-                return group
-    return GENERAL_TARGET
+def term_categories(post):
+    """The LLM's status category for each of a post's supplements, in the same order; UNMATCHED where
+    it gave no usable category (e.g. results from prompts before categories were assigned by the LLM)."""
+    return [match_name(o.get("status_category", ""), STATUS_CATEGORIES) or UNMATCHED
+            for o in parse_supplements(post.get("supplements"))]
 
 
 # ---------------------------------------------------------------------------
@@ -318,43 +183,61 @@ SENTINEL_VALUES = {
 }
 
 
-def split_supplements(value):
-    """Split the LLM's supplements field into individual raw terms."""
-    if not isinstance(value, str):
+def parse_supplements(value):
+    """The LLM's supplements field as a list of {name, status_category, product_type, ...} objects.
+
+    It's a JSON list of objects, or that list's text as stored in the results spreadsheet. Results
+    from earlier prompts are a list or comma separated string of names, giving objects with just a name."""
+    items = value
+    if isinstance(value, str):
+        items = None
+        if value.strip().startswith("["):
+            for load in (json.loads, ast.literal_eval):
+                try:
+                    items = load(value)
+                    break
+                except (ValueError, SyntaxError, TypeError):
+                    pass
+        if items is None:
+            items = [s.strip().strip("'\"") for s in value.strip("[]").split(",")]
+    if not isinstance(items, list):
         return []
-    items = [s.strip().strip("'\"") for s in value.strip("[]").split(",")]
-    return [s for s in items if s and s.lower() not in SENTINEL_VALUES]
+    objects = [item if isinstance(item, dict) else {"name": item} for item in items]
+    return [o for o in objects
+            if str(o.get("name") or "").strip() and str(o.get("name")).strip().lower() not in SENTINEL_VALUES]
 
 
-def _primary(supplements_value, coder, tiebreak_last):
-    """Most frequent code among a post's supplement terms.
+def split_supplements(value):
+    """The supplement names in the LLM's supplements field."""
+    return [str(o["name"]).strip() for o in parse_supplements(value)]
 
-    Ties resolve away from `tiebreak_last` (the catch-all code) so a post
-    with one specific and one vague term is categorised by the specific one.
-    """
-    terms = split_supplements(supplements_value)
-    if not terms:
+
+def primary_category(post):
+    """One status category per post: the LLM's primary category, or else the most frequent
+    category among its terms (ties resolved away from the vague catch-all)."""
+    if not split_supplements(post.get("supplements")):
         return None
-    cats = Counter(coder(t) for t in terms)
-    ranked = sorted(cats.items(), key=lambda kv: (-kv[1], kv[0] == tiebreak_last))
-    return ranked[0][0]
+    primary = match_name(post.get("primary_status_category"), STATUS_CATEGORIES)
+    if primary:
+        return primary
+    cats = Counter(c for c in term_categories(post) if c != UNMATCHED)
+    if not cats:
+        return UNMATCHED
+    return sorted(cats.items(), key=lambda kv: (-kv[1], kv[0] == VAGUE))[0][0]
 
 
-def primary_category(v):
-    """One status category per post: the modal category of its terms."""
-    return _primary(v, status_category, UNMATCHED)
-
-
-def primary_target(v):
-    """One marketing/target group per post: the modal group of its terms."""
-    return _primary(v, target_group, GENERAL_TARGET)
+def primary_target(post):
+    """One marketing/target group per post: the LLM's primary target group."""
+    if not split_supplements(post.get("supplements")):
+        return None
+    return match_name(post.get("primary_target_group"), TARGET_GROUPS) or UNMATCHED
 
 
 def code_dataset(df):
-    """Explode posts to one row per (post, supplement term) with all coding layers."""
+    """Explode posts to one row per (post, supplement term) with its canonical name and status category."""
     rows = []
     for _, post in df.iterrows():
-        for raw in split_supplements(post.get("supplements")):
+        for raw, category in zip(split_supplements(post.get("supplements")), term_categories(post)):
             rows.append({
                 "id": post.get("id"),
                 "extractor": post.get("extractor"),
@@ -364,8 +247,26 @@ def code_dataset(df):
                 "view_count": post.get("view_count"),
                 "raw_term": raw,
                 "canonical": canonicalize(raw),
-                "status_category": status_category(raw),
-                "target_group": target_group(raw),
+                "status_category": category,
+            })
+    return pd.DataFrame(rows)
+
+
+def code_targets(df):
+    """Explode posts to one row per (post, target group) the LLM says it frames its supplements for."""
+    rows = []
+    for _, post in df.iterrows():
+        if not split_supplements(post.get("supplements")):
+            continue
+        for group in dict.fromkeys(parse_names(post.get("target_groups"), TARGET_GROUPS)) or [UNMATCHED]:
+            rows.append({
+                "id": post.get("id"),
+                "extractor": post.get("extractor"),
+                "title": post.get("title"),
+                "webpage_url": post.get("webpage_url"),
+                "like_count": post.get("like_count"),
+                "view_count": post.get("view_count"),
+                "target_group": group,
             })
     return pd.DataFrame(rows)
 
@@ -397,11 +298,12 @@ def main():
     print(f"unique posts: {len(df)}")
 
     coded = code_dataset(df)
+    targets = code_targets(df)
     print(f"Coded {len(coded)} supplement mentions "
           f"({coded['raw_term'].nunique()} unique raw terms, "
           f"{coded['canonical'].nunique()} canonical groups)")
     unmatched = coded[coded["status_category"] == UNMATCHED]["raw_term"].nunique()
-    print(f"Raw terms flagged for manual review: {unmatched}")
+    print(f"Raw terms without a usable LLM category (manual review): {unmatched}")
 
     # primary (one-per-post) counts; these reconcile with the Sankey figures
     supp_mask = df["supplements"].apply(lambda v: len(split_supplements(v)) > 0)
@@ -410,8 +312,8 @@ def main():
         "id": supp_posts["id"],
         "like_count": supp_posts["like_count"],
         "view_count": supp_posts["view_count"],
-        "primary_category": supp_posts["supplements"].apply(primary_category),
-        "primary_target": supp_posts["supplements"].apply(primary_target),
+        "primary_category": supp_posts.apply(primary_category, axis=1),
+        "primary_target": supp_posts.apply(primary_target, axis=1),
     })
 
     def primary_summary(col):
@@ -428,7 +330,7 @@ def main():
         # so these columns sum to more than the number of posts
         group_summary(coded, "status_category").to_excel(
             writer, sheet_name="category_counts")
-        group_summary(coded, "target_group").to_excel(
+        group_summary(targets, "target_group").to_excel(
             writer, sheet_name="target_counts")
         # primary counts: one category/target per post, matching the Sankey
         primary_summary("primary_category").to_excel(
@@ -438,11 +340,10 @@ def main():
         # posts in rows grouped under each category, as requested
         coded.sort_values(["status_category", "canonical"]).to_excel(
             writer, sheet_name="posts_by_category", index=False)
-        coded.sort_values(["target_group", "canonical"]).to_excel(
+        targets.sort_values(["target_group", "id"]).to_excel(
             writer, sheet_name="posts_by_target", index=False)
         # full mapping for review
-        mapping = (coded.groupby(["raw_term", "canonical", "status_category",
-                                  "target_group"])
+        mapping = (coded.groupby(["raw_term", "canonical", "status_category"])
                    .size().reset_index(name="count")
                    .sort_values("count", ascending=False))
         mapping.to_excel(writer, sheet_name="term_mapping", index=False)

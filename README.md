@@ -197,7 +197,9 @@ python3 src/batch_LLM.py --dataset distress
 **For supplements videos:**
 - Video description and transcript
 - Tone and language
-- Supplements, vitamins, or medications mentioned
+- Supplements, vitamins, medications, and foods recommended for menopause
+- Per supplement (`supplement_details`): its status category (the team's nine-category framework plus foods), product type (e.g. single ingredient, menopause formulation) and ingredient type
+- The post's primary status category and product type, and the target groups its supplements are framed for (e.g. bone, hot flushes, sleep/mood) with a primary target group. These were assigned by keyword rules in `src/clean_supplements.py`; the LLM now assigns them from the whole video, and that script only parses its answers
 - Active ingredients
 - Symptoms or conditions addressed
 - Whether targeted at menopause
