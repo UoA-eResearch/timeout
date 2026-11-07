@@ -15,7 +15,7 @@ import re
 from collections import Counter
 import warnings
 
-from clean_supplements import canonicalize, remove_duplicates
+from clean_supplements import canonicalize, remove_duplicates, split_supplements
 
 warnings.filterwarnings('ignore')
 
@@ -244,17 +244,10 @@ def analyze_supplements(df):
     all_supplements = []
     sentinel_values = {'none', 'no supplements mentioned', 'yes', 'n/a', 'na', ''}
     for supp_list in df['supplements'].dropna():
-        if isinstance(supp_list, str):
-            # Parse the list-like string
-            items = [s.strip().strip("'\"") for s in supp_list.strip('[]').split(',')]
-            # Filter out sentinel values and empty strings
-            for supplement in items:
-                supplement = supplement.lower()
-                if supplement.lower() in sentinel_values:
-                    continue
-                # Collapse spelling/formulation/synonym variants to their
-                # canonical grouping (see clean_supplements.py)
-                all_supplements.append(canonicalize(supplement))
+        for supplement in split_supplements(supp_list):
+            # Collapse spelling/formulation/synonym variants to their
+            # canonical grouping (see clean_supplements.py)
+            all_supplements.append(canonicalize(supplement.lower()))
 
     supplement_counts = Counter(all_supplements)
     top_supplements = supplement_counts.most_common(10)
@@ -296,7 +289,7 @@ def analyze_supplements(df):
             period_supplements = []
             for supp_list in period_df['supplements'].dropna():
                 if isinstance(supp_list, str):
-                    items = [s.strip().strip("'\"") for s in supp_list.strip('[]').split(',')]
+                    items = split_supplements(supp_list)
                     # Filter out sentinel values and canonicalize, matching the top-10 counting
                     period_supplements.extend([
                         canonicalize(s) for s in items if s and s.lower() not in sentinel_values
