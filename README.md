@@ -1,6 +1,6 @@
 # Timeout and Menopause Supplement Video Research
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/UoA-eResearch/timeout)
+[![Ask DeepWiki](deepwiki.svg)](https://deepwiki.com/UoA-eResearch/timeout)
 [![Google Search Scraper](https://github.com/UoA-eResearch/timeout/actions/workflows/googlesearch.yml/badge.svg)](https://github.com/UoA-eResearch/timeout/actions/workflows/googlesearch.yml)
 [![Data Analysis](https://github.com/UoA-eResearch/timeout/actions/workflows/analyze_data.yml/badge.svg)](https://github.com/UoA-eResearch/timeout/actions/workflows/analyze_data.yml)
 
