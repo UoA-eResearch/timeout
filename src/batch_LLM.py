@@ -75,14 +75,22 @@ def prepare_video(video_path, ext):
     target_height = 1280
     if decoded_bytes > MAX_DECODED_BYTES:
         target_height = min(target_height, int(height * (MAX_DECODED_BYTES / decoded_bytes) ** 0.5) // 2 * 2)
-    with tempfile.NamedTemporaryFile(suffix=".mp4") as tmp:
-        (
-            ffmpeg.input(video_path)
-            .output(tmp.name, vcodec="libx264", preset="veryfast", crf=28, vf=f"scale=-2:'min({target_height},ih)'", acodec="aac")
-            .overwrite_output()
-            .run(quiet=True)
-        )
-        return tmp.read(), "mp4"
+    # if that's still over the size limit (a long video), shrink it to 2 fps (all the server samples), 480 high
+    # and mono audio
+    attempts = [dict(vf=f"scale=-2:'min({target_height},ih)'", crf=28),
+                dict(vf=f"fps=2,scale=-2:'min({min(target_height, 480)},ih)'", crf=32, ac=1, audio_bitrate="64k")]
+    for options in attempts:
+        with tempfile.NamedTemporaryFile(suffix=".mp4") as tmp:
+            (
+                ffmpeg.input(video_path)
+                .output(tmp.name, vcodec="libx264", preset="veryfast", acodec="aac", **options)
+                .overwrite_output()
+                .run(quiet=True)
+            )
+            video_bytes = tmp.read()
+        if len(video_bytes) <= MAX_VIDEO_MB * 1e6:
+            break
+    return video_bytes, "mp4"
 
 
 def get_prompt_supplements(data):

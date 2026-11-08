@@ -237,8 +237,9 @@ Measured on one NVIDIA A100 80GB PCIe with vLLM 0.33.0 (the [compose setup](http
 | Distress, all passes | 7,135 | 29.7 h start to finish | — | — | — | coded as videos downloaded, plus retries; GPU shared with the supplements validation runs |
 | Supplements validation sample, no thinking | 197–210 per run | 50–60 min | 0.056–0.070 videos/s | 14–18 s | 86–129 s / 77–102 s | four runs; GPU shared with a distress pass |
 | Supplements validation sample, `--think` | 207 | 3 h 44 min | 0.015 videos/s | 65 s | 472 s / 386 s | GPU shared with a distress pass |
+| Supplements, full re-code, no thinking | 12,046 | 32 h 26 min | 0.103 videos/s | 9.7 s | 70.0 s / 48.7 s | GPU otherwise idle apart from Open WebUI use; a retry pass then coded 147 of the 207 failures in 1 h 54 min |
 
-An average request carries about 16,000 prompt tokens (the video's frames and audio) and generates about 2,000 tokens (the JSON, including a full transcript), taking about 47 s, about three quarters of it generating. At the idle-GPU rate, the full supplements dataset (12,177 videos) takes about 24 hours without thinking; thinking mode is roughly 4–5× slower. The timeout dataset hasn't been benchmarked, as its videos aren't on this machine.
+An average request carries about 16,000 prompt tokens (the video's frames and audio) and generates about 2,000 tokens (the JSON, including a full transcript), taking about 47 s, about three quarters of it generating. Supplements videos take longer than distress ones (0.103 vs 0.139 videos/s) because their JSON answers are longer. Thinking mode is roughly 4–5× slower. The timeout dataset hasn't been benchmarked, as its videos aren't on this machine.
 
 ### 4. Joining Results (`src/join_results.py`)
 
@@ -420,7 +421,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-11-05 07:15:23 UTC*
+*Last updated: 2026-11-08 15:46:40 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -431,55 +432,56 @@ This section contains automated analysis of the LLM-processed video data. The an
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=3804 videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=4415 videos).
 
 #### Key Findings
 
 **Video Distribution by Platform:**
 | extractor   |   count |       like_count |   view_count |   comment_count |
 |:------------|--------:|-----------------:|-------------:|----------------:|
-| tiktok      |    1600 |      4.19835e+06 |  1.60706e+08 |          162048 |
-| youtube     |    1190 | 792359           |  2.84717e+07 |           28360 |
-| facebook    |     935 |      0           |  1.35088e+08 |               0 |
-| instagram   |      79 |  18285           | 82           |            1056 |
+| tiktok      |    1799 |      4.53009e+06 |  1.78607e+08 |          174640 |
+| youtube     |    1363 | 927042           |  3.38342e+07 |           34784 |
+| facebook    |    1166 |      0           |  1.58902e+08 |               0 |
+| instagram   |      87 |  19125           | 82           |            1099 |
 
 
-**Division 1 — Content Type (3804 posts total):**
+**Division 1 — Content Type (4415 posts total):**
 | Content type                      |   Post Count |
 |:----------------------------------|-------------:|
-| predominantly informative         |         2434 |
-| predominantly marketing           |          834 |
-| predominantly personal commentary |          536 |
+| predominantly informative         |         3045 |
+| predominantly marketing           |          704 |
+| predominantly personal commentary |          640 |
+| predominantly humorous            |            1 |
 
 
 **Top 10 Supplements Promoted:**
-| Supplement            |   Video Count |
-|:----------------------|--------------:|
-| Vitamin D             |           557 |
-| Magnesium             |           553 |
-| Omega-3 / marine oils |           371 |
-| B vitamins            |           359 |
-| Collagen              |           233 |
-| Microbiome products   |           160 |
-| Calcium               |           132 |
-| Creatine              |           129 |
-| Black cohosh          |           126 |
-| Ashwagandha           |           109 |
+| Supplement                  |   Video Count |
+|:----------------------------|--------------:|
+| Magnesium                   |           847 |
+| Vitamin D                   |           775 |
+| B vitamins                  |           649 |
+| Omega-3 / marine oils       |           544 |
+| Collagen                    |           330 |
+| Hormone replacement therapy |           301 |
+| Black cohosh                |           273 |
+| Microbiome products         |           267 |
+| Ashwagandha                 |           261 |
+| Calcium                     |           248 |
 
 
 **Top 10 Symptoms Targeted:**
 | Symptom      |   Mention Count |
 |:-------------|----------------:|
-| Mood Changes |            1528 |
-| Hot Flashes  |             975 |
-| Night Sweats |             557 |
-| Brain Fog    |             400 |
-| Insomnia     |             329 |
-| Fatigue      |             325 |
-| Weight Gain  |             255 |
-| Low Energy   |             202 |
-| Joint Pain   |             182 |
-| Inflammation |             164 |
+| Mood Changes |            1349 |
+| Hot Flashes  |             754 |
+| Night Sweats |             670 |
+| Brain Fog    |             424 |
+| Hot Flushes  |             359 |
+| Fatigue      |             284 |
+| Insomnia     |             217 |
+| Weight Gain  |             216 |
+| Joint Pain   |             176 |
+| Sleep Issues |             165 |
 
 #### Visualizations
 

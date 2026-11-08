@@ -6,6 +6,7 @@ For each dataset (timeout, supplements, distress), this script:
   1. Reads AI result JSON files from {dataset}_results/
   2. Joins them with the corresponding metadata from {dataset}_videos/*.info.json
   3. Saves the combined data to data/{dataset}_LLM_results.xlsx
+  (answers in data/{dataset}_validated_screen.csv, if present, replace the LLM's)
 """
 
 import argparse
@@ -76,6 +77,22 @@ def join_dataset(dataset: str) -> pd.DataFrame:
         rows.append(row)
 
     df = pd.DataFrame(rows)
+    # The LLM answers true/false questions with JSON booleans or with the strings "True"/"False"; make them all booleans
+    for col in df.columns:
+        values = df[col].dropna()
+        if len(values) and values.map(lambda v: str(v).strip().lower() in ("true", "false")).all():
+            df[col] = df[col].map(lambda v: str(v).strip().lower() == "true" if pd.notna(v) else v)
+    # Screening answers the research team validated (data/{dataset}_validated_screen.csv: id plus answer columns)
+    # take precedence over a later run's, which are kept as <column>_llm
+    screen_path = f"data/{dataset}_validated_screen.csv"
+    if os.path.isfile(screen_path):
+        screen = pd.read_csv(screen_path, dtype={"id": str}).set_index("id")
+        ids = df["id"].astype(str)
+        for col in screen.columns:
+            df[f"{col}_llm"] = df[col]
+            validated = ids.map(screen[col])
+            df[col] = validated.where(validated.notna(), df[col])
+            print(f"{col}: validated answers used for {int(validated.notna().sum())} of {len(df)} posts")
     if "upload_date" in df.columns:
         df = df.sort_values("upload_date")
     if "sentiment" in df.columns:
