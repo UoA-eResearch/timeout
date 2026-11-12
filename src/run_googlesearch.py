@@ -28,6 +28,8 @@ pd.set_option("display.max_colwidth", None)
 DATASETS = ["supplements", "timeout", "distress"]
 # Google country code (gl parameter) to localise a dataset's search results to
 REGIONS = {"distress": "nz"}
+# Date of this run, recorded as first_seen for newly found videos
+TODAY = datetime.now().strftime("%Y-%m-%d")
 
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
@@ -298,6 +300,12 @@ def search_and_scrape(driver, query, max_scrolls=10, region=None):
     return pd.DataFrame(parsed_results)
 
 
+def join_terms(values):
+    """Combine "; "-separated lists of search terms, without repeats"""
+    terms = sorted({t for v in values.dropna() for t in str(v).split("; ") if t})
+    return "; ".join(terms) if terms else None
+
+
 def scrape_dataset(driver, name, use_tor=False, retries=3, delay=30):
     """Run each of a dataset's search terms and merge the results into data/{name}.csv after each one.
     A term with no results is retried with a fresh browser after a growing wait (1, 2, 4... minutes), since that
@@ -347,10 +355,19 @@ def scrape_dataset(driver, name, use_tor=False, retries=3, delay=30):
 
         print(f"\nResults from {search_term}: {len(df)} rows")
         print(df.source.value_counts())
+        df["search_terms"] = search_term
         dfs.append(df)
 
         # Combine with old data, keeping the newly scraped row for links seen before, and save progress
-        df = drop_duplicate_videos(pd.concat(dfs if old_df is None else dfs + [old_df]))
+        combined = pd.concat(dfs if old_df is None else dfs + [old_df], ignore_index=True)
+        df = drop_duplicate_videos(combined)
+        # Record every search term that has found each video, and the date it was first seen (blank for videos
+        # found before this was recorded)
+        keys, df_keys = combined.link.map(video_key), df.link.map(video_key)
+        df["search_terms"] = df_keys.map(combined.groupby(keys)["search_terms"].agg(join_terms))
+        old_first_seen = {} if old_df is None else dict(zip(
+            old_df.link.map(video_key), old_df["first_seen"] if "first_seen" in old_df else [None] * len(old_df)))
+        df["first_seen"] = [old_first_seen[k] if k in old_first_seen else TODAY for k in df_keys]
         df = df[df.source.isin(["Instagram", "TikTok", "YouTube", "Facebook"])].sort_values(by="link")
         new = len(df) if old_df is None else (~df.link.map(video_key).isin(old_df.link.map(video_key))).sum()
         total = len(df)

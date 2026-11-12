@@ -484,6 +484,17 @@ SUPPORT_SOURCES = ["friends or peers", "whānau or family", "school or universit
 FRAMINGS = ["individual struggle", "normal part of life", "medical condition needing treatment",
             "caused by external pressures", "relational or whānau context", "holistic or cultural wellbeing",
             "stigma or shame", "recovery or hope"]
+# New Zealand Census ethnic groups (level 1), as in the prompt's speaker_ethnicity
+ETHNIC_GROUPS = ["european", "māori", "pacific peoples", "asian", "middle eastern / latin american / african", "unclear"]
+HUMOUR_FUNCTIONS = ["relatability or connection", "coping or lightening the mood", "deflecting or downplaying",
+                    "critiquing or satirising"]
+ETHNICITY_EVIDENCE = ["self-identified", "language or accent", "cultural or community references", "name or organisation",
+                      "appearance only", "no evidence"]
+
+
+def first_label(series, labels):
+    """Normalise a single-choice answer to the first known label it contains (the LLM sometimes adds an explanation)."""
+    return answer(series).map(lambda v: next((label for label in labels if label in v), v))
 
 
 def answer(series):
@@ -494,7 +505,9 @@ def answer(series):
 def count_labels(series, labels):
     """Number (and share) of videos whose answer includes each label."""
     text = answer(series)
-    display = [label.replace('gp ', 'GP ').replace('māori', 'Māori') for label in labels]
+    display = [label.replace('gp ', 'GP ').replace('māori', 'Māori').replace('pacific peoples', 'Pacific Peoples')
+               .replace('middle eastern / latin american / african', 'Middle Eastern / Latin American / African')
+               for label in labels]
     display = [label[0].upper() + label[1:] for label in display]
     counts = pd.DataFrame({'videos': [int(text.str.contains(label, regex=False).sum()) for label in labels]},
                           index=display)
@@ -593,6 +606,41 @@ def analyze_distress(df):
 
     framing = count_labels(df['framing'], FRAMINGS)
     analysis_results['summary'].append(f"\n**Framing of Distress:**\n{framing.to_markdown()}")
+
+    # Speakers' gender and ethnicity, and vernacular language (fields added to the prompt in November 2026, so only
+    # present once the videos have been coded with it)
+    if 'speaker_ethnicity' in df.columns:
+        print("\n3b. Speaker Demographics and Vernacular Language")
+        gender = answer(df['speaker_gender']).value_counts().rename('videos')
+        analysis_results['summary'].append(f"\n**Speaker Gender:**\n{gender.to_frame().to_markdown()}")
+        ethnicity = count_labels(df['speaker_ethnicity'], ETHNIC_GROUPS)
+        analysis_results['summary'].append(
+            f"\n**Speaker Ethnicity** (New Zealand Census groups; a speaker can have more than one):\n{ethnicity.to_markdown()}")
+        asian = answer(df['speaker_ethnicity']).str.contains('asian', regex=False)
+        asian_groups = answer(df.loc[asian, 'asian_ethnicity']).value_counts().rename('videos')
+        analysis_results['summary'].append(f"\n**Asian Ethnic Groups** (the {int(asian.sum())} videos with an Asian speaker):\n"
+                                           f"{asian_groups.to_frame().to_markdown()}")
+        evidence = first_label(df['ethnicity_evidence'], ETHNICITY_EVIDENCE).value_counts().rename('videos')
+        analysis_results['summary'].append(
+            f"\n**Basis of the Ethnicity Estimates** (estimates from appearance alone are the least reliable):\n"
+            f"{evidence.to_frame().to_markdown()}")
+        young = answer(df['young_person']) == 'yes'
+        focus = answer(df['asian_focus']) == 'true'
+        segments = pd.DataFrame({
+            'young people': [int((young & asian).sum()), int((young & ~asian).sum())],
+            'all speakers': [int(asian.sum()), int((~asian).sum())],
+        }, index=['Asian speaker', 'Other or unclear'])
+        analysis_results['summary'].append(
+            f"\n**Asian and Other Speakers** ({int(focus.sum())} videos are about or aimed at Asian communities):\n"
+            f"{segments.to_markdown()}")
+        metaphors, n_metaphors = count_terms(df['metaphors'], 'no metaphor', ';')
+        analysis_results['summary'].append(
+            f"\n**Top 10 Metaphors for Distress** (in {n_metaphors} videos):\n{metaphors.to_markdown(index=False)}")
+        indirect, n_indirect = count_terms(df['indirect_language'], 'no indirect', ';')
+        analysis_results['summary'].append(
+            f"\n**Top 10 Indirect or Vernacular Expressions** (in {n_indirect} videos):\n{indirect.to_markdown(index=False)}")
+        humour = count_labels(df['humour_function'], HUMOUR_FUNCTIONS)
+        analysis_results['summary'].append(f"\n**What Humour About Distress Is Doing:**\n{humour.to_markdown()}")
 
     # Help-seeking and public health messaging
     print("\n4. Help-seeking and Messaging")

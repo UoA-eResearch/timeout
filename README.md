@@ -82,15 +82,17 @@ python3 src/run_googlesearch.py --use-tor
 #### Output files:
 
 **Timeout dataset:**
-- `data/timeout.csv` - Full results with columns: link, duration, title, source, author
+- `data/timeout.csv` - Full results with columns: link, duration, title, source, author, search_terms, first_seen
 - `data/timeout_links.txt` - Just the links, one per line
 
 **Supplements dataset:**
-- `data/supplements.csv` - Full results with columns: link, duration, title, source, author
+- `data/supplements.csv` - Full results with columns: link, duration, title, source, author, search_terms, first_seen
 - `data/supplements_links.txt` - Just the links, one per line
 
 **Distress dataset:**
-- `data/distress.csv` - Full results with columns: link, duration, title, source, author
+- `data/distress.csv` - Full results with columns: link, duration, title, source, author, search_terms, first_seen
+
+`search_terms` lists every search term that has returned the video, and `first_seen` is the date the scraper first found it. Both were added in November 2026, so `first_seen` is blank for videos found before then, and `search_terms` only covers searches since then.
 - `data/distress_links.txt` - Just the links, one per line
 
 #### IP Blocking Protection:
@@ -213,9 +215,10 @@ python3 src/batch_LLM.py --dataset distress
 **For distress videos** (a first draft of the coding scheme, to be refined):
 - Video description, transcript and on-screen text
 - Screening: whether the video is about psychological distress, whether the speaker appears to be a young person, and evidence of a New Zealand connection
+- The main speaker's apparent gender and ethnicity (New Zealand Census groups, plus the Asian ethnic group), what the ethnicity estimate is based on (self-identification, language, cultural references, name or organisation, or appearance alone), and whether the video is about or aimed at Asian communities
 - Content type, speaker perspective and who is communicating (young person, health service, campaign, etc.)
 - Distress experiences and their categories, quoted distress terms, and vocabulary register (clinical, everyday, slang, metaphor, te reo Māori)
-- Algospeak and euphemisms (e.g. "unalive"), use of humour, and te reo Māori words
+- Algospeak and euphemisms (e.g. "unalive"), metaphors and indirect or vernacular expressions for distress (quoted verbatim), use of humour and what it is doing (relatability, coping, deflecting, critiquing), and te reo Māori words
 - Framing of distress, help-seeking, support sources, coping strategies and calls to action
 - Public health messages, intended audience, safe messaging adherence for suicide/self-harm content, and self-disclosed risk
 - Emotional tone and intensity, speaker's profession, usefulness, misleading content, and quality ratings
