@@ -362,30 +362,30 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 ## Dataset Statistics
 
 **Supplements dataset:**
-- Total videos: 32040
+- Total videos: 32625
 - Breakdown by source:
-- Instagram    9109
-- TikTok       8276
-- Facebook     7775
-- YouTube      6880
+- Instagram    9296
+- TikTok       8434
+- Facebook     7955
+- YouTube      6940
 
 **Timeout dataset:**
-- Total videos: 5092
+- Total videos: 5178
 - Breakdown by source:
-- Instagram    1852
-- TikTok       1579
-- Facebook     1308
-- YouTube       353
+- Instagram    1876
+- TikTok       1609
+- Facebook     1338
+- YouTube       355
 
 **Distress dataset:**
-- Total videos: 35366
+- Total videos: 37350
 - Breakdown by source:
-- Facebook     11313
-- Instagram    10322
-- TikTok        8236
-- YouTube       5495
+- Facebook     11941
+- Instagram    10884
+- TikTok        8807
+- YouTube       5718
 
-*Last updated: 2026-11-16 06:52:06 UTC*
+*Last updated: 2026-11-17 06:53:25 UTC*
 
 
 ## Repository Structure
