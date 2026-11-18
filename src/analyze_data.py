@@ -78,7 +78,7 @@ def load_and_filter_data():
     print(f"Loaded distress dataset: {len(distress_df)} rows")
     distress_df['extractor'] = distress_df['extractor'].str.lower()
     distress_df = distress_df[distress_df['extractor'].isin(allowed_platforms)].copy()
-    distress_filtered = distress_df[answer(distress_df['distress']) == 'true'].copy()
+    distress_filtered = distress_df[is_true(distress_df['distress'])].copy()
     print(f"Filtered distress (distress=True): {len(distress_filtered)} rows")
     distress_filtered = remove_duplicates(distress_filtered)
     print(f"After duplicate removal: {len(distress_filtered)} rows")
@@ -488,18 +488,29 @@ FRAMINGS = ["individual struggle", "normal part of life", "medical condition nee
 ETHNIC_GROUPS = ["european", "māori", "pacific peoples", "asian", "middle eastern / latin american / african", "unclear"]
 HUMOUR_FUNCTIONS = ["relatability or connection", "coping or lightening the mood", "deflecting or downplaying",
                     "critiquing or satirising"]
-ETHNICITY_EVIDENCE = ["self-identified", "language or accent", "cultural or community references", "name or organisation",
-                      "appearance only", "no evidence"]
+# (keyword, label) pairs for single-choice answers the LLM sometimes words differently or explains; checked in order
+ETHNICITY_EVIDENCE = [("self-identified", "self-identified"), ("language", "language or accent"),
+                      ("cultural", "cultural or community references"), ("name", "name or organisation"),
+                      ("organisation", "name or organisation"), ("appearance", "appearance only"),
+                      ("no evidence", "no evidence"), ("unclear", "no evidence")]
+GENDERS = [("woman", "woman"), ("non-binary", "non-binary or gender diverse"), ("gender diverse", "non-binary or gender diverse"),
+           ("man", "man"), ("unclear", "unclear")]
 
 
-def first_label(series, labels):
-    """Normalise a single-choice answer to the first known label it contains (the LLM sometimes adds an explanation)."""
-    return answer(series).map(lambda v: next((label for label in labels if label in v), v))
+def normalise(series, keywords):
+    """Map single-choice answers to the label of the first keyword they contain, or "other answer"."""
+    return answer(series).map(lambda v: next((label for key, label in keywords if key in v), 'other answer')
+                              if isinstance(v, str) else v)
 
 
 def answer(series):
     """Normalise a single-choice LLM answer for counting."""
     return series.astype(str).str.strip().str.lower()
+
+
+def is_true(series):
+    """True/false answers, which can be booleans, 1.0/0.0 (booleans read back from Excel with blanks) or "True"/"False"."""
+    return answer(series).isin(['true', '1', '1.0'])
 
 
 def count_labels(series, labels):
@@ -573,7 +584,7 @@ def analyze_distress(df):
     # Who is speaking, and to whom
     print("\n2. Speakers")
     young = answer(df['young_person']).value_counts()
-    nz = (answer(df['new_zealand']) == 'true').sum()
+    nz = is_true(df['new_zealand']).sum()
     analysis_results['summary'].append(
         f"\n**Speakers:** the main speaker appears to be a young person (about 12–24) in {young.get('yes', 0)} videos "
         f"({young.get('yes', 0) / len(df):.0%}), is unclear in {young.get('unclear', 0)}, and {nz} videos ({nz / len(df):.0%}) "
@@ -611,7 +622,7 @@ def analyze_distress(df):
     # present once the videos have been coded with it)
     if 'speaker_ethnicity' in df.columns:
         print("\n3b. Speaker Demographics and Vernacular Language")
-        gender = answer(df['speaker_gender']).value_counts().rename('videos')
+        gender = normalise(df['speaker_gender'], GENDERS).value_counts().rename('videos')
         analysis_results['summary'].append(f"\n**Speaker Gender:**\n{gender.to_frame().to_markdown()}")
         ethnicity = count_labels(df['speaker_ethnicity'], ETHNIC_GROUPS)
         analysis_results['summary'].append(
@@ -620,12 +631,12 @@ def analyze_distress(df):
         asian_groups = answer(df.loc[asian, 'asian_ethnicity']).value_counts().rename('videos')
         analysis_results['summary'].append(f"\n**Asian Ethnic Groups** (the {int(asian.sum())} videos with an Asian speaker):\n"
                                            f"{asian_groups.to_frame().to_markdown()}")
-        evidence = first_label(df['ethnicity_evidence'], ETHNICITY_EVIDENCE).value_counts().rename('videos')
+        evidence = normalise(df['ethnicity_evidence'], ETHNICITY_EVIDENCE).value_counts().rename('videos')
         analysis_results['summary'].append(
             f"\n**Basis of the Ethnicity Estimates** (estimates from appearance alone are the least reliable):\n"
             f"{evidence.to_frame().to_markdown()}")
         young = answer(df['young_person']) == 'yes'
-        focus = answer(df['asian_focus']) == 'true'
+        focus = is_true(df['asian_focus'])
         segments = pd.DataFrame({
             'young people': [int((young & asian).sum()), int((young & ~asian).sum())],
             'all speakers': [int(asian.sum()), int((~asian).sum())],

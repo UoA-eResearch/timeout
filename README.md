@@ -424,7 +424,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-11-12 01:45:09 UTC*
+*Last updated: 2026-11-18 06:02:56 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -548,143 +548,237 @@ The timeout dataset was filtered to include only videos where `timeout=True` fro
 
 ### Distress Dataset Analysis (Youth Psychological Distress, New Zealand)
 
-The distress dataset was filtered to include only videos where `distress=True` from YouTube, TikTok, Facebook, and Instagram, with cross-platform duplicates removed (n=3326 videos). Its coding scheme is a first draft (see `get_prompt_distress` in `src/batch_LLM.py`), so these figures are indicative until the coding is validated. Search results favour recent videos, so counts over time reflect when the data was collected more than how posting has changed.
+The distress dataset was filtered to include only videos where `distress=True` from YouTube, TikTok, Facebook, and Instagram, with cross-platform duplicates removed (n=8555 videos). Its coding scheme is a first draft (see `get_prompt_distress` in `src/batch_LLM.py`), so these figures are indicative until the coding is validated. Search results favour recent videos, so counts over time reflect when the data was collected more than how posting has changed.
 
 #### Key Findings
 
 **Video Distribution by Platform:**
 | extractor   |   count |   like_count |   view_count |   comment_count |
 |:------------|--------:|-------------:|-------------:|----------------:|
-| instagram   |    1345 |  1.35173e+07 |  0           |          217385 |
-| youtube     |     805 |  2.56932e+06 |  1.43054e+08 |           61625 |
-| facebook    |     713 |  0           |  2.78934e+07 |               0 |
-| tiktok      |     463 |  2.35481e+07 |  2.36698e+08 |          271492 |
+| instagram   |    3604 |  3.82889e+07 |  0           |          536876 |
+| tiktok      |    1848 |  6.68082e+07 |  5.97594e+08 |          689572 |
+| facebook    |    1570 |  0           |  6.11906e+07 |               0 |
+| youtube     |    1533 |  6.02366e+06 |  1.93312e+08 |          145863 |
 
 
-**Speakers:** the main speaker appears to be a young person (about 12–24) in 1146 videos (34%), is unclear in 78, and 1311 videos (39%) show a New Zealand connection.
+**Speakers:** the main speaker appears to be a young person (about 12–24) in 3438 videos (40%), is unclear in 223, and 4217 videos (49%) show a New Zealand connection.
 
 
 **Who Is Communicating:**
 | messaging_source                          |   videos |
 |:------------------------------------------|---------:|
-| young person sharing their own experience |     1237 |
-| health professional                       |      947 |
-| health service or charity                 |      392 |
-| community or iwi organisation             |      243 |
-| musician or entertainer                   |      164 |
-| peer supporter or advocate                |      151 |
-| government or public health campaign      |       59 |
-| other                                     |       43 |
+| young person sharing their own experience |     4152 |
+| health professional                       |     2006 |
+| health service or charity                 |      628 |
+| community or iwi organisation             |      576 |
+| peer supporter or advocate                |      412 |
+| musician or entertainer                   |      361 |
+| other                                     |      126 |
+| government or public health campaign      |      103 |
 
 
 **Distress Experiences Described:**
 |                         |   videos | share   |
 |:------------------------|---------:|:--------|
-| Stress or pressure      |     1345 | 40.4%   |
-| Low mood or depression  |     1312 | 39.4%   |
-| Anxiety or panic        |     1152 | 34.6%   |
-| Overwhelm               |     1096 | 33.0%   |
-| Loneliness or isolation |      754 | 22.7%   |
-| Suicidal thoughts       |      560 | 16.8%   |
-| Burnout or exhaustion   |      384 | 11.5%   |
-| Grief or loss           |      327 | 9.8%    |
-| Self-harm               |      235 | 7.1%    |
-| Trauma                  |      188 | 5.7%    |
-| Anger or irritability   |       99 | 3.0%    |
+| Stress or pressure      |     3711 | 43.4%   |
+| Low mood or depression  |     3306 | 38.6%   |
+| Overwhelm               |     3155 | 36.9%   |
+| Anxiety or panic        |     2799 | 32.7%   |
+| Loneliness or isolation |     1986 | 23.2%   |
+| Suicidal thoughts       |     1081 | 12.6%   |
+| Burnout or exhaustion   |      997 | 11.7%   |
+| Grief or loss           |      865 | 10.1%   |
+| Trauma                  |      839 | 9.8%    |
+| Self-harm               |      559 | 6.5%    |
+| Anger or irritability   |      303 | 3.5%    |
 
 
 **Vocabulary Used for Distress:**
 |                                         |   videos | share   |
 |:----------------------------------------|---------:|:--------|
-| Everyday emotional language             |     3111 | 93.5%   |
-| Clinical or diagnostic terms            |      900 | 27.1%   |
-| Metaphor or imagery                     |      260 | 7.8%    |
-| Te reo Māori or other cultural concepts |      143 | 4.3%    |
-| Slang or internet language              |       68 | 2.0%    |
-| Euphemism or algospeak                  |       48 | 1.4%    |
+| Everyday emotional language             |     8112 | 94.8%   |
+| Clinical or diagnostic terms            |     2206 | 25.8%   |
+| Metaphor or imagery                     |      650 | 7.6%    |
+| Slang or internet language              |      276 | 3.2%    |
+| Te reo Māori or other cultural concepts |      233 | 2.7%    |
+| Euphemism or algospeak                  |       85 | 1.0%    |
 
 
-**Top 10 Algospeak and Euphemisms** (in 221 videos; as quoted by the LLM, which sometimes includes plain words or helpline numbers):
-| term             |   videos |
-|:-----------------|---------:|
-| unalive          |       49 |
-| unaliving        |       22 |
-| sewerslide       |       10 |
-| 988              |        7 |
-| fucking          |        4 |
-| unalived         |        4 |
-| suicide          |        4 |
-| 1737             |        4 |
-| shout            |        3 |
-| mental breakdown |        3 |
+**Top 10 Algospeak and Euphemisms** (in 531 videos; as quoted by the LLM, which sometimes includes plain words or helpline numbers):
+| term       |   videos |
+|:-----------|---------:|
+| unalive    |      137 |
+| unaliving  |       45 |
+| unalived   |       22 |
+| sewerslide |       21 |
+| sh         |       16 |
+| fucking    |       10 |
+| shit       |        8 |
+| 988        |        8 |
+| crash out  |        7 |
+| k*ll       |        6 |
 
 
-**Top 10 Te Reo Māori Words** (in 385 videos):
+**Top 10 Te Reo Māori Words** (in 754 videos):
 | term           |   videos |
 |:---------------|---------:|
-| whānau         |      121 |
-| kia ora        |       37 |
-| kōrero         |       32 |
-| hauora         |       30 |
-| aotearoa       |       23 |
-| rangatahi      |       22 |
-| tamariki       |       20 |
-| wairua         |       18 |
-| taha hinengaro |       17 |
-| kaupapa        |       17 |
+| whānau         |      233 |
+| hauora         |      120 |
+| taha hinengaro |      115 |
+| kia ora        |       66 |
+| kōrero         |       41 |
+| rangatahi      |       33 |
+| kia kaha       |       28 |
+| kaupapa        |       26 |
+| tamariki       |       24 |
+| te reo māori   |       23 |
 
 
 **Framing of Distress:**
 |                                     |   videos | share   |
 |:------------------------------------|---------:|:--------|
-| Individual struggle                 |     2717 | 81.7%   |
-| Normal part of life                 |     1518 | 45.6%   |
-| Holistic or cultural wellbeing      |     1112 | 33.4%   |
-| Medical condition needing treatment |      703 | 21.1%   |
-| Relational or whānau context        |      527 | 15.8%   |
-| Recovery or hope                    |      338 | 10.2%   |
-| Caused by external pressures        |      205 | 6.2%    |
-| Stigma or shame                     |      116 | 3.5%    |
+| Individual struggle                 |     7502 | 87.7%   |
+| Normal part of life                 |     3805 | 44.5%   |
+| Holistic or cultural wellbeing      |     2360 | 27.6%   |
+| Medical condition needing treatment |     1587 | 18.6%   |
+| Relational or whānau context        |     1428 | 16.7%   |
+| Recovery or hope                    |      756 | 8.8%    |
+| Caused by external pressures        |      508 | 5.9%    |
+| Stigma or shame                     |      221 | 2.6%    |
+
+
+**Speaker Gender:**
+| speaker_gender               |   videos |
+|:-----------------------------|---------:|
+| woman                        |     4385 |
+| man                          |     3338 |
+| unclear                      |      796 |
+| non-binary or gender diverse |       35 |
+
+
+**Speaker Ethnicity** (New Zealand Census groups; a speaker can have more than one):
+|                                           |   videos | share   |
+|:------------------------------------------|---------:|:--------|
+| Unclear                                   |     5533 | 64.7%   |
+| European                                  |     3100 | 36.2%   |
+| Asian                                     |     1361 | 15.9%   |
+| Māori                                     |      763 | 8.9%    |
+| Pacific Peoples                           |      381 | 4.5%    |
+| Middle Eastern / Latin American / African |      264 | 3.1%    |
+
+
+**Asian Ethnic Groups** (the 1361 videos with an Asian speaker):
+| asian_ethnicity       |   videos |
+|:----------------------|---------:|
+| indian                |      398 |
+| other asian           |      366 |
+| other south asian     |      196 |
+| other southeast asian |      146 |
+| chinese               |      143 |
+| asian                 |       41 |
+| filipino              |       28 |
+| korean                |       20 |
+| unclear               |       11 |
+| japanese              |       10 |
+| not applicable        |        1 |
+| other                 |        1 |
+
+
+**Basis of the Ethnicity Estimates** (estimates from appearance alone are the least reliable):
+| ethnicity_evidence               |   videos |
+|:---------------------------------|---------:|
+| appearance only                  |     4882 |
+| no evidence                      |     3029 |
+| self-identified                  |      551 |
+| language or accent               |       55 |
+| name or organisation             |       33 |
+| cultural or community references |        3 |
+
+
+**Asian and Other Speakers** (334 videos are about or aimed at Asian communities):
+|                  |   young people |   all speakers |
+|:-----------------|---------------:|---------------:|
+| Asian speaker    |            609 |           1361 |
+| Other or unclear |           2829 |           7194 |
+
+
+**Top 10 Metaphors for Distress** (in 3027 videos):
+| term                                   |   videos |
+|:---------------------------------------|---------:|
+| drowning                               |       36 |
+| in a dark place                        |       28 |
+| my whole life came crashing            |       15 |
+| like my house was always made of glass |        9 |
+| light at the end of the tunnel         |        9 |
+| taniwha                                |        9 |
+| rock bottom                            |        7 |
+| i'm hanging on the rails               |        7 |
+| spiral                                 |        7 |
+| hanging on the rails                   |        6 |
+
+
+**Top 10 Indirect or Vernacular Expressions** (in 1598 videos):
+| term                  |   videos |
+|:----------------------|---------:|
+| no distress discussed |       16 |
+| i'm not okay          |       14 |
+| unalive               |       14 |
+| not okay              |       12 |
+| crash out             |       11 |
+| crashing out          |        9 |
+| i'm fine              |        8 |
+| unaliving             |        6 |
+| overthinking          |        5 |
+| kill me               |        4 |
+
+
+**What Humour About Distress Is Doing:**
+|                               |   videos | share   |
+|:------------------------------|---------:|:--------|
+| Relatability or connection    |      590 | 6.9%    |
+| Coping or lightening the mood |      404 | 4.7%    |
+| Deflecting or downplaying     |        7 | 0.1%    |
+| Critiquing or satirising      |        5 | 0.1%    |
 
 
 **Help-seeking:**
 | help_seeking                             |   videos |
 |:-----------------------------------------|---------:|
-| encourages help-seeking                  |     2426 |
-| not mentioned                            |      780 |
-| describes the speaker's own help-seeking |       81 |
-| sceptical of or discourages help-seeking |       39 |
+| encourages help-seeking                  |     5222 |
+| not mentioned                            |     3012 |
+| describes the speaker's own help-seeking |      204 |
+| sceptical of or discourages help-seeking |      117 |
 
 
 **Sources of Support Mentioned:**
 |                               |   videos | share   |
 |:------------------------------|---------:|:--------|
-| Friends or peers              |     1415 | 42.5%   |
-| Whānau or family              |      968 | 29.1%   |
-| Helpline or text service      |      954 | 28.7%   |
-| Counsellor or therapist       |      857 | 25.8%   |
-| GP or doctor                  |      519 | 15.6%   |
-| School or university          |      230 | 6.9%    |
-| Cultural or spiritual support |      207 | 6.2%    |
-| Online community              |      183 | 5.5%    |
-| Medication                    |      106 | 3.2%    |
+| Friends or peers              |     3415 | 39.9%   |
+| Helpline or text service      |     2430 | 28.4%   |
+| Whānau or family              |     2382 | 27.8%   |
+| Counsellor or therapist       |     2071 | 24.2%   |
+| GP or doctor                  |     1251 | 14.6%   |
+| Online community              |      605 | 7.1%    |
+| Cultural or spiritual support |      581 | 6.8%    |
+| School or university          |      567 | 6.6%    |
+| Medication                    |      350 | 4.1%    |
 
 
-**Safe Messaging** (the 600 videos discussing suicide or self-harm):
+**Safe Messaging** (the 1194 videos discussing suicide or self-harm):
 | safe_messaging               |   videos |
 |:-----------------------------|---------:|
-| follows guidelines           |      516 |
-| partially follows guidelines |       58 |
-| does not follow guidelines   |       21 |
-| not applicable               |        5 |
+| follows guidelines           |      980 |
+| partially follows guidelines |      132 |
+| does not follow guidelines   |       59 |
+| not applicable               |       23 |
 
 
 **Self-disclosed Risk:**
 | risk_disclosure                        |   videos |
 |:---------------------------------------|---------:|
-| no disclosure                          |     3019 |
-| past suicidal thoughts or self-harm    |      158 |
-| current suicidal thoughts or self-harm |      149 |
+| no disclosure                          |     7790 |
+| current suicidal thoughts or self-harm |      452 |
+| past suicidal thoughts or self-harm    |      313 |
 
 #### Visualizations
 
