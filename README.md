@@ -370,22 +370,22 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 - YouTube       7400
 
 **Timeout dataset:**
-- Total videos: 5516
+- Total videos: 5600
 - Breakdown by source:
-- Instagram    1957
-- TikTok       1716
-- Facebook     1477
-- YouTube       366
+- Instagram    1977
+- TikTok       1746
+- Facebook     1509
+- YouTube       368
 
 **Distress dataset:**
-- Total videos: 43230
+- Total videos: 43475
 - Breakdown by source:
-- Facebook     13956
-- Instagram    12522
-- TikTok       10481
-- YouTube       6271
+- Facebook     14048
+- Instagram    12579
+- TikTok       10573
+- YouTube       6275
 
-*Last updated: 2026-11-23 03:29:40 UTC*
+*Last updated: 2026-11-24 02:50:13 UTC*
 
 
 ## Repository Structure
