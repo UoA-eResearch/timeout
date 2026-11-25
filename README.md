@@ -241,8 +241,9 @@ Measured on one NVIDIA A100 80GB PCIe with vLLM 0.33.0 (the [compose setup](http
 | Supplements validation sample, no thinking | 197–210 per run | 50–60 min | 0.056–0.070 videos/s | 14–18 s | 86–129 s / 77–102 s | four runs; GPU shared with a distress pass |
 | Supplements validation sample, `--think` | 207 | 3 h 44 min | 0.015 videos/s | 65 s | 472 s / 386 s | GPU shared with a distress pass |
 | Supplements, full re-code, no thinking | 12,046 | 32 h 26 min | 0.103 videos/s | 9.7 s | 70.0 s / 48.7 s | GPU otherwise idle apart from Open WebUI use; a retry pass then coded 147 of the 207 failures in 1 h 54 min |
+| Timeout, full run, no thinking | 5,319 | 7 h 16 min | 0.203 videos/s | 4.9 s | 35.2 s / 21.9 s | GPU otherwise idle apart from Open WebUI use |
 
-An average request carries about 16,000 prompt tokens (the video's frames and audio) and generates about 2,000 tokens (the JSON, including a full transcript), taking about 47 s, about three quarters of it generating. Supplements videos take longer than distress ones (0.103 vs 0.139 videos/s) because their JSON answers are longer. Thinking mode is roughly 4–5× slower. The timeout dataset hasn't been benchmarked, as its videos aren't on this machine.
+An average request carries about 16,000 prompt tokens (the video's frames and audio) and generates about 2,000 tokens (the JSON, including a full transcript), taking about 47 s, about three quarters of it generating. Timeout videos are the quickest (0.203 videos/s) and supplements the slowest (0.103 videos/s, vs 0.139 for distress), mostly because of how long each prompt's JSON answer is. Thinking mode is roughly 4–5× slower.
 
 ### 4. Joining Results (`src/join_results.py`)
 
@@ -424,7 +425,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-11-18 06:04:28 UTC*
+*Last updated: 2026-11-25 06:25:27 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -515,25 +516,25 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 
 ### Timeout Dataset Analysis
 
-The timeout dataset was filtered to include only videos where `timeout=True` from YouTube, TikTok, Facebook, and Instagram (n=194 videos).
+The timeout dataset was filtered to include only videos where `timeout=True` from YouTube, TikTok, Facebook, and Instagram (n=1684 videos).
 
 #### Key Findings
 
 **Video Distribution by Platform:**
-| extractor   |   count |       like_count |       view_count |   comment_count |
-|:------------|--------:|-----------------:|-----------------:|----------------:|
-| tiktok      |     111 |      6.93815e+06 |      6.96975e+07 |           75515 |
-| youtube     |      43 | 933798           |      2.23285e+07 |            7239 |
-| instagram   |      36 |      2.30622e+06 |      0           |           34919 |
-| facebook    |       4 |      0           | 281104           |               0 |
+| extractor   |   count |   like_count |   view_count |   comment_count |
+|:------------|--------:|-------------:|-------------:|----------------:|
+| tiktok      |     561 |  8.22088e+07 |  7.13603e+08 |          515834 |
+| instagram   |     504 |  1.06215e+07 |  0           |          183667 |
+| facebook    |     394 |  0           |  9.57961e+07 |               0 |
+| youtube     |     225 |  4.57964e+06 |  1.96121e+08 |           57062 |
 
 
 **Sentiment Distribution:**
 | sentiment   |   count |
 |:------------|--------:|
-| negative    |     119 |
-| neutral     |      51 |
-| positive    |      24 |
+| negative    |    1107 |
+| positive    |     485 |
+| neutral     |      92 |
 
 #### Visualizations
 

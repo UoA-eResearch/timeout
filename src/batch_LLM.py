@@ -187,7 +187,7 @@ def get_prompt_supplements(data):
 
 
 def get_prompt_timeout(data):
-    return f"""This is a video downloaded from {data['extractor']}. Here's the description of the video: {data['description']}.
+    return f"""This is a video downloaded from {data['extractor']}. Here's the description of the video: {data.get('description', 'No description available')}.
 
         The creator of the video is {data.get('channel', 'an unknown channel')} ({data.get('uploader', 'an unknown uploader')})
         It has {data.get('like_count', 'an unknown number of')} likes, {data.get('view_count', 'an unknown number of')} views, and {data.get('comment_count', 'an unknown number of')} comments.
