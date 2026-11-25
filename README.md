@@ -425,7 +425,7 @@ Writes a self-contained page to `docs/index.html`, served with GitHub Pages at h
 
 ## Data Analysis
 
-*Last updated: 2026-11-25 06:27:28 UTC*
+*Last updated: 2026-11-25 09:01:52 UTC*
 
 This section contains automated analysis of the LLM-processed video data. The analysis is automatically updated when the Excel files are modified.
 
@@ -436,7 +436,7 @@ This section contains automated analysis of the LLM-processed video data. The an
 
 ### Supplements Dataset Analysis (Menopause-Related Content)
 
-The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=4415 videos).
+The supplements dataset was filtered to include only videos where `menopause=True` from YouTube, TikTok, Facebook, and Instagram (n=4398 videos).
 
 #### Key Findings
 
@@ -445,46 +445,46 @@ The supplements dataset was filtered to include only videos where `menopause=Tru
 |:------------|--------:|-----------------:|-------------:|----------------:|
 | tiktok      |    1799 |      4.53009e+06 |  1.78607e+08 |          174640 |
 | youtube     |    1363 | 927042           |  3.38342e+07 |           34784 |
-| facebook    |    1166 |      0           |  1.58902e+08 |               0 |
+| facebook    |    1149 |      0           |  1.58244e+08 |               0 |
 | instagram   |      87 |  19125           | 82           |            1099 |
 
 
-**Division 1 — Content Type (4415 posts total):**
+**Division 1 — Content Type (4398 posts total):**
 | Content type                      |   Post Count |
 |:----------------------------------|-------------:|
-| predominantly informative         |         3045 |
+| predominantly informative         |         3030 |
 | predominantly marketing           |          704 |
-| predominantly personal commentary |          640 |
+| predominantly personal commentary |          639 |
 | predominantly humorous            |            1 |
 
 
 **Top 10 Supplements Promoted:**
 | Supplement                  |   Video Count |
 |:----------------------------|--------------:|
-| Magnesium                   |           847 |
-| Vitamin D                   |           775 |
+| Magnesium                   |           841 |
+| Vitamin D                   |           771 |
 | B vitamins                  |           649 |
-| Omega-3 / marine oils       |           544 |
-| Collagen                    |           330 |
-| Hormone replacement therapy |           301 |
+| Omega-3 / marine oils       |           541 |
+| Collagen                    |           326 |
+| Hormone replacement therapy |           300 |
 | Black cohosh                |           273 |
 | Microbiome products         |           267 |
 | Ashwagandha                 |           261 |
-| Calcium                     |           248 |
+| Calcium                     |           247 |
 
 
 **Top 10 Symptoms Targeted:**
 | Symptom      |   Mention Count |
 |:-------------|----------------:|
-| Mood Changes |            1349 |
-| Hot Flashes  |             754 |
-| Night Sweats |             670 |
+| Mood Changes |            1345 |
+| Hot Flashes  |             753 |
+| Night Sweats |             669 |
 | Brain Fog    |             424 |
-| Hot Flushes  |             359 |
-| Fatigue      |             284 |
-| Insomnia     |             217 |
+| Hot Flushes  |             358 |
+| Fatigue      |             281 |
 | Weight Gain  |             216 |
-| Joint Pain   |             176 |
+| Insomnia     |             215 |
+| Joint Pain   |             172 |
 | Sleep Issues |             165 |
 
 #### Visualizations

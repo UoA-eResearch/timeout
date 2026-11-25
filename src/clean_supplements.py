@@ -160,9 +160,17 @@ def remove_duplicates(df):
     the same duration rounded to the nearest second. Posts without a duration
     are never merged: many Instagram posts have no duration and a title like
     "Video by <account>", which would merge every video from that account.
+    The same video downloaded twice (same platform and video id, e.g. under a
+    Facebook title that includes its changing view count) is also removed.
     The copy with the highest view count is kept.
     """
     df = df.copy()
+    if 'extractor' in df.columns and 'id' in df.columns:
+        by_views = df.sort_values(['view_count', 'id'], ascending=[False, True], kind='mergesort')
+        same_video = by_views[by_views['id'].notna() & by_views.duplicated(['extractor', 'id'], keep='first')].index
+        if len(same_video):
+            print(f"Removing {len(same_video)} duplicate posts (same video downloaded twice)")
+        df = df.drop(index=same_video)
     title_norm = df['title'].fillna('').str.lower().str.strip()
     duration = df['duration'].round() if 'duration' in df.columns else 0
     df['_dedup_key'] = title_norm + '|' + duration.astype(str)
@@ -346,6 +354,14 @@ def main():
             writer, sheet_name="posts_by_category", index=False)
         targets.sort_values(["target_group", "id"]).to_excel(
             writer, sheet_name="posts_by_target", index=False)
+        # supplements grouped by canonical name (spelling, formulation and synonym variants combined):
+        # posts mentioning each, total mentions, how many raw variants it combines and its usual status category
+        canonical = (coded.groupby("canonical")
+                     .agg(posts=("id", "nunique"), mentions=("raw_term", "size"),
+                          raw_variants=("raw_term", lambda terms: terms.str.lower().nunique()),
+                          status_category=("status_category", lambda cats: cats.mode().iat[0]))
+                     .sort_values(["posts", "mentions"], ascending=False))
+        canonical.to_excel(writer, sheet_name="canonical_counts")
         # full mapping for review
         mapping = (coded.groupby(["raw_term", "canonical", "status_category"])
                    .size().reset_index(name="count")

@@ -82,170 +82,174 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <div class="wrap">
 <header>
 <h1>Menopause Supplement Pipeline</h1>
-<p class="meta">How <strong>36,607</strong> Google search results become <strong>3,896</strong> unique menopause-targeted posts that mention supplements, divided by content type (Division&nbsp;1), primary supplement category (Division&nbsp;2) and target group (Division&nbsp;3). Counts as of 25 November 2026.</p>
+<p class="meta">How <strong>18,137</strong> Google search results become <strong>3,881</strong> unique menopause-targeted posts that mention supplements, classified by content type, supplement category and symptom target. Search links are those collected by 28 Jul 2026, the last update before the videos were downloaded; counts as of 25 November 2026.</p>
 </header>
 
 <div class="figure">
-<svg viewBox="0 0 1450 780" role="img" font-family="'IBM Plex Sans', system-ui, sans-serif">
-<title>Sankey diagram: 36,607 Google search links filtered to 3,896 menopause posts mentioning supplements, divided by content type and primary supplement category</title>
-<text x="164" y="28" text-anchor="end" class="stage">GOOGLE SEARCH</text>
-<text x="164" y="46" text-anchor="end" class="stagecount">36,607 links</text>
+<svg viewBox="0 0 1530 780" role="img" font-family="'IBM Plex Sans', system-ui, sans-serif">
+<title>Sankey diagram: 18,137 Google search links filtered to 3,881 menopause posts mentioning supplements, divided by content type and primary supplement category</title>
+<text x="164" y="13" text-anchor="end" class="stage">GOOGLE SEARCH</text>
+<text x="164" y="28" text-anchor="end" class="stage">TO 28 JUL 2026</text>
+<text x="164" y="46" text-anchor="end" class="stagecount">18,137 links</text>
 <text x="327.0" y="28" text-anchor="middle" class="stage">DOWNLOAD + LLM</text>
 <text x="327.0" y="46" text-anchor="middle" class="stagecount">12,193 kept</text>
 <text x="502.0" y="28" text-anchor="middle" class="stage">MENOPAUSE SCREEN</text>
 <text x="502.0" y="46" text-anchor="middle" class="stagecount">4,537 kept</text>
 <text x="672.0" y="28" text-anchor="middle" class="stage">DEDUPLICATION</text>
-<text x="672.0" y="46" text-anchor="middle" class="stagecount">4,415 kept</text>
-<text x="842.0" y="28" text-anchor="middle" class="stage">DIVISION 1</text>
-<text x="842.0" y="46" text-anchor="middle" class="stagecount">content type</text>
+<text x="672.0" y="46" text-anchor="middle" class="stagecount">4,398 kept</text>
+<text x="842.0" y="13" text-anchor="middle" class="stage">CONTENT TYPE</text>
+<text x="842.0" y="28" text-anchor="middle" class="stage">CLASSIFICATION</text>
+<text x="842.0" y="46" text-anchor="middle" class="stagecount">4,398 posts</text>
 <text x="1017.0" y="28" text-anchor="middle" class="stage">SUPPLEMENT SCREEN</text>
-<text x="1017.0" y="46" text-anchor="middle" class="stagecount">3,896 kept</text>
-<text x="1180" y="28" text-anchor="start" class="stage">DIVISION 2</text>
-<text x="1180" y="46" text-anchor="start" class="stagecount">primary category</text>
-<path d="M164.0,70.0 C242.0,70.0 242.0,70.0 320.0,70.0 L320.0,72.6 C242.0,72.6 242.0,72.6 164.0,72.6 Z" class="flow f-ig" data-tip="Instagram → Downloaded & LLM-processed: 151 posts (1.5%)"/>
-<path d="M164.0,72.6 C242.0,72.6 242.0,319.8 320.0,319.8 L320.0,496.1 C242.0,496.1 242.0,248.9 164.0,248.9 Z" class="flow f-sink" data-tip="Instagram → Not retrievable / not processed: 10,242 posts (98.5%)"/>
-<path d="M164.0,258.9 C242.0,258.9 242.0,72.6 320.0,72.6 L320.0,155.6 C242.0,155.6 242.0,341.8 164.0,341.8 Z" class="flow f-tt" data-tip="TikTok → Downloaded & LLM-processed: 4,822 posts (51.0%)"/>
-<path d="M164.0,341.8 C242.0,341.8 242.0,496.1 320.0,496.1 L320.0,576.0 C242.0,576.0 242.0,421.7 164.0,421.7 Z" class="flow f-sink" data-tip="TikTok → Not retrievable / not processed: 4,641 posts (49.0%)"/>
-<path d="M164.0,431.7 C242.0,431.7 242.0,155.6 320.0,155.6 L320.0,213.9 C242.0,213.9 242.0,490.1 164.0,490.1 Z" class="flow f-fb" data-tip="Facebook → Downloaded & LLM-processed: 3,391 posts (37.0%)"/>
-<path d="M164.0,490.1 C242.0,490.1 242.0,576.0 320.0,576.0 L320.0,675.4 C242.0,675.4 242.0,589.5 164.0,589.5 Z" class="flow f-sink" data-tip="Facebook → Not retrievable / not processed: 5,776 posts (63.0%)"/>
-<path d="M164.0,599.5 C242.0,599.5 242.0,213.9 320.0,213.9 L320.0,279.8 C242.0,279.8 242.0,665.4 164.0,665.4 Z" class="flow f-yt" data-tip="YouTube → Downloaded & LLM-processed: 3,829 posts (50.5%)"/>
-<path d="M164.0,665.4 C242.0,665.4 242.0,675.4 320.0,675.4 L320.0,740.0 C242.0,740.0 242.0,730.0 164.0,730.0 Z" class="flow f-sink" data-tip="YouTube → Not retrievable / not processed: 3,755 posts (49.5%)"/>
-<path d="M334.0,70.0 C414.5,70.0 414.5,70.0 495.0,70.0 L495.0,148.1 C414.5,148.1 414.5,148.1 334.0,148.1 Z" class="flow f-kept" data-tip="Downloaded & LLM-processed → Menopause-targeted: 4,537 posts (37.2%)"/>
-<path d="M334.0,148.1 C414.5,148.1 414.5,188.1 495.0,188.1 L495.0,319.8 C414.5,319.8 414.5,279.8 334.0,279.8 Z" class="flow f-sink" data-tip="Downloaded & LLM-processed → Not menopause-targeted: 7,656 posts (62.8%)"/>
-<path d="M509.0,70.0 C587.0,70.0 587.0,70.0 665.0,70.0 L665.0,146.0 C587.0,146.0 587.0,146.0 509.0,146.0 Z" class="flow f-kept" data-tip="Menopause-targeted → Unique posts: 4,415 posts (97.3%)"/>
-<path d="M509.0,146.0 C587.0,146.0 587.0,186.0 665.0,186.0 L665.0,190.0 C587.0,190.0 587.0,148.1 509.0,148.1 Z" class="flow f-sink" data-tip="Menopause-targeted → Cross-platform duplicates: 122 posts (2.7%)"/>
-<path d="M679.0,70.0 C757.0,70.0 757.0,70.0 835.0,70.0 L835.0,122.4 C757.0,122.4 757.0,122.4 679.0,122.4 Z" class="flow f-kept" data-tip="Unique posts → Informative: 3,045 posts (69.0%)"/>
-<path d="M679.0,122.4 C757.0,122.4 757.0,132.4 835.0,132.4 L835.0,144.5 C757.0,144.5 757.0,134.5 679.0,134.5 Z" class="flow f-kept" data-tip="Unique posts → Marketing: 704 posts (15.9%)"/>
-<path d="M679.0,134.5 C757.0,134.5 757.0,154.5 835.0,154.5 L835.0,165.5 C757.0,165.5 757.0,145.5 679.0,145.5 Z" class="flow f-kept" data-tip="Unique posts → Other material: 640 posts (14.5%)"/>
-<path d="M679.0,145.5 C757.0,145.5 757.0,175.5 835.0,175.5 L835.0,179.5 C757.0,179.5 757.0,146.0 679.0,146.0 Z" class="flow f-kept" data-tip="Unique posts → Unclassified: 26 posts (0.6%)"/>
-<path d="M849.0,70.0 C929.5,70.0 929.5,70.0 1010.0,70.0 L1010.0,115.8 C929.5,115.8 929.5,115.8 849.0,115.8 Z" class="flow f-kept" data-tip="Informative → Mentions supplements: 2,661 posts (87.4%)"/>
-<path d="M849.0,115.8 C929.5,115.8 929.5,177.0 1010.0,177.0 L1010.0,183.7 C929.5,183.7 929.5,122.4 849.0,122.4 Z" class="flow f-sink2" data-tip="Informative → No supplements mentioned: 384 posts (12.6%)"/>
-<path d="M849.0,132.4 C929.5,132.4 929.5,115.8 1010.0,115.8 L1010.0,127.4 C929.5,127.4 929.5,144.0 849.0,144.0 Z" class="flow f-kept" data-tip="Marketing → Mentions supplements: 672 posts (95.5%)"/>
-<path d="M849.0,144.0 C929.5,144.0 929.5,183.7 1010.0,183.7 L1010.0,184.2 C929.5,184.2 929.5,144.5 849.0,144.5 Z" class="flow f-sink2" data-tip="Marketing → No supplements mentioned: 32 posts (4.5%)"/>
-<path d="M849.0,154.5 C929.5,154.5 929.5,127.4 1010.0,127.4 L1010.0,136.6 C929.5,136.6 929.5,163.8 849.0,163.8 Z" class="flow f-kept" data-tip="Other material → Mentions supplements: 537 posts (83.9%)"/>
-<path d="M849.0,163.8 C929.5,163.8 929.5,184.2 1010.0,184.2 L1010.0,186.0 C929.5,186.0 929.5,165.5 849.0,165.5 Z" class="flow f-sink2" data-tip="Other material → No supplements mentioned: 103 posts (16.1%)"/>
-<path d="M849.0,175.5 C929.5,175.5 929.5,136.6 1010.0,136.6 L1010.0,137.0 C929.5,137.0 929.5,179.5 849.0,179.5 Z" class="flow f-kept" data-tip="Unclassified → Mentions supplements: 26 posts (100.0%)"/>
-<path d="M1024.0,70.0 C1102.0,70.0 1102.0,70.0 1180.0,70.0 L1180.0,87.8 C1102.0,87.8 1102.0,87.8 1024.0,87.8 Z" class="flow f-kept" data-tip="Mentions supplements → Branded menopause formulations: 1,034 posts (26.5%)"/>
-<path d="M1024.0,87.8 C1102.0,87.8 1102.0,96.8 1180.0,96.8 L1180.0,113.7 C1102.0,113.7 1102.0,104.7 1024.0,104.7 Z" class="flow f-kept" data-tip="Mentions supplements → Vitamins & minerals: 983 posts (25.2%)"/>
-<path d="M1024.0,104.7 C1102.0,104.7 1102.0,122.7 1180.0,122.7 L1180.0,132.5 C1102.0,132.5 1102.0,114.5 1024.0,114.5 Z" class="flow f-kept" data-tip="Mentions supplements → Hormone therapies: 571 posts (14.7%)"/>
-<path d="M1024.0,114.5 C1102.0,114.5 1102.0,141.5 1180.0,141.5 L1180.0,148.4 C1102.0,148.4 1102.0,121.4 1024.0,121.4 Z" class="flow f-kept" data-tip="Mentions supplements → Vague or non-classifiable: 396 posts (10.2%)"/>
-<path d="M1024.0,121.4 C1102.0,121.4 1102.0,157.4 1180.0,157.4 L1180.0,163.3 C1102.0,163.3 1102.0,127.3 1024.0,127.3 Z" class="flow f-kept" data-tip="Mentions supplements → Herbals & botanicals: 344 posts (8.8%)"/>
-<path d="M1024.0,127.3 C1102.0,127.3 1102.0,172.3 1180.0,172.3 L1180.0,176.9 C1102.0,176.9 1102.0,131.9 1024.0,131.9 Z" class="flow f-kept" data-tip="Mentions supplements → Foods & dietary items: 269 posts (6.9%)"/>
-<path d="M1024.0,131.9 C1102.0,131.9 1102.0,185.9 1180.0,185.9 L1180.0,189.9 C1102.0,189.9 1102.0,133.7 1024.0,133.7 Z" class="flow f-kept" data-tip="Mentions supplements → Manual review queue: 107 posts (2.7%)"/>
-<path d="M1024.0,133.7 C1102.0,133.7 1102.0,198.9 1180.0,198.9 L1180.0,202.9 C1102.0,202.9 1102.0,135.3 1024.0,135.3 Z" class="flow f-kept" data-tip="Mentions supplements → Prescription & OTC medicines: 90 posts (2.3%)"/>
-<path d="M1024.0,135.3 C1102.0,135.3 1102.0,211.9 1180.0,211.9 L1180.0,215.9 C1102.0,215.9 1102.0,136.2 1024.0,136.2 Z" class="flow f-kept" data-tip="Mentions supplements → Protein, amino acids & creatine: 51 posts (1.3%)"/>
-<path d="M1024.0,136.2 C1102.0,136.2 1102.0,224.9 1180.0,224.9 L1180.0,228.9 C1102.0,228.9 1102.0,136.7 1024.0,136.7 Z" class="flow f-kept" data-tip="Mentions supplements → Gut / microbiome: 29 posts (0.7%)"/>
-<path d="M1024.0,136.7 C1102.0,136.7 1102.0,237.9 1180.0,237.9 L1180.0,241.9 C1102.0,241.9 1102.0,137.0 1024.0,137.0 Z" class="flow f-kept" data-tip="Mentions supplements → Fatty acids & oils: 22 posts (0.6%)"/>
-<rect x="150" y="70.0" width="14" height="178.9" rx="2" class="node n-ig" data-tip="Instagram: 10,393 (28.4% of search links)"/>
-<rect x="150" y="258.9" width="14" height="162.9" rx="2" class="node n-tt" data-tip="TikTok: 9,463 (25.9% of search links)"/>
-<rect x="150" y="431.7" width="14" height="157.8" rx="2" class="node n-fb" data-tip="Facebook: 9,167 (25.0% of search links)"/>
-<rect x="150" y="599.5" width="14" height="130.5" rx="2" class="node n-yt" data-tip="YouTube: 7,584 (20.7% of search links)"/>
-<rect x="320" y="70.0" width="14" height="209.8" rx="2" class="node n-kept" data-tip="Downloaded & LLM-processed: 12,193 (33.3% of search links)"/>
-<rect x="320" y="319.8" width="14" height="420.2" rx="2" class="node n-sink" data-tip="Not retrievable / not processed: 24,414 (66.7% of search links)"/>
-<rect x="495" y="70.0" width="14" height="78.1" rx="2" class="node n-kept" data-tip="Menopause-targeted: 4,537 (12.4% of search links)"/>
-<rect x="495" y="188.1" width="14" height="131.8" rx="2" class="node n-sink" data-tip="Not menopause-targeted: 7,656 (20.9% of search links)"/>
-<rect x="665" y="70.0" width="14" height="76.0" rx="2" class="node n-kept" data-tip="Unique posts: 4,415 (12.1% of search links)"/>
-<rect x="665" y="186.0" width="14" height="4.0" rx="2" class="node n-sink" data-tip="Cross-platform duplicates: 122 (0.3% of search links)"/>
-<rect x="835" y="70.0" width="14" height="52.4" rx="2" class="node n-kept" data-tip="Informative: 3,045 (8.3% of search links)"/>
-<rect x="835" y="132.4" width="14" height="12.1" rx="2" class="node n-kept" data-tip="Marketing: 704 (1.9% of search links)"/>
-<rect x="835" y="154.5" width="14" height="11.0" rx="2" class="node n-kept" data-tip="Other material: 640 (1.7% of search links)"/>
-<rect x="835" y="175.5" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Unclassified: 26 (0.1% of search links)"/>
-<rect x="1010" y="70.0" width="14" height="67.0" rx="2" class="node n-kept" data-tip="Mentions supplements: 3,896 (10.6% of search links)"/>
-<rect x="1010" y="177.0" width="14" height="8.9" rx="2" class="node n-sink2" data-tip="No supplements mentioned: 519 (1.4% of search links)"/>
-<rect x="1180" y="70.0" width="14" height="17.8" rx="2" class="node n-kept" data-tip="Branded menopause formulations: 1,034 (2.8% of search links)"/>
-<rect x="1180" y="96.8" width="14" height="16.9" rx="2" class="node n-kept" data-tip="Vitamins & minerals: 983 (2.7% of search links)"/>
-<rect x="1180" y="122.7" width="14" height="9.8" rx="2" class="node n-kept" data-tip="Hormone therapies: 571 (1.6% of search links)"/>
-<rect x="1180" y="141.5" width="14" height="6.8" rx="2" class="node n-kept" data-tip="Vague or non-classifiable: 396 (1.1% of search links)"/>
-<rect x="1180" y="157.4" width="14" height="5.9" rx="2" class="node n-kept" data-tip="Herbals & botanicals: 344 (0.9% of search links)"/>
-<rect x="1180" y="172.3" width="14" height="4.6" rx="2" class="node n-kept" data-tip="Foods & dietary items: 269 (0.7% of search links)"/>
-<rect x="1180" y="185.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Manual review queue: 107 (0.3% of search links)"/>
-<rect x="1180" y="198.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Prescription & OTC medicines: 90 (0.2% of search links)"/>
-<rect x="1180" y="211.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Protein, amino acids & creatine: 51 (0.1% of search links)"/>
-<rect x="1180" y="224.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Gut / microbiome: 29 (0.1% of search links)"/>
-<rect x="1180" y="237.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Fatty acids & oils: 22 (0.1% of search links)"/>
-<text x="140" y="156.4" text-anchor="end" class="nlabel">Instagram</text>
-<text x="140" y="173.4" text-anchor="end" class="ncount">10,393</text>
-<text x="140" y="337.3" text-anchor="end" class="nlabel">TikTok</text>
-<text x="140" y="354.3" text-anchor="end" class="ncount">9,463</text>
-<text x="140" y="507.6" text-anchor="end" class="nlabel">Facebook</text>
-<text x="140" y="524.6" text-anchor="end" class="ncount">9,167</text>
-<text x="140" y="661.7" text-anchor="end" class="nlabel">YouTube</text>
-<text x="140" y="678.7" text-anchor="end" class="ncount">7,584</text>
-<text x="342" y="347.8" class="ncount halo">24,414</text>
-<text x="342" y="362.8" class="nlabel-sm halo">not retrievable or</text>
-<text x="342" y="375.8" class="nlabel-sm halo">not processed</text>
-<text x="517" y="216.1" class="ncount halo">7,656</text>
-<text x="517" y="231.1" class="nlabel-sm halo">not menopause-</text>
-<text x="517" y="244.1" class="nlabel-sm halo">targeted</text>
-<text x="687" y="186.0" class="ncount halo">122</text>
-<text x="687" y="201.0" class="nlabel-sm halo">cross-platform</text>
-<text x="687" y="214.0" class="nlabel-sm halo">duplicates</text>
-<text x="1032" y="179.5" class="ncount halo">519</text>
-<text x="1032" y="194.5" class="nlabel-sm halo">no supplements mentioned</text>
-<text x="1032" y="207.5" class="nlabel-sm halo">(symptom &amp; experience posts)</text>
-<text x="857" y="100.2" class="nlabel halo"><tspan class="ncount-inline">3,045</tspan>  Informative</text>
-<text x="857" y="142.5" class="nlabel halo"><tspan class="ncount-inline">704</tspan>  Marketing</text>
-<text x="857" y="164.0" class="nlabel halo"><tspan class="ncount-inline">640</tspan>  Other material</text>
-<text x="857" y="181.5" class="nlabel halo"><tspan class="ncount-inline">26</tspan>  Unclassified</text>
-<text x="1202" y="82.9" class="nlabel"><tspan class="ncount-inline">1,034</tspan>  Branded menopause formulations</text>
-<text x="1202" y="109.3" class="nlabel"><tspan class="ncount-inline">983</tspan>  Vitamins &amp; minerals</text>
-<text x="1202" y="131.6" class="nlabel"><tspan class="ncount-inline">571</tspan>  Hormone therapies</text>
-<text x="1202" y="148.9" class="nlabel"><tspan class="ncount-inline">396</tspan>  Vague or non-classifiable</text>
-<text x="1202" y="164.3" class="nlabel"><tspan class="ncount-inline">344</tspan>  Herbals &amp; botanicals</text>
-<text x="1202" y="178.6" class="nlabel"><tspan class="ncount-inline">269</tspan>  Foods &amp; dietary items</text>
-<text x="1202" y="191.9" class="nlabel"><tspan class="ncount-inline">107</tspan>  Manual review queue</text>
-<text x="1202" y="204.9" class="nlabel"><tspan class="ncount-inline">90</tspan>  Prescription &amp; OTC medicines</text>
-<text x="1202" y="217.9" class="nlabel"><tspan class="ncount-inline">51</tspan>  Protein, amino acids &amp; creatine</text>
-<text x="1202" y="230.9" class="nlabel"><tspan class="ncount-inline">29</tspan>  Gut / microbiome</text>
-<text x="1202" y="243.9" class="nlabel"><tspan class="ncount-inline">22</tspan>  Fatty acids &amp; oils</text>
+<text x="1017.0" y="46" text-anchor="middle" class="stagecount">3,881 kept</text>
+<text x="1180" y="13" text-anchor="start" class="stage">SUPPLEMENT CATEGORY</text>
+<text x="1180" y="28" text-anchor="start" class="stage">CLASSIFICATION</text>
+<text x="1180" y="46" text-anchor="start" class="stagecount">3,881 posts</text>
+<path d="M164.0,70.0 C242.0,70.0 242.0,70.0 320.0,70.0 L320.0,75.2 C242.0,75.2 242.0,75.2 164.0,75.2 Z" class="flow f-ig" data-tip="Instagram → Downloaded & LLM-processed: 151 posts (2.8%)"/>
+<path d="M164.0,75.2 C242.0,75.2 242.0,533.5 320.0,533.5 L320.0,714.7 C242.0,714.7 242.0,256.4 164.0,256.4 Z" class="flow f-sink" data-tip="Instagram → Not retrievable / not processed: 5,216 posts (97.2%)"/>
+<path d="M164.0,266.4 C242.0,266.4 242.0,75.2 320.0,75.2 L320.0,242.7 C242.0,242.7 242.0,433.9 164.0,433.9 Z" class="flow f-tt" data-tip="TikTok → Downloaded & LLM-processed: 4,822 posts (93.6%)"/>
+<path d="M164.0,433.9 C242.0,433.9 242.0,714.7 320.0,714.7 L320.0,726.1 C242.0,726.1 242.0,445.3 164.0,445.3 Z" class="flow f-sink" data-tip="TikTok → Not retrievable / not processed: 328 posts (6.4%)"/>
+<path d="M164.0,455.3 C242.0,455.3 242.0,242.7 320.0,242.7 L320.0,375.7 C242.0,375.7 242.0,588.3 164.0,588.3 Z" class="flow f-yt" data-tip="YouTube → Downloaded & LLM-processed: 3,829 posts (99.1%)"/>
+<path d="M164.0,588.3 C242.0,588.3 242.0,726.1 320.0,726.1 L320.0,727.3 C242.0,727.3 242.0,589.5 164.0,589.5 Z" class="flow f-sink" data-tip="YouTube → Not retrievable / not processed: 33 posts (0.9%)"/>
+<path d="M164.0,599.5 C242.0,599.5 242.0,375.7 320.0,375.7 L320.0,493.5 C242.0,493.5 242.0,717.3 164.0,717.3 Z" class="flow f-fb" data-tip="Facebook → Downloaded & LLM-processed: 3,391 posts (90.2%)"/>
+<path d="M164.0,717.3 C242.0,717.3 242.0,727.3 320.0,727.3 L320.0,740.0 C242.0,740.0 242.0,730.0 164.0,730.0 Z" class="flow f-sink" data-tip="Facebook → Not retrievable / not processed: 367 posts (9.8%)"/>
+<path d="M334.0,70.0 C414.5,70.0 414.5,70.0 495.0,70.0 L495.0,227.6 C414.5,227.6 414.5,227.6 334.0,227.6 Z" class="flow f-kept" data-tip="Downloaded & LLM-processed → Menopause-targeted: 4,537 posts (37.2%)"/>
+<path d="M334.0,227.6 C414.5,227.6 414.5,267.6 495.0,267.6 L495.0,533.5 C414.5,533.5 414.5,493.5 334.0,493.5 Z" class="flow f-sink" data-tip="Downloaded & LLM-processed → Not menopause-targeted: 7,656 posts (62.8%)"/>
+<path d="M509.0,70.0 C587.0,70.0 587.0,70.0 665.0,70.0 L665.0,222.8 C587.0,222.8 587.0,222.8 509.0,222.8 Z" class="flow f-kept" data-tip="Menopause-targeted → Unique posts: 4,398 posts (96.9%)"/>
+<path d="M509.0,222.8 C587.0,222.8 587.0,262.8 665.0,262.8 L665.0,267.6 C587.0,267.6 587.0,227.6 509.0,227.6 Z" class="flow f-sink" data-tip="Menopause-targeted → Cross-platform duplicates: 139 posts (3.1%)"/>
+<path d="M679.0,70.0 C757.0,70.0 757.0,70.0 835.0,70.0 L835.0,175.2 C757.0,175.2 757.0,175.2 679.0,175.2 Z" class="flow f-kept" data-tip="Unique posts → Informative: 3,030 posts (68.9%)"/>
+<path d="M679.0,175.2 C757.0,175.2 757.0,185.2 835.0,185.2 L835.0,209.7 C757.0,209.7 757.0,199.7 679.0,199.7 Z" class="flow f-kept" data-tip="Unique posts → Marketing: 704 posts (16.0%)"/>
+<path d="M679.0,199.7 C757.0,199.7 757.0,219.7 835.0,219.7 L835.0,241.9 C757.0,241.9 757.0,221.9 679.0,221.9 Z" class="flow f-kept" data-tip="Unique posts → Other material: 639 posts (14.5%)"/>
+<path d="M679.0,221.9 C757.0,221.9 757.0,251.9 835.0,251.9 L835.0,255.9 C757.0,255.9 757.0,222.8 679.0,222.8 Z" class="flow f-kept" data-tip="Unique posts → Unclassified: 25 posts (0.6%)"/>
+<path d="M849.0,70.0 C929.5,70.0 929.5,70.0 1010.0,70.0 L1010.0,162.0 C929.5,162.0 929.5,162.0 849.0,162.0 Z" class="flow f-kept" data-tip="Informative → Mentions supplements: 2,648 posts (87.4%)"/>
+<path d="M849.0,162.0 C929.5,162.0 929.5,244.8 1010.0,244.8 L1010.0,258.1 C929.5,258.1 929.5,175.2 849.0,175.2 Z" class="flow f-sink2" data-tip="Informative → No supplements mentioned: 382 posts (12.6%)"/>
+<path d="M849.0,185.2 C929.5,185.2 929.5,162.0 1010.0,162.0 L1010.0,185.3 C929.5,185.3 929.5,208.6 849.0,208.6 Z" class="flow f-kept" data-tip="Marketing → Mentions supplements: 672 posts (95.5%)"/>
+<path d="M849.0,208.6 C929.5,208.6 929.5,258.1 1010.0,258.1 L1010.0,259.2 C929.5,259.2 929.5,209.7 849.0,209.7 Z" class="flow f-sink2" data-tip="Marketing → No supplements mentioned: 32 posts (4.5%)"/>
+<path d="M849.0,219.7 C929.5,219.7 929.5,185.3 1010.0,185.3 L1010.0,203.9 C929.5,203.9 929.5,238.3 849.0,238.3 Z" class="flow f-kept" data-tip="Other material → Mentions supplements: 536 posts (83.9%)"/>
+<path d="M849.0,238.3 C929.5,238.3 929.5,259.2 1010.0,259.2 L1010.0,262.8 C929.5,262.8 929.5,241.9 849.0,241.9 Z" class="flow f-sink2" data-tip="Other material → No supplements mentioned: 103 posts (16.1%)"/>
+<path d="M849.0,251.9 C929.5,251.9 929.5,203.9 1010.0,203.9 L1010.0,204.8 C929.5,204.8 929.5,255.9 849.0,255.9 Z" class="flow f-kept" data-tip="Unclassified → Mentions supplements: 25 posts (100.0%)"/>
+<path d="M1024.0,70.0 C1102.0,70.0 1102.0,70.0 1180.0,70.0 L1180.0,105.9 C1102.0,105.9 1102.0,105.9 1024.0,105.9 Z" class="flow f-kept" data-tip="Mentions supplements → Branded menopause formulations: 1,033 posts (26.6%)"/>
+<path d="M1024.0,105.9 C1102.0,105.9 1102.0,114.9 1180.0,114.9 L1180.0,148.9 C1102.0,148.9 1102.0,139.9 1024.0,139.9 Z" class="flow f-kept" data-tip="Mentions supplements → Vitamins & minerals: 978 posts (25.2%)"/>
+<path d="M1024.0,139.9 C1102.0,139.9 1102.0,157.9 1180.0,157.9 L1180.0,177.7 C1102.0,177.7 1102.0,159.7 1024.0,159.7 Z" class="flow f-kept" data-tip="Mentions supplements → Hormone therapies: 570 posts (14.7%)"/>
+<path d="M1024.0,159.7 C1102.0,159.7 1102.0,186.7 1180.0,186.7 L1180.0,200.3 C1102.0,200.3 1102.0,173.3 1024.0,173.3 Z" class="flow f-kept" data-tip="Mentions supplements → Vague or non-classifiable: 394 posts (10.2%)"/>
+<path d="M1024.0,173.3 C1102.0,173.3 1102.0,209.3 1180.0,209.3 L1180.0,221.3 C1102.0,221.3 1102.0,185.3 1024.0,185.3 Z" class="flow f-kept" data-tip="Mentions supplements → Herbals & botanicals: 343 posts (8.8%)"/>
+<path d="M1024.0,185.3 C1102.0,185.3 1102.0,230.3 1180.0,230.3 L1180.0,239.5 C1102.0,239.5 1102.0,194.5 1024.0,194.5 Z" class="flow f-kept" data-tip="Mentions supplements → Foods & dietary items: 267 posts (6.9%)"/>
+<path d="M1024.0,194.5 C1102.0,194.5 1102.0,248.5 1180.0,248.5 L1180.0,252.5 C1102.0,252.5 1102.0,198.2 1024.0,198.2 Z" class="flow f-kept" data-tip="Mentions supplements → Manual review queue: 107 posts (2.8%)"/>
+<path d="M1024.0,198.2 C1102.0,198.2 1102.0,261.5 1180.0,261.5 L1180.0,265.5 C1102.0,265.5 1102.0,201.3 1024.0,201.3 Z" class="flow f-kept" data-tip="Mentions supplements → Prescription & OTC medicines: 87 posts (2.2%)"/>
+<path d="M1024.0,201.3 C1102.0,201.3 1102.0,274.5 1180.0,274.5 L1180.0,278.5 C1102.0,278.5 1102.0,203.0 1024.0,203.0 Z" class="flow f-kept" data-tip="Mentions supplements → Protein, amino acids & creatine: 51 posts (1.3%)"/>
+<path d="M1024.0,203.0 C1102.0,203.0 1102.0,287.5 1180.0,287.5 L1180.0,291.5 C1102.0,291.5 1102.0,204.0 1024.0,204.0 Z" class="flow f-kept" data-tip="Mentions supplements → Gut / microbiome: 29 posts (0.7%)"/>
+<path d="M1024.0,204.0 C1102.0,204.0 1102.0,300.5 1180.0,300.5 L1180.0,304.5 C1102.0,304.5 1102.0,204.8 1024.0,204.8 Z" class="flow f-kept" data-tip="Mentions supplements → Fatty acids & oils: 22 posts (0.6%)"/>
+<rect x="150" y="70.0" width="14" height="186.4" rx="2" class="node n-ig" data-tip="Instagram: 5,367 (29.6% of search links)"/>
+<rect x="150" y="266.4" width="14" height="178.9" rx="2" class="node n-tt" data-tip="TikTok: 5,150 (28.4% of search links)"/>
+<rect x="150" y="455.3" width="14" height="134.1" rx="2" class="node n-yt" data-tip="YouTube: 3,862 (21.3% of search links)"/>
+<rect x="150" y="599.5" width="14" height="130.5" rx="2" class="node n-fb" data-tip="Facebook: 3,758 (20.7% of search links)"/>
+<rect x="320" y="70.0" width="14" height="423.5" rx="2" class="node n-kept" data-tip="Downloaded & LLM-processed: 12,193 (67.2% of search links)"/>
+<rect x="320" y="533.5" width="14" height="206.5" rx="2" class="node n-sink" data-tip="Not retrievable / not processed: 5,944 (32.8% of search links)"/>
+<rect x="495" y="70.0" width="14" height="157.6" rx="2" class="node n-kept" data-tip="Menopause-targeted: 4,537 (37.2% of processed posts)"/>
+<rect x="495" y="267.6" width="14" height="265.9" rx="2" class="node n-sink" data-tip="Not menopause-targeted: 7,656 (62.8% of processed posts)"/>
+<rect x="665" y="70.0" width="14" height="152.8" rx="2" class="node n-kept" data-tip="Unique posts: 4,398 (96.9% of menopause-targeted posts)"/>
+<rect x="665" y="262.8" width="14" height="4.8" rx="2" class="node n-sink" data-tip="Cross-platform duplicates: 139 (3.1% of menopause-targeted posts)"/>
+<rect x="835" y="70.0" width="14" height="105.2" rx="2" class="node n-kept" data-tip="Informative: 3,030 (68.9% of unique posts)"/>
+<rect x="835" y="185.2" width="14" height="24.5" rx="2" class="node n-kept" data-tip="Marketing: 704 (16.0% of unique posts)"/>
+<rect x="835" y="219.7" width="14" height="22.2" rx="2" class="node n-kept" data-tip="Other material: 639 (14.5% of unique posts)"/>
+<rect x="835" y="251.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Unclassified: 25 (0.6% of unique posts)"/>
+<rect x="1010" y="70.0" width="14" height="134.8" rx="2" class="node n-kept" data-tip="Mentions supplements: 3,881 (88.2% of unique posts)"/>
+<rect x="1010" y="244.8" width="14" height="18.0" rx="2" class="node n-sink2" data-tip="No supplements mentioned: 517 (11.8% of unique posts)"/>
+<rect x="1180" y="70.0" width="14" height="35.9" rx="2" class="node n-kept" data-tip="Branded menopause formulations: 1,033 (26.6% of supplement posts)"/>
+<rect x="1180" y="114.9" width="14" height="34.0" rx="2" class="node n-kept" data-tip="Vitamins & minerals: 978 (25.2% of supplement posts)"/>
+<rect x="1180" y="157.9" width="14" height="19.8" rx="2" class="node n-kept" data-tip="Hormone therapies: 570 (14.7% of supplement posts)"/>
+<rect x="1180" y="186.7" width="14" height="13.7" rx="2" class="node n-kept" data-tip="Vague or non-classifiable: 394 (10.2% of supplement posts)"/>
+<rect x="1180" y="209.3" width="14" height="11.9" rx="2" class="node n-kept" data-tip="Herbals & botanicals: 343 (8.8% of supplement posts)"/>
+<rect x="1180" y="230.3" width="14" height="9.3" rx="2" class="node n-kept" data-tip="Foods & dietary items: 267 (6.9% of supplement posts)"/>
+<rect x="1180" y="248.5" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Manual review queue: 107 (2.8% of supplement posts)"/>
+<rect x="1180" y="261.5" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Prescription & OTC medicines: 87 (2.2% of supplement posts)"/>
+<rect x="1180" y="274.5" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Protein, amino acids & creatine: 51 (1.3% of supplement posts)"/>
+<rect x="1180" y="287.5" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Gut / microbiome: 29 (0.7% of supplement posts)"/>
+<rect x="1180" y="300.5" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Fatty acids & oils: 22 (0.6% of supplement posts)"/>
+<text x="140" y="160.2" text-anchor="end" class="nlabel">Instagram</text>
+<text x="140" y="177.2" text-anchor="end" class="ncount">5,367 (29.6%)</text>
+<text x="140" y="352.9" text-anchor="end" class="nlabel">TikTok</text>
+<text x="140" y="369.9" text-anchor="end" class="ncount">5,150 (28.4%)</text>
+<text x="140" y="519.4" text-anchor="end" class="nlabel">YouTube</text>
+<text x="140" y="536.4" text-anchor="end" class="ncount">3,862 (21.3%)</text>
+<text x="140" y="661.7" text-anchor="end" class="nlabel">Facebook</text>
+<text x="140" y="678.7" text-anchor="end" class="ncount">3,758 (20.7%)</text>
+<text x="342" y="561.5" class="ncount halo">5,944 (32.8%)</text>
+<text x="342" y="576.5" class="nlabel-sm halo">not retrievable or</text>
+<text x="342" y="589.5" class="nlabel-sm halo">not processed</text>
+<text x="517" y="295.6" class="ncount halo">7,656 (62.8%)</text>
+<text x="517" y="310.6" class="nlabel-sm halo">not menopause-</text>
+<text x="517" y="323.6" class="nlabel-sm halo">targeted</text>
+<text x="687" y="263.2" class="ncount halo">139 (3.1%)</text>
+<text x="687" y="278.2" class="nlabel-sm halo">cross-platform</text>
+<text x="687" y="291.2" class="nlabel-sm halo">duplicates</text>
+<text x="1032" y="251.8" class="ncount halo">517 (11.8%)</text>
+<text x="1032" y="266.8" class="nlabel-sm halo">no supplements mentioned</text>
+<text x="1032" y="279.8" class="nlabel-sm halo">(symptom &amp; experience posts)</text>
+<text x="857" y="126.6" class="nlabel halo"><tspan class="ncount-inline">3,030 (68.9%)</tspan>  Informative</text>
+<text x="857" y="201.5" class="nlabel halo"><tspan class="ncount-inline">704 (16.0%)</tspan>  Marketing</text>
+<text x="857" y="234.8" class="nlabel halo"><tspan class="ncount-inline">639 (14.5%)</tspan>  Other material</text>
+<text x="857" y="257.9" class="nlabel halo"><tspan class="ncount-inline">25 (0.6%)</tspan>  Unclassified</text>
+<text x="1202" y="91.9" class="nlabel"><tspan class="ncount-inline">1,033 (26.6%)</tspan>  Branded menopause formulations</text>
+<text x="1202" y="135.9" class="nlabel"><tspan class="ncount-inline">978 (25.2%)</tspan>  Vitamins &amp; minerals</text>
+<text x="1202" y="171.8" class="nlabel"><tspan class="ncount-inline">570 (14.7%)</tspan>  Hormone therapies</text>
+<text x="1202" y="197.5" class="nlabel"><tspan class="ncount-inline">394 (10.2%)</tspan>  Vague or non-classifiable</text>
+<text x="1202" y="219.3" class="nlabel"><tspan class="ncount-inline">343 (8.8%)</tspan>  Herbals &amp; botanicals</text>
+<text x="1202" y="238.9" class="nlabel"><tspan class="ncount-inline">267 (6.9%)</tspan>  Foods &amp; dietary items</text>
+<text x="1202" y="254.5" class="nlabel"><tspan class="ncount-inline">107 (2.8%)</tspan>  Manual review queue</text>
+<text x="1202" y="267.5" class="nlabel"><tspan class="ncount-inline">87 (2.2%)</tspan>  Prescription &amp; OTC medicines</text>
+<text x="1202" y="280.5" class="nlabel"><tspan class="ncount-inline">51 (1.3%)</tspan>  Protein, amino acids &amp; creatine</text>
+<text x="1202" y="293.5" class="nlabel"><tspan class="ncount-inline">29 (0.7%)</tspan>  Gut / microbiome</text>
+<text x="1202" y="306.5" class="nlabel"><tspan class="ncount-inline">22 (0.6%)</tspan>  Fatty acids &amp; oils</text>
 </svg>
 </div>
-<p class="figcaption">Figure 1 — the pipeline from search links through Division 1 (content type) and the supplement screen to Division 2 (primary supplement category).</p>
+<p class="figcaption">Figure 1 — the pipeline from search links through content type classification and the supplement screen to supplement category classification (primary supplement category).</p>
 
-<h2>Division 3 — marketing / target group</h2>
+<h2>Symptom target classification</h2>
 <div class="figure">
-<svg viewBox="0 0 1450 612" role="img" font-family="'IBM Plex Sans', system-ui, sans-serif">
-<title>Sankey diagram: 3,896 supplement-mentioning posts divided by marketing/target group</title>
+<svg viewBox="0 0 1530 612" role="img" font-family="'IBM Plex Sans', system-ui, sans-serif">
+<title>Sankey diagram: 3,881 supplement-mentioning posts divided by marketing/target group</title>
 <text x="150" y="28" class="stage">SUPPLEMENT POSTS</text>
-<text x="150" y="46" class="stagecount">3,896 posts</text>
-<text x="1010" y="28" class="stage">DIVISION 3</text>
-<text x="1010" y="46" class="stagecount">target group</text>
-<path d="M164.0,70.0 C587.0,70.0 587.0,70.0 1010.0,70.0 L1010.0,412.4 C587.0,412.4 587.0,412.4 164.0,412.4 Z" class="flow f-kept" data-tip="Mentions supplements → General / multisymptom / unclear: 3,176 posts (81.5%)"/>
-<path d="M164.0,412.4 C587.0,412.4 587.0,421.4 1010.0,421.4 L1010.0,441.6 C587.0,441.6 587.0,432.6 164.0,432.6 Z" class="flow f-kept" data-tip="Mentions supplements → Bone / musculoskeletal support: 188 posts (4.8%)"/>
-<path d="M164.0,432.6 C587.0,432.6 587.0,450.6 1010.0,450.6 L1010.0,464.7 C587.0,464.7 587.0,446.7 164.0,446.7 Z" class="flow f-kept" data-tip="Mentions supplements → Skin / hair / beauty ageing: 130 posts (3.3%)"/>
-<path d="M164.0,446.7 C587.0,446.7 587.0,473.7 1010.0,473.7 L1010.0,485.1 C587.0,485.1 587.0,458.1 164.0,458.1 Z" class="flow f-kept" data-tip="Mentions supplements → Vasomotor / hot-flush relief: 106 posts (2.7%)"/>
-<path d="M164.0,458.1 C587.0,458.1 587.0,494.1 1010.0,494.1 L1010.0,503.9 C587.0,503.9 587.0,467.9 164.0,467.9 Z" class="flow f-kept" data-tip="Mentions supplements → Sexual / vaginal symptoms: 91 posts (2.3%)"/>
-<path d="M164.0,467.9 C587.0,467.9 587.0,512.9 1010.0,512.9 L1010.0,519.4 C587.0,519.4 587.0,474.4 164.0,474.4 Z" class="flow f-kept" data-tip="Mentions supplements → Sleep / stress / mood / cognition: 60 posts (1.5%)"/>
-<path d="M164.0,474.4 C587.0,474.4 587.0,528.4 1010.0,528.4 L1010.0,532.8 C587.0,532.8 587.0,478.8 164.0,478.8 Z" class="flow f-kept" data-tip="Mentions supplements → Manual review queue: 41 posts (1.1%)"/>
-<path d="M164.0,478.8 C587.0,478.8 587.0,541.8 1010.0,541.8 L1010.0,545.8 C587.0,545.8 587.0,482.8 164.0,482.8 Z" class="flow f-kept" data-tip="Mentions supplements → Phytoestrogenic / hormone-modulating: 37 posts (0.9%)"/>
-<path d="M164.0,482.8 C587.0,482.8 587.0,554.8 1010.0,554.8 L1010.0,558.8 C587.0,558.8 587.0,486.6 164.0,486.6 Z" class="flow f-kept" data-tip="Mentions supplements → Gut / inflammation / detox: 35 posts (0.9%)"/>
-<path d="M164.0,486.6 C587.0,486.6 587.0,567.8 1010.0,567.8 L1010.0,571.8 C587.0,571.8 587.0,490.0 164.0,490.0 Z" class="flow f-kept" data-tip="Mentions supplements → Metabolic / weight / insulin: 32 posts (0.8%)"/>
-<rect x="150" y="70.0" width="14" height="420.0" rx="2" class="node n-kept" data-tip="Mentions supplements: 3,896 (10.6% of search links)"/>
-<rect x="1010" y="70.0" width="14" height="342.4" rx="2" class="node n-kept" data-tip="General / multisymptom / unclear: 3,176 (8.7% of search links)"/>
-<rect x="1010" y="421.4" width="14" height="20.3" rx="2" class="node n-kept" data-tip="Bone / musculoskeletal support: 188 (0.5% of search links)"/>
-<rect x="1010" y="450.6" width="14" height="14.0" rx="2" class="node n-kept" data-tip="Skin / hair / beauty ageing: 130 (0.4% of search links)"/>
-<rect x="1010" y="473.7" width="14" height="11.4" rx="2" class="node n-kept" data-tip="Vasomotor / hot-flush relief: 106 (0.3% of search links)"/>
-<rect x="1010" y="494.1" width="14" height="9.8" rx="2" class="node n-kept" data-tip="Sexual / vaginal symptoms: 91 (0.2% of search links)"/>
-<rect x="1010" y="512.9" width="14" height="6.5" rx="2" class="node n-kept" data-tip="Sleep / stress / mood / cognition: 60 (0.2% of search links)"/>
-<rect x="1010" y="528.4" width="14" height="4.4" rx="2" class="node n-kept" data-tip="Manual review queue: 41 (0.1% of search links)"/>
-<rect x="1010" y="541.8" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Phytoestrogenic / hormone-modulating: 37 (0.1% of search links)"/>
-<rect x="1010" y="554.8" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Gut / inflammation / detox: 35 (0.1% of search links)"/>
-<rect x="1010" y="567.8" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Metabolic / weight / insulin: 32 (0.1% of search links)"/>
+<text x="150" y="46" class="stagecount">3,881 posts</text>
+<text x="1010" y="13" text-anchor="start" class="stage">SYMPTOM TARGET</text>
+<text x="1010" y="28" text-anchor="start" class="stage">CLASSIFICATION</text>
+<text x="1010" y="46" text-anchor="start" class="stagecount">3,881 posts</text>
+<path d="M164.0,70.0 C587.0,70.0 587.0,70.0 1010.0,70.0 L1010.0,412.7 C587.0,412.7 587.0,412.7 164.0,412.7 Z" class="flow f-kept" data-tip="Mentions supplements → General / multisymptom / unclear: 3,167 posts (81.6%)"/>
+<path d="M164.0,412.7 C587.0,412.7 587.0,421.7 1010.0,421.7 L1010.0,442.0 C587.0,442.0 587.0,433.0 164.0,433.0 Z" class="flow f-kept" data-tip="Mentions supplements → Bone / musculoskeletal support: 187 posts (4.8%)"/>
+<path d="M164.0,433.0 C587.0,433.0 587.0,451.0 1010.0,451.0 L1010.0,464.8 C587.0,464.8 587.0,446.8 164.0,446.8 Z" class="flow f-kept" data-tip="Mentions supplements → Skin / hair / beauty ageing: 128 posts (3.3%)"/>
+<path d="M164.0,446.8 C587.0,446.8 587.0,473.8 1010.0,473.8 L1010.0,485.3 C587.0,485.3 587.0,458.3 164.0,458.3 Z" class="flow f-kept" data-tip="Mentions supplements → Vasomotor / hot-flush relief: 106 posts (2.7%)"/>
+<path d="M164.0,458.3 C587.0,458.3 587.0,494.3 1010.0,494.3 L1010.0,504.0 C587.0,504.0 587.0,468.0 164.0,468.0 Z" class="flow f-kept" data-tip="Mentions supplements → Sexual / vaginal symptoms: 90 posts (2.3%)"/>
+<path d="M164.0,468.0 C587.0,468.0 587.0,513.0 1010.0,513.0 L1010.0,519.5 C587.0,519.5 587.0,474.5 164.0,474.5 Z" class="flow f-kept" data-tip="Mentions supplements → Sleep / stress / mood / cognition: 60 posts (1.5%)"/>
+<path d="M164.0,474.5 C587.0,474.5 587.0,528.5 1010.0,528.5 L1010.0,532.9 C587.0,532.9 587.0,478.9 164.0,478.9 Z" class="flow f-kept" data-tip="Mentions supplements → Manual review queue: 40 posts (1.0%)"/>
+<path d="M164.0,478.9 C587.0,478.9 587.0,541.9 1010.0,541.9 L1010.0,545.9 C587.0,545.9 587.0,482.7 164.0,482.7 Z" class="flow f-kept" data-tip="Mentions supplements → Phytoestrogenic / hormone-modulating: 36 posts (0.9%)"/>
+<path d="M164.0,482.7 C587.0,482.7 587.0,554.9 1010.0,554.9 L1010.0,558.9 C587.0,558.9 587.0,486.5 164.0,486.5 Z" class="flow f-kept" data-tip="Mentions supplements → Gut / inflammation / detox: 35 posts (0.9%)"/>
+<path d="M164.0,486.5 C587.0,486.5 587.0,567.9 1010.0,567.9 L1010.0,571.9 C587.0,571.9 587.0,490.0 164.0,490.0 Z" class="flow f-kept" data-tip="Mentions supplements → Metabolic / weight / insulin: 32 posts (0.8%)"/>
+<rect x="150" y="70.0" width="14" height="420.0" rx="2" class="node n-kept" data-tip="Mentions supplements: 3,881 (100.0% of supplement posts)"/>
+<rect x="1010" y="70.0" width="14" height="342.7" rx="2" class="node n-kept" data-tip="General / multisymptom / unclear: 3,167 (81.6% of supplement posts)"/>
+<rect x="1010" y="421.7" width="14" height="20.2" rx="2" class="node n-kept" data-tip="Bone / musculoskeletal support: 187 (4.8% of supplement posts)"/>
+<rect x="1010" y="451.0" width="14" height="13.9" rx="2" class="node n-kept" data-tip="Skin / hair / beauty ageing: 128 (3.3% of supplement posts)"/>
+<rect x="1010" y="473.8" width="14" height="11.5" rx="2" class="node n-kept" data-tip="Vasomotor / hot-flush relief: 106 (2.7% of supplement posts)"/>
+<rect x="1010" y="494.3" width="14" height="9.7" rx="2" class="node n-kept" data-tip="Sexual / vaginal symptoms: 90 (2.3% of supplement posts)"/>
+<rect x="1010" y="513.0" width="14" height="6.5" rx="2" class="node n-kept" data-tip="Sleep / stress / mood / cognition: 60 (1.5% of supplement posts)"/>
+<rect x="1010" y="528.5" width="14" height="4.3" rx="2" class="node n-kept" data-tip="Manual review queue: 40 (1.0% of supplement posts)"/>
+<rect x="1010" y="541.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Phytoestrogenic / hormone-modulating: 36 (0.9% of supplement posts)"/>
+<rect x="1010" y="554.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Gut / inflammation / detox: 35 (0.9% of supplement posts)"/>
+<rect x="1010" y="567.9" width="14" height="4.0" rx="2" class="node n-kept" data-tip="Metabolic / weight / insulin: 32 (0.8% of supplement posts)"/>
 <text x="140" y="277.0" text-anchor="end" class="nlabel">Mentions</text>
 <text x="140" y="294.0" text-anchor="end" class="nlabel">supplements</text>
-<text x="1032" y="245.2" class="nlabel"><tspan class="ncount-inline">3,176</tspan>  General / multisymptom / unclear</text>
-<text x="1032" y="435.5" class="nlabel"><tspan class="ncount-inline">188</tspan>  Bone / musculoskeletal support</text>
-<text x="1032" y="461.7" class="nlabel"><tspan class="ncount-inline">130</tspan>  Skin / hair / beauty ageing</text>
-<text x="1032" y="483.4" class="nlabel"><tspan class="ncount-inline">106</tspan>  Vasomotor / hot-flush relief</text>
-<text x="1032" y="503.0" class="nlabel"><tspan class="ncount-inline">91</tspan>  Sexual / vaginal symptoms</text>
-<text x="1032" y="520.1" class="nlabel"><tspan class="ncount-inline">60</tspan>  Sleep / stress / mood / cognition</text>
-<text x="1032" y="534.6" class="nlabel"><tspan class="ncount-inline">41</tspan>  Manual review queue</text>
-<text x="1032" y="547.8" class="nlabel"><tspan class="ncount-inline">37</tspan>  Phytoestrogenic / hormone-modulating</text>
-<text x="1032" y="560.8" class="nlabel"><tspan class="ncount-inline">35</tspan>  Gut / inflammation / detox</text>
-<text x="1032" y="573.8" class="nlabel"><tspan class="ncount-inline">32</tspan>  Metabolic / weight / insulin</text>
+<text x="1032" y="245.4" class="nlabel"><tspan class="ncount-inline">3,167 (81.6%)</tspan>  General / multisymptom / unclear</text>
+<text x="1032" y="435.8" class="nlabel"><tspan class="ncount-inline">187 (4.8%)</tspan>  Bone / musculoskeletal support</text>
+<text x="1032" y="461.9" class="nlabel"><tspan class="ncount-inline">128 (3.3%)</tspan>  Skin / hair / beauty ageing</text>
+<text x="1032" y="483.6" class="nlabel"><tspan class="ncount-inline">106 (2.7%)</tspan>  Vasomotor / hot-flush relief</text>
+<text x="1032" y="503.2" class="nlabel"><tspan class="ncount-inline">90 (2.3%)</tspan>  Sexual / vaginal symptoms</text>
+<text x="1032" y="520.3" class="nlabel"><tspan class="ncount-inline">60 (1.5%)</tspan>  Sleep / stress / mood / cognition</text>
+<text x="1032" y="534.7" class="nlabel"><tspan class="ncount-inline">40 (1.0%)</tspan>  Manual review queue</text>
+<text x="1032" y="547.9" class="nlabel"><tspan class="ncount-inline">36 (0.9%)</tspan>  Phytoestrogenic / hormone-modulating</text>
+<text x="1032" y="560.9" class="nlabel"><tspan class="ncount-inline">35 (0.9%)</tspan>  Gut / inflammation / detox</text>
+<text x="1032" y="573.9" class="nlabel"><tspan class="ncount-inline">32 (0.8%)</tspan>  Metabolic / weight / insulin</text>
 </svg>
 </div>
-<p class="figcaption">Figure 2 — the same 3,896 supplement-mentioning posts divided by the marketed target. Per the MIMICS plan this is a separate division, not a sub-level of Division 2, so each post appears once in each figure's final column.</p>
+<p class="figcaption">Figure 2 — the same 3,881 supplement-mentioning posts divided by the marketed target. Per the MIMICS plan this is a separate classification, not a sub-level of the supplement category classification, so each post appears once in each figure's final column.</p>
 
 <div id="tooltip" role="status"></div>
 
@@ -256,14 +260,14 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <thead><tr><th>Stage</th><th>Rule</th><th class="num">In</th><th class="num">Kept</th><th class="num">Removed</th></tr></thead>
 <tbody>
 
-<tr><td>Google search</td><td>Daily scrape across 13 search terms; links from YouTube, TikTok, Facebook, Instagram</td><td class="num">—</td><td class="num">36,607</td><td class="num">—</td></tr>
-<tr><td>Download + LLM</td><td>Video retrieved by yt-dlp and processed by Nemotron&nbsp;3 Nano Omni; drops unretrievable links (most Instagram), audio-only files and processing failures</td><td class="num">36,607</td><td class="num">12,193</td><td class="num">24,414</td></tr>
+<tr><td>Google search</td><td>Daily scrape across 13 search terms; links from YouTube, TikTok, Facebook, Instagram</td><td class="num">—</td><td class="num">18,137</td><td class="num">—</td></tr>
+<tr><td>Download + LLM</td><td>Video retrieved by yt-dlp and processed by Nemotron&nbsp;3 Nano Omni; drops unretrievable links (most Instagram), audio-only files and processing failures</td><td class="num">18,137</td><td class="num">12,193</td><td class="num">5,944</td></tr>
 <tr><td>Menopause screen</td><td>LLM field <em>menopause</em> = True (post targets the supplement toward menopause-related symptoms)</td><td class="num">12,193</td><td class="num">4,537</td><td class="num">7,656</td></tr>
-<tr><td>Deduplication</td><td>Same normalised title (≥ 15 chars) and duration across platforms; copy with most views kept</td><td class="num">4,537</td><td class="num">4,415</td><td class="num">122</td></tr>
-<tr><td>Division 1 — content type</td><td>LLM classification: informative / marketing / other material (personal stories or anecdotes): Informative 3,045 / Marketing 704 / Other material 640 / Unclassified 26</td><td class="num">4,415</td><td class="num">4,415</td><td class="num">—</td></tr>
-<tr><td>Supplement screen</td><td>Post names at least one supplement; the 519 without are retained separately as symptom-and-experience posts</td><td class="num">4,415</td><td class="num">3,896</td><td class="num">519</td></tr>
-<tr><td>Division 2 — primary supplement category</td><td>The post's primary status category, assigned by the LLM from the whole video per the team's nine-category coding framework plus foods; posts without a usable answer go to the manual review queue</td><td class="num">3,896</td><td class="num">3,896</td><td class="num">—</td></tr>
-<tr><td>Division 3 — target group</td><td>The post's primary marketing/target group, assigned by the LLM from the whole video (several different symptom areas count as general / multisymptom). A separate division of the same 3,896 posts, not a sub-level of Division 2 (second figure)</td><td class="num">3,896</td><td class="num">3,896</td><td class="num">—</td></tr>
+<tr><td>Deduplication</td><td>Same normalised title (≥ 15 chars) and duration across platforms; copy with most views kept</td><td class="num">4,537</td><td class="num">4,398</td><td class="num">139</td></tr>
+<tr><td>Content type classification</td><td>LLM classification: informative / marketing / other material (personal stories or anecdotes): Informative 3,030 / Marketing 704 / Other material 639 / Unclassified 25</td><td class="num">4,398</td><td class="num">4,398</td><td class="num">—</td></tr>
+<tr><td>Supplement screen</td><td>Post names at least one supplement; the 517 without are retained separately as symptom-and-experience posts</td><td class="num">4,398</td><td class="num">3,881</td><td class="num">517</td></tr>
+<tr><td>Supplement category classification</td><td>The post's primary status category, assigned by the LLM from the whole video per the team's nine-category coding framework plus foods; posts without a usable answer go to the manual review queue</td><td class="num">3,881</td><td class="num">3,881</td><td class="num">—</td></tr>
+<tr><td>Symptom target classification</td><td>The post's primary marketing/target group, assigned by the LLM from the whole video (several different symptom areas count as general / multisymptom). A separate division of the same 3,881 posts, not a sub-level of Division 2 (second figure)</td><td class="num">3,881</td><td class="num">3,881</td><td class="num">—</td></tr>
 
 </tbody>
 </table>
@@ -275,48 +279,48 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <table>
 <thead><tr><th>From</th><th>To</th><th class="num">Posts</th><th class="num">% of source</th></tr></thead>
 <tbody>
-<tr><td>Instagram</td><td>Downloaded & LLM-processed</td><td class="num">151</td><td class="num">1.5%</td></tr>
-<tr><td>Instagram</td><td>Not retrievable / not processed</td><td class="num">10,242</td><td class="num">98.5%</td></tr>
-<tr><td>TikTok</td><td>Downloaded & LLM-processed</td><td class="num">4,822</td><td class="num">51.0%</td></tr>
-<tr><td>TikTok</td><td>Not retrievable / not processed</td><td class="num">4,641</td><td class="num">49.0%</td></tr>
-<tr><td>Facebook</td><td>Downloaded & LLM-processed</td><td class="num">3,391</td><td class="num">37.0%</td></tr>
-<tr><td>Facebook</td><td>Not retrievable / not processed</td><td class="num">5,776</td><td class="num">63.0%</td></tr>
-<tr><td>YouTube</td><td>Downloaded & LLM-processed</td><td class="num">3,829</td><td class="num">50.5%</td></tr>
-<tr><td>YouTube</td><td>Not retrievable / not processed</td><td class="num">3,755</td><td class="num">49.5%</td></tr>
+<tr><td>Instagram</td><td>Downloaded & LLM-processed</td><td class="num">151</td><td class="num">2.8%</td></tr>
+<tr><td>Instagram</td><td>Not retrievable / not processed</td><td class="num">5,216</td><td class="num">97.2%</td></tr>
+<tr><td>TikTok</td><td>Downloaded & LLM-processed</td><td class="num">4,822</td><td class="num">93.6%</td></tr>
+<tr><td>TikTok</td><td>Not retrievable / not processed</td><td class="num">328</td><td class="num">6.4%</td></tr>
+<tr><td>YouTube</td><td>Downloaded & LLM-processed</td><td class="num">3,829</td><td class="num">99.1%</td></tr>
+<tr><td>YouTube</td><td>Not retrievable / not processed</td><td class="num">33</td><td class="num">0.9%</td></tr>
+<tr><td>Facebook</td><td>Downloaded & LLM-processed</td><td class="num">3,391</td><td class="num">90.2%</td></tr>
+<tr><td>Facebook</td><td>Not retrievable / not processed</td><td class="num">367</td><td class="num">9.8%</td></tr>
 <tr><td>Downloaded & LLM-processed</td><td>Menopause-targeted</td><td class="num">4,537</td><td class="num">37.2%</td></tr>
 <tr><td>Downloaded & LLM-processed</td><td>Not menopause-targeted</td><td class="num">7,656</td><td class="num">62.8%</td></tr>
-<tr><td>Menopause-targeted</td><td>Unique posts</td><td class="num">4,415</td><td class="num">97.3%</td></tr>
-<tr><td>Menopause-targeted</td><td>Cross-platform duplicates</td><td class="num">122</td><td class="num">2.7%</td></tr>
-<tr><td>Unique posts</td><td>Informative</td><td class="num">3,045</td><td class="num">69.0%</td></tr>
-<tr><td>Unique posts</td><td>Marketing</td><td class="num">704</td><td class="num">15.9%</td></tr>
-<tr><td>Unique posts</td><td>Other material</td><td class="num">640</td><td class="num">14.5%</td></tr>
-<tr><td>Unique posts</td><td>Unclassified</td><td class="num">26</td><td class="num">0.6%</td></tr>
-<tr><td>Informative</td><td>Mentions supplements</td><td class="num">2,661</td><td class="num">87.4%</td></tr>
-<tr><td>Informative</td><td>No supplements mentioned</td><td class="num">384</td><td class="num">12.6%</td></tr>
+<tr><td>Menopause-targeted</td><td>Unique posts</td><td class="num">4,398</td><td class="num">96.9%</td></tr>
+<tr><td>Menopause-targeted</td><td>Cross-platform duplicates</td><td class="num">139</td><td class="num">3.1%</td></tr>
+<tr><td>Unique posts</td><td>Informative</td><td class="num">3,030</td><td class="num">68.9%</td></tr>
+<tr><td>Unique posts</td><td>Marketing</td><td class="num">704</td><td class="num">16.0%</td></tr>
+<tr><td>Unique posts</td><td>Other material</td><td class="num">639</td><td class="num">14.5%</td></tr>
+<tr><td>Unique posts</td><td>Unclassified</td><td class="num">25</td><td class="num">0.6%</td></tr>
+<tr><td>Informative</td><td>Mentions supplements</td><td class="num">2,648</td><td class="num">87.4%</td></tr>
+<tr><td>Informative</td><td>No supplements mentioned</td><td class="num">382</td><td class="num">12.6%</td></tr>
 <tr><td>Marketing</td><td>Mentions supplements</td><td class="num">672</td><td class="num">95.5%</td></tr>
 <tr><td>Marketing</td><td>No supplements mentioned</td><td class="num">32</td><td class="num">4.5%</td></tr>
-<tr><td>Other material</td><td>Mentions supplements</td><td class="num">537</td><td class="num">83.9%</td></tr>
+<tr><td>Other material</td><td>Mentions supplements</td><td class="num">536</td><td class="num">83.9%</td></tr>
 <tr><td>Other material</td><td>No supplements mentioned</td><td class="num">103</td><td class="num">16.1%</td></tr>
-<tr><td>Unclassified</td><td>Mentions supplements</td><td class="num">26</td><td class="num">100.0%</td></tr>
-<tr><td>Mentions supplements</td><td>Branded menopause formulations</td><td class="num">1,034</td><td class="num">26.5%</td></tr>
-<tr><td>Mentions supplements</td><td>Vitamins & minerals</td><td class="num">983</td><td class="num">25.2%</td></tr>
-<tr><td>Mentions supplements</td><td>Hormone therapies</td><td class="num">571</td><td class="num">14.7%</td></tr>
-<tr><td>Mentions supplements</td><td>Vague or non-classifiable</td><td class="num">396</td><td class="num">10.2%</td></tr>
-<tr><td>Mentions supplements</td><td>Herbals & botanicals</td><td class="num">344</td><td class="num">8.8%</td></tr>
-<tr><td>Mentions supplements</td><td>Foods & dietary items</td><td class="num">269</td><td class="num">6.9%</td></tr>
-<tr><td>Mentions supplements</td><td>Manual review queue</td><td class="num">107</td><td class="num">2.7%</td></tr>
-<tr><td>Mentions supplements</td><td>Prescription & OTC medicines</td><td class="num">90</td><td class="num">2.3%</td></tr>
+<tr><td>Unclassified</td><td>Mentions supplements</td><td class="num">25</td><td class="num">100.0%</td></tr>
+<tr><td>Mentions supplements</td><td>Branded menopause formulations</td><td class="num">1,033</td><td class="num">26.6%</td></tr>
+<tr><td>Mentions supplements</td><td>Vitamins & minerals</td><td class="num">978</td><td class="num">25.2%</td></tr>
+<tr><td>Mentions supplements</td><td>Hormone therapies</td><td class="num">570</td><td class="num">14.7%</td></tr>
+<tr><td>Mentions supplements</td><td>Vague or non-classifiable</td><td class="num">394</td><td class="num">10.2%</td></tr>
+<tr><td>Mentions supplements</td><td>Herbals & botanicals</td><td class="num">343</td><td class="num">8.8%</td></tr>
+<tr><td>Mentions supplements</td><td>Foods & dietary items</td><td class="num">267</td><td class="num">6.9%</td></tr>
+<tr><td>Mentions supplements</td><td>Manual review queue</td><td class="num">107</td><td class="num">2.8%</td></tr>
+<tr><td>Mentions supplements</td><td>Prescription & OTC medicines</td><td class="num">87</td><td class="num">2.2%</td></tr>
 <tr><td>Mentions supplements</td><td>Protein, amino acids & creatine</td><td class="num">51</td><td class="num">1.3%</td></tr>
 <tr><td>Mentions supplements</td><td>Gut / microbiome</td><td class="num">29</td><td class="num">0.7%</td></tr>
 <tr><td>Mentions supplements</td><td>Fatty acids & oils</td><td class="num">22</td><td class="num">0.6%</td></tr>
-<tr><td>Mentions supplements</td><td>General / multisymptom / unclear</td><td class="num">3,176</td><td class="num">81.5%</td></tr>
-<tr><td>Mentions supplements</td><td>Bone / musculoskeletal support</td><td class="num">188</td><td class="num">4.8%</td></tr>
-<tr><td>Mentions supplements</td><td>Skin / hair / beauty ageing</td><td class="num">130</td><td class="num">3.3%</td></tr>
+<tr><td>Mentions supplements</td><td>General / multisymptom / unclear</td><td class="num">3,167</td><td class="num">81.6%</td></tr>
+<tr><td>Mentions supplements</td><td>Bone / musculoskeletal support</td><td class="num">187</td><td class="num">4.8%</td></tr>
+<tr><td>Mentions supplements</td><td>Skin / hair / beauty ageing</td><td class="num">128</td><td class="num">3.3%</td></tr>
 <tr><td>Mentions supplements</td><td>Vasomotor / hot-flush relief</td><td class="num">106</td><td class="num">2.7%</td></tr>
-<tr><td>Mentions supplements</td><td>Sexual / vaginal symptoms</td><td class="num">91</td><td class="num">2.3%</td></tr>
+<tr><td>Mentions supplements</td><td>Sexual / vaginal symptoms</td><td class="num">90</td><td class="num">2.3%</td></tr>
 <tr><td>Mentions supplements</td><td>Sleep / stress / mood / cognition</td><td class="num">60</td><td class="num">1.5%</td></tr>
-<tr><td>Mentions supplements</td><td>Manual review queue</td><td class="num">41</td><td class="num">1.1%</td></tr>
-<tr><td>Mentions supplements</td><td>Phytoestrogenic / hormone-modulating</td><td class="num">37</td><td class="num">0.9%</td></tr>
+<tr><td>Mentions supplements</td><td>Manual review queue</td><td class="num">40</td><td class="num">1.0%</td></tr>
+<tr><td>Mentions supplements</td><td>Phytoestrogenic / hormone-modulating</td><td class="num">36</td><td class="num">0.9%</td></tr>
 <tr><td>Mentions supplements</td><td>Gut / inflammation / detox</td><td class="num">35</td><td class="num">0.9%</td></tr>
 <tr><td>Mentions supplements</td><td>Metabolic / weight / insulin</td><td class="num">32</td><td class="num">0.8%</td></tr>
 </tbody>
@@ -324,7 +328,7 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </div>
 </details>
 
-<p class="fineprint">Bands are proportional to post counts; nodes smaller than 232 posts are drawn at a 4px minimum so they stay visible. The post-level data behind every node is exported to <code>data/pipeline_stages.xlsx</code> — its recipes sheet states the exact filter that reproduces each number here. Division 2 and 3 use the primary status category and target group the LLM assigns each post after watching it. Generated by <code>src/generate_sankey.py</code> from <code>data/supplements.csv</code> (search links), <code>data/supplements_LLM_results.xlsx</code> (LLM output), <code>src/clean_supplements.py</code> (parsing the LLM's category and target coding) and <code>src/analyze_data.py</code> (platform filter and deduplication).</p>
+<p class="fineprint">Bands are proportional to post counts; nodes smaller than 115 posts are drawn at a 4px minimum so they stay visible. The post-level data behind every node is exported to <code>data/pipeline_stages.xlsx</code> — its recipes sheet states the exact filter that reproduces each number here. The supplement category and symptom target classifications use the primary status category and target group the LLM assigns each post after watching it. Percentages are of each stage's input (e.g. a category as a share of all supplement posts). Generated by <code>src/generate_sankey.py</code> from <code>data/supplements_links_at_download.csv</code> (the search links collected by 28 Jul 2026, the last update before the videos were downloaded), <code>data/supplements_LLM_results.xlsx</code> (LLM output), <code>src/clean_supplements.py</code> (parsing the LLM's category and target coding) and <code>src/analyze_data.py</code> (platform filter and deduplication).</p>
 </div>
 
 <script>

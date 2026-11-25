@@ -38,9 +38,15 @@ DIAGRAM_HEIGHT = 630   # px used by the tallest column
 NODE_WIDTH = 14
 MIN_NODE_H = 4         # visibility floor for tiny nodes
 COLUMN_X = [150, 320, 495, 665, 835, 1010, 1180]
-VIEWBOX_W = 1450
+VIEWBOX_W = 1530
 
 ALLOWED_PLATFORMS = ["youtube", "tiktok", "facebook", "instagram"]
+
+# Search links collected by the download cut-off: the link list as last updated before the videos were downloaded
+# (June to 4 August 2026), cleaned as the scraper now cleans links. Links found later haven't been downloaded or
+# coded, so they're left out of the diagram rather than counted as lost
+LINKS_AT_DOWNLOAD = Path("data/supplements_links_at_download.csv")
+DOWNLOAD_CUTOFF = "28 Jul 2026"
 PLATFORM_CLASS = {"instagram": "ig", "tiktok": "tt", "youtube": "yt", "facebook": "fb"}
 PLATFORM_LABEL = {"instagram": "Instagram", "tiktok": "TikTok", "youtube": "YouTube", "facebook": "Facebook"}
 
@@ -85,7 +91,7 @@ def fmt(n):
 
 def compute_counts():
     """Recompute every pipeline stage from the current data files."""
-    links = pd.read_csv("data/supplements.csv")
+    links = pd.read_csv(LINKS_AT_DOWNLOAD if LINKS_AT_DOWNLOAD.exists() else "data/supplements.csv")
     link_counts = links["source"].str.lower().value_counts().to_dict()
 
     n_terms = sum(1 for line in open("data/supplements_search_terms.txt") if line.strip())
@@ -196,33 +202,40 @@ def build_main(c):
 
     nodes, flows = {}, []
 
-    def add(nid, col, y, val, cls, label):
-        nodes[nid] = dict(col=col, x=COLUMN_X[col], y=y, val=val, h=h(val), cls=cls, label=label)
+    def add(nid, col, y, val, cls, label, base):
+        # base: the (count, description) this node's percentage is relative to, usually its stage's input
+        nodes[nid] = dict(col=col, x=COLUMN_X[col], y=y, val=val, h=h(val), cls=cls, label=label, base=base)
         return y + nodes[nid]["h"]
+
+    links = (c["total_links"], "search links")
+    processed = (c["total_processed"], "processed posts")
+    meno = (c["n_meno"], "menopause-targeted posts")
+    unique = (c["n_uniq"], "unique posts")
+    supp = (c["n_supp"], "supplement posts")
 
     y = 70
     for p in c["platforms"]:
         y = add(p, 0, y, c["link_counts"][p], PLATFORM_CLASS.get(p, "kept"),
-                PLATFORM_LABEL.get(p, p.title())) + 10
+                PLATFORM_LABEL.get(p, p.title()), links) + 10
 
-    add("proc", 1, 70, c["total_processed"], "kept", "Downloaded & LLM-processed")
+    add("proc", 1, 70, c["total_processed"], "kept", "Downloaded & LLM-processed", links)
     add("fail", 1, 70 + c["total_processed"] * k + 40,
-        c["total_links"] - c["total_processed"], "sink", "Not retrievable / not processed")
-    add("meno", 2, 70, c["n_meno"], "kept", "Menopause-targeted")
-    add("notmeno", 2, 70 + c["n_meno"] * k + 40, c["n_not_meno"], "sink", "Not menopause-targeted")
-    add("uniq", 3, 70, c["n_uniq"], "kept", "Unique posts")
-    add("dupe", 3, 70 + c["n_uniq"] * k + 40, c["n_dupes"], "sink", "Cross-platform duplicates")
+        c["total_links"] - c["total_processed"], "sink", "Not retrievable / not processed", links)
+    add("meno", 2, 70, c["n_meno"], "kept", "Menopause-targeted", processed)
+    add("notmeno", 2, 70 + c["n_meno"] * k + 40, c["n_not_meno"], "sink", "Not menopause-targeted", processed)
+    add("uniq", 3, 70, c["n_uniq"], "kept", "Unique posts", meno)
+    add("dupe", 3, 70 + c["n_uniq"] * k + 40, c["n_dupes"], "sink", "Cross-platform duplicates", meno)
 
     y = 70
     for i, (label, val) in enumerate(c["div1"]):
-        y = add(f"div1_{i}", 4, y, val, "kept", label) + 10
+        y = add(f"div1_{i}", 4, y, val, "kept", label, unique) + 10
 
-    add("supp", 5, 70, c["n_supp"], "kept", "Mentions supplements")
-    add("nosupp", 5, 70 + c["n_supp"] * k + 40, c["n_no_supp"], "sink2", "No supplements mentioned")
+    add("supp", 5, 70, c["n_supp"], "kept", "Mentions supplements", unique)
+    add("nosupp", 5, 70 + c["n_supp"] * k + 40, c["n_no_supp"], "sink2", "No supplements mentioned", unique)
 
     y = 70
     for i, (name, val) in enumerate(c["categories"]):
-        y = add(f"cat{i}", 6, y, val, "kept", CATEGORY_SHORT.get(name, name)) + 9
+        y = add(f"cat{i}", 6, y, val, "kept", CATEGORY_SHORT.get(name, name), supp) + 9
 
     for p in c["platforms"]:
         done = c["processed_counts"][p]
@@ -248,12 +261,13 @@ def build_div3(c):
     def h(v):
         return max(v * k, MIN_NODE_H)
 
+    supp = (c["n_supp"], "supplement posts")
     nodes = {"supp": dict(col=0, x=COLUMN_X[0], y=70, val=c["n_supp"], h=h(c["n_supp"]),
-                          cls="kept", label="Mentions supplements")}
+                          cls="kept", label="Mentions supplements", base=supp)}
     y = 70
     for i, (name, val) in enumerate(c["targets"]):
         nodes[f"tgt{i}"] = dict(col=1, x=COLUMN_X[5], y=y, val=val, h=h(val),
-                                cls="kept", label=TARGET_SHORT.get(name, name))
+                                cls="kept", label=TARGET_SHORT.get(name, name), base=supp)
         y += h(val) + 9
     flows = [("supp", f"tgt{i}", val, "kept") for i, (_, val) in enumerate(c["targets"])]
     return nodes, ribbon_paths(nodes, flows, k)
@@ -272,13 +286,18 @@ def svg_open(nodes, title, extra_h=40):
 def svg_flows_nodes(s, c, nodes, paths):
     for p in paths:
         sv, dv = nodes[p["src"]], nodes[p["dst"]]
-        pct = p["val"] / sv["val"] * 100
-        tip = f'{sv["label"]} → {dv["label"]}: {fmt(p["val"])} posts ({pct:.1f}%)'
+        share = p["val"] / sv["val"] * 100
+        tip = f'{sv["label"]} → {dv["label"]}: {fmt(p["val"])} posts ({share:.1f}%)'
         s.append(f'<path d="{p["d"]}" class="flow f-{p["cls"]}" data-tip="{tip}"/>')
     for n in nodes.values():
-        tip = f'{n["label"]}: {fmt(n["val"])} ({n["val"] / c["total_links"] * 100:.1f}% of search links)'
+        tip = f'{n["label"]}: {fmt(n["val"])} ({pct(n)} of {n["base"][1]})'
         s.append(f'<rect x="{n["x"]}" y="{n["y"]:.1f}" width="{NODE_WIDTH}" height="{n["h"]:.1f}" '
                  f'rx="2" class="node n-{n["cls"]}" data-tip="{tip}"/>')
+
+
+def pct(n):
+    """A node's count as a percentage of its base (e.g. a category as a share of all supplement posts)."""
+    return f'{n["val"] / n["base"][0] * 100:.1f}%'
 
 
 def right_label(s, n, halo=False):
@@ -286,18 +305,26 @@ def right_label(s, n, halo=False):
     cy = n["y"] + n["h"] / 2 + 4
     label = n["label"].replace("&", "&amp;")
     s.append(f'<text x="{n["x"] + NODE_WIDTH + 8}" y="{cy:.1f}" class="{cls}">'
-             f'<tspan class="ncount-inline">{fmt(n["val"])}</tspan>  {label}</text>')
+             f'<tspan class="ncount-inline">{fmt(n["val"])} ({pct(n)})</tspan>  {label}</text>')
+
+
+def stage_heading(s, x, anchor, name, sub):
+    """A stage's name (one or two lines, ending at the usual heading line) and its count beneath."""
+    lines = name.upper().split("\n")
+    for i, line in enumerate(lines):
+        s.append(f'<text x="{x}" y="{28 - 15 * (len(lines) - 1 - i)}" text-anchor="{anchor}" class="stage">{line}</text>')
+    s.append(f'<text x="{x}" y="46" text-anchor="{anchor}" class="stagecount">{sub}</text>')
 
 
 def build_main_svg(c, nodes, paths):
     stage_headers = [
-        ("Google search", f"{fmt(c['total_links'])} links", 0),
+        (f"Google search\nto {DOWNLOAD_CUTOFF}", f"{fmt(c['total_links'])} links", 0),
         ("Download + LLM", f"{fmt(c['total_processed'])} kept", 1),
         ("Menopause screen", f"{fmt(c['n_meno'])} kept", 2),
         ("Deduplication", f"{fmt(c['n_uniq'])} kept", 3),
-        ("Division 1", "content type", 4),
+        ("Content type\nclassification", f"{fmt(c['n_uniq'])} posts", 4),
         ("Supplement screen", f"{fmt(c['n_supp'])} kept", 5),
-        ("Division 2", "primary category", 6),
+        ("Supplement category\nclassification", f"{fmt(c['n_supp'])} posts", 6),
     ]
     s, height = svg_open(nodes, (
         f'Sankey diagram: {fmt(c["total_links"])} Google search links filtered to '
@@ -312,8 +339,7 @@ def build_main_svg(c, nodes, paths):
             tx, anchor = COLUMN_X[col], "start"
         else:
             tx, anchor = COLUMN_X[col] + NODE_WIDTH / 2, "middle"
-        s.append(f'<text x="{tx}" y="28" text-anchor="{anchor}" class="stage">{name.upper()}</text>')
-        s.append(f'<text x="{tx}" y="46" text-anchor="{anchor}" class="stagecount">{sub}</text>')
+        stage_heading(s, tx, anchor, name, sub)
 
     svg_flows_nodes(s, c, nodes, paths)
 
@@ -321,7 +347,7 @@ def build_main_svg(c, nodes, paths):
         n = nodes[p]
         cy = n["y"] + n["h"] / 2
         s.append(f'<text x="{n["x"] - 10}" y="{cy - 3:.1f}" text-anchor="end" class="nlabel">{n["label"]}</text>')
-        s.append(f'<text x="{n["x"] - 10}" y="{cy + 14:.1f}" text-anchor="end" class="ncount">{fmt(n["val"])}</text>')
+        s.append(f'<text x="{n["x"] - 10}" y="{cy + 14:.1f}" text-anchor="end" class="ncount">{fmt(n["val"])} ({pct(n)})</text>')
 
     side_sinks = {"fail": ["not retrievable or", "not processed"],
                   "notmeno": ["not menopause-", "targeted"],
@@ -331,7 +357,7 @@ def build_main_svg(c, nodes, paths):
         n = nodes[nid]
         x = n["x"] + NODE_WIDTH + 8
         cy = n["y"] + min(n["h"] / 2, 30)
-        s.append(f'<text x="{x}" y="{cy - 2:.1f}" class="ncount halo">{fmt(n["val"])}</text>')
+        s.append(f'<text x="{x}" y="{cy - 2:.1f}" class="ncount halo">{fmt(n["val"])} ({pct(n)})</text>')
         for i, line in enumerate(lines):
             s.append(f'<text x="{x}" y="{cy + 13 + i * 13:.1f}" class="nlabel-sm halo">{line}</text>')
 
@@ -349,8 +375,7 @@ def build_div3_svg(c, nodes, paths):
         f'marketing/target group'))
     s.append(f'<text x="{COLUMN_X[0]}" y="28" class="stage">SUPPLEMENT POSTS</text>')
     s.append(f'<text x="{COLUMN_X[0]}" y="46" class="stagecount">{fmt(c["n_supp"])} posts</text>')
-    s.append(f'<text x="{COLUMN_X[5]}" y="28" class="stage">DIVISION 3</text>')
-    s.append(f'<text x="{COLUMN_X[5]}" y="46" class="stagecount">target group</text>')
+    stage_heading(s, COLUMN_X[5], "start", "Symptom target\nclassification", f'{fmt(c["n_supp"])} posts')
 
     svg_flows_nodes(s, c, nodes, paths)
 
@@ -381,10 +406,10 @@ def build_html(c, main_svg, div3_svg, all_paths, all_nodes):
 <tr><td>Download + LLM</td><td>Video retrieved by yt-dlp and processed by Nemotron&nbsp;3 Nano Omni; drops unretrievable links (most Instagram), audio-only files and processing failures</td><td class="num">{fmt(c['total_links'])}</td><td class="num">{fmt(c['total_processed'])}</td><td class="num">{fmt(c['total_links'] - c['total_processed'])}</td></tr>
 <tr><td>Menopause screen</td><td>LLM field <em>menopause</em> = True (post targets the supplement toward menopause-related symptoms)</td><td class="num">{fmt(c['total_processed'])}</td><td class="num">{fmt(c['n_meno'])}</td><td class="num">{fmt(c['n_not_meno'])}</td></tr>
 <tr><td>Deduplication</td><td>Same normalised title (≥ 15 chars) and duration across platforms; copy with most views kept</td><td class="num">{fmt(c['n_meno'])}</td><td class="num">{fmt(c['n_uniq'])}</td><td class="num">{fmt(c['n_dupes'])}</td></tr>
-<tr><td>Division 1 — content type</td><td>LLM classification: informative / marketing / other material (personal stories or anecdotes): {div1_summary}</td><td class="num">{fmt(c['n_uniq'])}</td><td class="num">{fmt(c['n_uniq'])}</td><td class="num">—</td></tr>
+<tr><td>Content type classification</td><td>LLM classification: informative / marketing / other material (personal stories or anecdotes): {div1_summary}</td><td class="num">{fmt(c['n_uniq'])}</td><td class="num">{fmt(c['n_uniq'])}</td><td class="num">—</td></tr>
 <tr><td>Supplement screen</td><td>Post names at least one supplement; the {fmt(c['n_no_supp'])} without are retained separately as symptom-and-experience posts</td><td class="num">{fmt(c['n_uniq'])}</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">{fmt(c['n_no_supp'])}</td></tr>
-<tr><td>Division 2 — primary supplement category</td><td>The post's primary status category, assigned by the LLM from the whole video per the team's nine-category coding framework plus foods; posts without a usable answer go to the manual review queue</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">—</td></tr>
-<tr><td>Division 3 — target group</td><td>The post's primary marketing/target group, assigned by the LLM from the whole video (several different symptom areas count as general / multisymptom). A separate division of the same {fmt(c['n_supp'])} posts, not a sub-level of Division 2 (second figure)</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">—</td></tr>
+<tr><td>Supplement category classification</td><td>The post's primary status category, assigned by the LLM from the whole video per the team's nine-category coding framework plus foods; posts without a usable answer go to the manual review queue</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">—</td></tr>
+<tr><td>Symptom target classification</td><td>The post's primary marketing/target group, assigned by the LLM from the whole video (several different symptom areas count as general / multisymptom). A separate division of the same {fmt(c['n_supp'])} posts, not a sub-level of Division 2 (second figure)</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">{fmt(c['n_supp'])}</td><td class="num">—</td></tr>
 """
 
     return f'''<!doctype html>
@@ -471,19 +496,19 @@ summary:focus-visible {{ outline: 2px solid var(--accent); outline-offset: 2px; 
 <div class="wrap">
 <header>
 <h1>Menopause Supplement Pipeline</h1>
-<p class="meta">How <strong>{fmt(c["total_links"])}</strong> Google search results become <strong>{fmt(c["n_supp"])}</strong> unique menopause-targeted posts that mention supplements, divided by content type (Division&nbsp;1), primary supplement category (Division&nbsp;2) and target group (Division&nbsp;3). Counts as of {today}.</p>
+<p class="meta">How <strong>{fmt(c["total_links"])}</strong> Google search results become <strong>{fmt(c["n_supp"])}</strong> unique menopause-targeted posts that mention supplements, classified by content type, supplement category and symptom target. Search links are those collected by {DOWNLOAD_CUTOFF}, the last update before the videos were downloaded; counts as of {today}.</p>
 </header>
 
 <div class="figure">
 {main_svg}
 </div>
-<p class="figcaption">Figure 1 — the pipeline from search links through Division 1 (content type) and the supplement screen to Division 2 (primary supplement category).</p>
+<p class="figcaption">Figure 1 — the pipeline from search links through content type classification and the supplement screen to supplement category classification (primary supplement category).</p>
 
-<h2>Division 3 — marketing / target group</h2>
+<h2>Symptom target classification</h2>
 <div class="figure">
 {div3_svg}
 </div>
-<p class="figcaption">Figure 2 — the same {fmt(c["n_supp"])} supplement-mentioning posts divided by the marketed target. Per the MIMICS plan this is a separate division, not a sub-level of Division 2, so each post appears once in each figure's final column.</p>
+<p class="figcaption">Figure 2 — the same {fmt(c["n_supp"])} supplement-mentioning posts divided by the marketed target. Per the MIMICS plan this is a separate classification, not a sub-level of the supplement category classification, so each post appears once in each figure's final column.</p>
 
 <div id="tooltip" role="status"></div>
 
@@ -510,7 +535,7 @@ summary:focus-visible {{ outline: 2px solid var(--accent); outline-offset: 2px; 
 </div>
 </details>
 
-<p class="fineprint">Bands are proportional to post counts; nodes smaller than {min_visible} posts are drawn at a {MIN_NODE_H}px minimum so they stay visible. The post-level data behind every node is exported to <code>data/pipeline_stages.xlsx</code> — its recipes sheet states the exact filter that reproduces each number here. Division 2 and 3 use the primary status category and target group the LLM assigns each post after watching it. Generated by <code>src/generate_sankey.py</code> from <code>data/supplements.csv</code> (search links), <code>data/supplements_LLM_results.xlsx</code> (LLM output), <code>src/clean_supplements.py</code> (parsing the LLM's category and target coding) and <code>src/analyze_data.py</code> (platform filter and deduplication).</p>
+<p class="fineprint">Bands are proportional to post counts; nodes smaller than {min_visible} posts are drawn at a {MIN_NODE_H}px minimum so they stay visible. The post-level data behind every node is exported to <code>data/pipeline_stages.xlsx</code> — its recipes sheet states the exact filter that reproduces each number here. The supplement category and symptom target classifications use the primary status category and target group the LLM assigns each post after watching it. Percentages are of each stage's input (e.g. a category as a share of all supplement posts). Generated by <code>src/generate_sankey.py</code> from <code>data/supplements_links_at_download.csv</code> (the search links collected by {DOWNLOAD_CUTOFF}, the last update before the videos were downloaded), <code>data/supplements_LLM_results.xlsx</code> (LLM output), <code>src/clean_supplements.py</code> (parsing the LLM's category and target coding) and <code>src/analyze_data.py</code> (platform filter and deduplication).</p>
 </div>
 
 <script>
@@ -552,7 +577,7 @@ def write_stages_workbook(c):
     ]
     uniq_mask = stages["menopause_targeted"] & (stages["cross_platform_duplicate"] == False)
     for label, val in c["div1"]:
-        recipes.append((f"Division 1: {label}",
+        recipes.append((f"Content type: {label}",
                         f"unique posts & division1_content_type == '{label}'",
                         int((uniq_mask & (stages["division1_content_type"] == label)).sum())))
     recipes.append(("Mentions supplements", "in_final_supplement_set == True",
@@ -560,11 +585,11 @@ def write_stages_workbook(c):
     recipes.append(("No supplements mentioned", "unique posts & ~mentions_supplements",
                     int((uniq_mask & ~stages["mentions_supplements"]).sum())))
     for name, val in c["categories"]:
-        recipes.append((f"Division 2: {CATEGORY_SHORT.get(name, name)}",
+        recipes.append((f"Supplement category: {CATEGORY_SHORT.get(name, name)}",
                         f"division2_primary_category == '{name}'",
                         int((stages["division2_primary_category"] == name).sum())))
     for name, val in c["targets"]:
-        recipes.append((f"Division 3: {TARGET_SHORT.get(name, name)}",
+        recipes.append((f"Symptom target: {TARGET_SHORT.get(name, name)}",
                         f"division3_primary_target == '{name}'",
                         int((stages["division3_primary_target"] == name).sum())))
     recipes_df = pd.DataFrame(recipes, columns=["Sankey node", "Filter on posts sheet", "Posts"])
